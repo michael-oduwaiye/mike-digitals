@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MichaelStack Telecoms — Admin</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap');
+  :root {
+    --bg: #0A0E1A; --bg-card: #121729; --border: #232B45;
+    --amber: #FFB627; --green: #3DDC97; --red: #FF6B6B;
+    --text: #E8EAF0; --text-muted: #8B93A7; --text-faint: #4E5670;
+    --font-display: 'Space Grotesk', sans-serif; --font-body: 'Inter', sans-serif; --font-mono: 'JetBrains Mono', monospace;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: var(--font-body); min-height: 100vh; }
+  .wrap { max-width: 900px; margin: 0 auto; padding: 28px 18px 60px; }
+
+  .login-screen { max-width: 340px; margin: 100px auto; text-align: center; }
+  .login-screen h1 { font-family: var(--font-display); font-size: 22px; margin-bottom: 20px; }
+  .login-screen input {
+    width: 100%; background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px;
+    padding: 13px 14px; color: var(--text); font-family: var(--font-mono); margin-bottom: 12px; outline: none;
+  }
+  .login-screen input:focus { border-color: var(--amber); }
+  .login-screen button {
+    width: 100%; background: var(--amber); color: #1A1200; border: none; border-radius: 10px;
+    padding: 13px; font-family: var(--font-display); font-weight: 700; cursor: pointer;
+  }
+  .login-error { color: var(--red); font-size: 13px; margin-top: 10px; }
+  .server-url-hint { color: var(--text-faint); font-size: 11px; margin-top: 18px; line-height: 1.5; }
+
+  header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+  header h1 { font-family: var(--font-display); font-size: 20px; }
+  .refresh-btn {
+    background: var(--bg-card); border: 1px solid var(--border); color: var(--text-muted);
+    border-radius: 8px; padding: 8px 14px; font-size: 13px; cursor: pointer;
+  }
+  .refresh-btn:hover { color: var(--text); border-color: var(--amber); }
+
+  .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 24px; }
+  .summary-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; }
+  .summary-card .label { font-size: 11px; color: var(--text-faint); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; }
+  .summary-card .value { font-family: var(--font-mono); font-size: 20px; font-weight: 600; }
+  .summary-card.profit .value { color: var(--green); }
+  .summary-card.review .value { color: var(--red); }
+
+  .section-title { font-family: var(--font-display); font-size: 15px; color: var(--text-muted); margin-bottom: 10px; }
+
+  .order-row {
+    background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px;
+    padding: 14px 16px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; gap: 12px;
+  }
+  .order-row.flagged { border-color: var(--red); background: rgba(255,107,107,0.06); }
+  .order-info { flex: 1; min-width: 0; }
+  .order-plan { font-family: var(--font-mono); font-size: 14px; font-weight: 600; }
+  .order-meta { font-size: 12px; color: var(--text-faint); margin-top: 3px; }
+  .order-right { text-align: right; flex-shrink: 0; }
+  .order-profit { font-family: var(--font-mono); font-size: 14px; color: var(--green); }
+  .order-status {
+    display: inline-block; font-size: 10.5px; padding: 3px 8px; border-radius: 6px; margin-top: 4px;
+    font-family: var(--font-mono);
+  }
+  .status-delivered { background: rgba(61,220,151,0.12); color: var(--green); }
+  .status-pending { background: rgba(255,182,39,0.12); color: var(--amber); }
+  .status-failed, .status-partial { background: rgba(255,107,107,0.12); color: var(--red); }
+
+  .empty-state { text-align: center; padding: 60px 20px; color: var(--text-faint); }
+</style>
+</head>
+<body>
+
+<div id="loginScreen" class="login-screen">
+  <h1>MichaelStack Admin</h1>
+  <input type="text" id="serverUrlInput" placeholder="Server URL (e.g. https://xxxx.ngrok.io)" />
+  <input type="password" id="passwordInput" placeholder="Admin password" />
+  <button onclick="login()">View Dashboard</button>
+  <div id="loginError" class="login-error"></div>
+  <div class="server-url-hint">This is your backend's public URL — from ngrok while testing, or your real domain once deployed. Nothing is stored after you close this page.</div>
+</div>
+
+<div id="dashboard" class="wrap" style="display:none;">
+  <header>
+    <h1>MichaelStack Telecoms — Admin</h1>
+    <button class="refresh-btn" onclick="loadData()">↻ Refresh</button>
+  </header>
+
+  <div class="summary-grid" id="summaryGrid"></div>
+
+  <div class="section-title">Orders needing your attention</div>
+  <div id="flaggedOrders"></div>
+
+  <div class="section-title" style="margin-top:20px;">Recent orders</div>
+  <div id="ordersList"></div>
+</div>
+
+<script>
+let SERVER_URL = "";
+let PASSWORD = "";
+
+function login() {
+  SERVER_URL = document.getElementById("serverUrlInput").value.trim().replace(/\/$/, "");
+  PASSWORD = document.getElementById("passwordInput").value;
+  if (!SERVER_URL || !PASSWORD) {
+    document.getElementById("loginError").textContent = "Enter both server URL and password.";
+    return;
+  }
+  loadData();
+}
+
+function fmtNaira(n) {
+  return "₦" + Number(n).toLocaleString("en-NG");
+}
+
+function timeAgo(iso) {
+  const diff = (Date.now() - new Date(iso)) / 1000;
+  if (diff < 60) return "just now";
+  if (diff < 3600) return Math.floor(diff / 60) + "m ago";
+  if (diff < 86400) return Math.floor(diff / 3600) + "h ago";
+  return Math.floor(diff / 86400) + "d ago";
+}
+
+async function loadData() {
+  const errEl = document.getElementById("loginError");
+  errEl.textContent = "";
+  try {
+    const headers = { "x-admin-password": PASSWORD, "ngrok-skip-browser-warning": "true" };
+    const [summaryRes, ordersRes] = await Promise.all([
+      fetch(`${SERVER_URL}/api/admin/summary`, { headers }),
+      fetch(`${SERVER_URL}/api/admin/orders`, { headers }),
+    ]);
+    if (summaryRes.status === 401 || ordersRes.status === 401) {
+      errEl.textContent = "Wrong password, or server not reachable.";
+      return;
+    }
+    const summary = await summaryRes.json();
+    const orders = await ordersRes.json();
+
+    document.getElementById("loginScreen").style.display = "none";
+    document.getElementById("dashboard").style.display = "block";
+
+    renderSummary(summary);
+    renderOrders(orders);
+  } catch (e) {
+    errEl.textContent = "Couldn't reach server. Check the URL and that your server is running.";
+  }
+}
+
+function renderSummary(s) {
+  const grid = document.getElementById("summaryGrid");
+  grid.innerHTML = `
+    <div class="summary-card"><div class="label">Total Orders</div><div class="value">${s.totalOrders}</div></div>
+    <div class="summary-card"><div class="label">Delivered</div><div class="value">${s.deliveredOrders}</div></div>
+    <div class="summary-card"><div class="label">Revenue</div><div class="value">${fmtNaira(s.totalRevenue)}</div></div>
+    <div class="summary-card profit"><div class="label">Profit</div><div class="value">${fmtNaira(s.totalProfit)}</div></div>
+    <div class="summary-card review"><div class="label">Needs Review</div><div class="value">${s.needsManualReview}</div></div>
+  `;
+}
+
+function orderRowHtml(o) {
+  const statusClass = "status-" + (o.fulfillmentStatus || "pending").replace("not_started", "pending");
+  return `
+    <div class="order-row ${o.needsManualReview ? "flagged" : ""}">
+      <div class="order-info">
+        <div class="order-plan">${o.size} · ${(o.network || "").toUpperCase()} · ${o.mobileNumber}</div>
+        <div class="order-meta">${timeAgo(o.createdAt)} · ${o.paystackReference}</div>
+      </div>
+      <div class="order-right">
+        <div class="order-profit">+${fmtNaira(o.profit)}</div>
+        <div class="order-status ${statusClass}">${(o.fulfillmentStatus || "pending").replace("_", " ")}</div>
+      </div>
+    </div>
+  `;
+}
+
+function renderOrders(orders) {
+  const flagged = orders.filter((o) => o.needsManualReview);
+  const flaggedEl = document.getElementById("flaggedOrders");
+  flaggedEl.innerHTML = flagged.length
+    ? flagged.map(orderRowHtml).join("")
+    : `<div class="empty-state" style="padding:20px;">Nothing needs attention right now.</div>`;
+
+  const listEl = document.getElementById("ordersList");
+  listEl.innerHTML = orders.length
+    ? orders.slice(0, 30).map(orderRowHtml).join("")
+    : `<div class="empty-state">No orders yet. Once your first customer pays, it'll show up here.</div>`;
+}
+</script>
+
+</body>
+</html>
