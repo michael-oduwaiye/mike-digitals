@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MichaelStack Telecoms — Cheap Data, Delivered Instantly</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+  :root {
+    --bg: #0A0E1A;
+    --bg-card: #121729;
+    --bg-card-hover: #171E36;
+    --border: #232B45;
+    --amber: #FFB627;
+    --amber-dim: #997219;
+    --green: #3DDC97;
+    --text: #E8EAF0;
+    --text-muted: #8B93A7;
+    --text-faint: #4E5670;
+    --radius: 14px;
+    --font-display: 'Space Grotesk', sans-serif;
+    --font-body: 'Inter', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  }
+
+  .wrap { max-width: 780px; margin: 0 auto; padding: 32px 20px 80px; }
+
+  /* ---------- HERO ---------- */
+  header.hero {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 40px;
+  }
+  .brand { display: flex; align-items: center; gap: 10px; }
+  .brand-bars { display: flex; align-items: flex-end; gap: 3px; height: 22px; }
+  .brand-bars span {
+    width: 4px; background: var(--amber); border-radius: 2px;
+    animation: pulse 1.6s ease-in-out infinite;
+  }
+  .brand-bars span:nth-child(1) { height: 8px; animation-delay: 0s; }
+  .brand-bars span:nth-child(2) { height: 14px; animation-delay: 0.15s; }
+  .brand-bars span:nth-child(3) { height: 20px; animation-delay: 0.3s; }
+  .brand-bars span:nth-child(4) { height: 12px; animation-delay: 0.45s; }
+  @keyframes pulse {
+    0%, 100% { opacity: 0.5; transform: scaleY(0.85); }
+    50% { opacity: 1; transform: scaleY(1); }
+  }
+  .brand-name { font-family: var(--font-display); font-weight: 700; font-size: 18px; letter-spacing: -0.02em; line-height: 1.1; }
+  .brand-sub { font-family: var(--font-mono); font-weight: 500; font-size: 10px; letter-spacing: 0.14em; color: var(--amber); line-height: 1.2; margin-top: 1px; }
+  .wallet-pill {
+    font-family: var(--font-mono); font-size: 13px; color: var(--text-muted);
+    border: 1px solid var(--border); padding: 6px 14px; border-radius: 100px;
+  }
+
+  .hero-copy { margin-bottom: 36px; }
+  .hero-copy h1 {
+    font-family: var(--font-display); font-weight: 700; font-size: 34px;
+    line-height: 1.15; letter-spacing: -0.02em; margin-bottom: 10px;
+  }
+  .hero-copy h1 em { color: var(--amber); font-style: normal; }
+  .hero-copy p { color: var(--text-muted); font-size: 15px; max-width: 46ch; }
+
+  /* ---------- NETWORK TOGGLE (signature element) ---------- */
+  .network-toggle {
+    display: flex; gap: 10px; margin-bottom: 28px;
+  }
+  .network-btn {
+    flex: 1; display: flex; align-items: center; justify-content: center; gap: 10px;
+    background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 16px; cursor: pointer; transition: border-color 0.2s, background 0.2s;
+    font-family: var(--font-display); font-weight: 600; font-size: 15px; color: var(--text-muted);
+  }
+  .network-btn:hover { background: var(--bg-card-hover); }
+  .network-btn.active { border-color: var(--amber); color: var(--text); background: var(--bg-card-hover); }
+  .sig-bars { display: flex; align-items: flex-end; gap: 2px; height: 16px; }
+  .sig-bars i { width: 3px; background: var(--text-faint); border-radius: 1px; display: block; }
+  .network-btn.active .sig-bars i { background: var(--amber); }
+  .sig-bars i:nth-child(1) { height: 6px; }
+  .sig-bars i:nth-child(2) { height: 10px; }
+  .sig-bars i:nth-child(3) { height: 13px; }
+  .sig-bars i:nth-child(4) { height: 16px; }
+
+  /* ---------- PLAN GRID ---------- */
+  .plan-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 12px; margin-bottom: 8px;
+  }
+  .plan-card {
+    background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 18px 16px; cursor: pointer; transition: transform 0.15s, border-color 0.15s, background 0.15s;
+    position: relative;
+  }
+  .plan-card:hover { transform: translateY(-2px); border-color: var(--amber-dim); background: var(--bg-card-hover); }
+  .plan-size { font-family: var(--font-display); font-weight: 700; font-size: 22px; }
+  .plan-validity { color: var(--text-faint); font-size: 12px; margin-top: 2px; margin-bottom: 10px; }
+  .plan-price { font-family: var(--font-mono); font-weight: 600; font-size: 16px; color: var(--green); }
+
+  .plan-card-top { display: flex; align-items: flex-start; justify-content: space-between; position: relative; }
+  .info-icon {
+    width: 18px; height: 18px; border-radius: 50%; border: 1px solid var(--text-faint);
+    background: none; color: var(--text-faint); font-family: var(--font-mono); font-size: 11px;
+    font-style: italic; cursor: pointer; flex-shrink: 0; line-height: 1;
+    display: flex; align-items: center; justify-content: center; transition: border-color 0.15s, color 0.15s;
+  }
+  .info-icon:hover { border-color: var(--amber); color: var(--amber); }
+  .combo-badge {
+    display: inline-block; font-size: 10.5px; color: var(--amber); background: rgba(255,182,39,0.1);
+    border: 1px solid var(--amber-dim); border-radius: 6px; padding: 3px 7px; margin-bottom: 10px;
+    line-height: 1.4;
+  }
+  .tooltip-bubble {
+    position: absolute; top: 24px; right: 0; z-index: 5; width: 210px;
+    background: #060810; border: 1px solid var(--amber-dim); border-radius: 10px;
+    padding: 12px; font-size: 12px; line-height: 1.5; color: var(--text); font-family: var(--font-body);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+  }
+
+  /* ---------- CHECKOUT PANEL ---------- */
+  .overlay {
+    position: fixed; inset: 0; background: rgba(6, 8, 15, 0.75);
+    display: none; align-items: center; justify-content: center; padding: 20px; z-index: 10;
+    backdrop-filter: blur(4px);
+  }
+  .overlay.show { display: flex; }
+  .sheet {
+    background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px;
+    padding: 28px; width: 100%; max-width: 380px;
+  }
+  .sheet-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
+  .sheet-head h2 { font-family: var(--font-display); font-size: 20px; }
+  .sheet-head .close {
+    cursor: pointer; color: var(--text-muted); font-size: 28px; line-height: 1;
+    background: none; border: none; padding: 4px 8px; border-radius: 8px;
+    transition: color 0.15s, background 0.15s;
+  }
+  .sheet-head .close:hover { color: var(--text); background: rgba(255,255,255,0.06); }
+  .sheet-summary {
+    display: flex; justify-content: space-between; align-items: center;
+    background: rgba(255,182,39,0.06); border: 1px solid var(--amber-dim);
+    border-radius: 10px; padding: 12px 14px; margin-bottom: 20px;
+  }
+  .sheet-summary .sz { font-family: var(--font-display); font-weight: 700; }
+  .sheet-summary .pr { font-family: var(--font-mono); color: var(--amber); font-weight: 600; }
+
+  label { display: block; font-size: 13px; color: var(--text-muted); margin-bottom: 6px; }
+  input[type=tel] {
+    width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 10px;
+    padding: 13px 14px; color: var(--text); font-family: var(--font-mono); font-size: 15px;
+    margin-bottom: 18px; outline: none; transition: border-color 0.15s;
+  }
+  input[type=tel]:focus { border-color: var(--amber); }
+
+  .pay-methods { display: flex; gap: 8px; margin-bottom: 8px; }
+  .pay-methods-note { font-size: 11.5px; color: var(--text-faint); margin-bottom: 20px; line-height: 1.5; }
+  .pay-methods button {
+    flex: 1; background: var(--bg); border: 1px solid var(--border); border-radius: 10px;
+    padding: 10px 8px; color: var(--text-muted); font-size: 12px; font-family: var(--font-body);
+    cursor: pointer; transition: border-color 0.15s, color 0.15s;
+  }
+  .pay-methods button.active { border-color: var(--green); color: var(--text); }
+
+  .pay-btn {
+    width: 100%; background: var(--amber); color: #1A1200; border: none; border-radius: 10px;
+    padding: 15px; font-family: var(--font-display); font-weight: 700; font-size: 15px;
+    cursor: pointer; transition: filter 0.15s;
+  }
+  .pay-btn:hover { filter: brightness(1.08); }
+  .pay-btn:disabled { opacity: 0.6; cursor: wait; }
+
+  .state-view { text-align: center; padding: 10px 0; }
+  .spinner {
+    width: 36px; height: 36px; border: 3px solid var(--border); border-top-color: var(--amber);
+    border-radius: 50%; margin: 10px auto 18px; animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .state-view p { color: var(--text-muted); font-size: 14px; }
+
+  .success-icon {
+    width: 48px; height: 48px; border-radius: 50%; background: rgba(61,220,151,0.12);
+    display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;
+    color: var(--green); font-size: 22px;
+  }
+  .success-msg {
+    background: var(--bg); border: 1px solid var(--border); border-radius: 10px;
+    padding: 14px; font-size: 13px; color: var(--text-muted); text-align: left;
+    font-family: var(--font-mono); line-height: 1.6; margin-top: 16px;
+  }
+  .done-btn {
+    width: 100%; background: transparent; border: 1px solid var(--border); color: var(--text);
+    border-radius: 10px; padding: 13px; font-family: var(--font-body); font-weight: 500;
+    margin-top: 18px; cursor: pointer;
+  }
+
+  .demo-note {
+    margin-top: 40px; padding: 14px 16px; border: 1px dashed var(--border); border-radius: 10px;
+    color: var(--text-faint); font-size: 12.5px; line-height: 1.6;
+  }
+  .demo-note b { color: var(--text-muted); }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="hero">
+    <div class="brand">
+      <div class="brand-bars"><span></span><span></span><span></span><span></span></div>
+      <div>
+        <div class="brand-name">MichaelStack</div>
+        <div class="brand-sub">TELECOMS</div>
+      </div>
+    </div>
+  </header>
+
+  <div class="hero-copy">
+    <h1>Cheap data,<br><em>delivered in seconds.</em></h1>
+    <p>Pick a network, enter the number, pay — the data lands before the receipt does.</p>
+  </div>
+
+  <div class="network-toggle" id="networkToggle">
+    <button class="network-btn active" data-network="mtn">
+      <span class="sig-bars"><i></i><i></i><i></i><i></i></span> MTN
+    </button>
+    <button class="network-btn" data-network="glo">
+      <span class="sig-bars"><i></i><i></i><i></i><i></i></span> Glo
+    </button>
+  </div>
+
+  <div class="plan-grid" id="planGrid"></div>
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="sheet" id="sheet"></div>
+</div>
+
+<script>
+// SET THIS to your backend's current public URL (ngrok while testing,
+// your real domain once deployed). Update this any time your ngrok URL
+// changes (it changes every time you restart ngrok on the free plan).
+const BACKEND_URL = window.location.origin;
+
+const plans = {
+  mtn: [
+    { id: "mtn-1gb-1d", size: "1GB", validity: "1 day", price: 270 },
+    { id: "mtn-1gb-2d", size: "1GB", validity: "2 days", price: 400 },
+    { id: "mtn-1gb-7d", size: "1GB", validity: "7 days", price: 500 },
+    { id: "mtn-5gb-14d", size: "5GB", validity: "14 days", price: 1400 },
+    { id: "mtn-6gb-7d", size: "6GB", validity: "14d + 7d", price: 2000, combo: "5GB · 14 days", comboExtra: "1GB · 7 days",
+      tooltip: "Delivered as two bundles sent together: 5GB valid for 14 days, plus 1GB valid for 7 days. The extra 1GB expires first — your 5GB stays active for the full 14 days." },
+    { id: "mtn-10gb-14d", size: "10GB", validity: "14 days", price: 2800, combo: "2 × 5GB · 14 days",
+      tooltip: "Delivered as two 5GB bundles sent together, both valid for 14 days — same expiry across the full 10GB." },
+    { id: "mtn-15gb-14d", size: "15GB", validity: "14 days", price: 3800, combo: "3 × 5GB · 14 days",
+      tooltip: "Delivered as three 5GB bundles sent together, all valid for 14 days — same expiry across the full 15GB." },
+    { id: "mtn-20gb-14d", size: "20GB", validity: "14 days", price: 4800, combo: "4 × 5GB · 14 days",
+      tooltip: "Delivered as four 5GB bundles sent together, all valid for 14 days — same expiry across the full 20GB." },
+  ],
+  glo: [
+    { id: "glo-1gb-3d", size: "1GB", validity: "3 days", price: 300 },
+    { id: "glo-1gb-7d", size: "1GB", validity: "7 days", price: 330 },
+    { id: "glo-3gb-3d", size: "3GB", validity: "3 days", price: 900 },
+    { id: "glo-5gb-3d", size: "5GB", validity: "3 days", price: 1550 },
+    { id: "glo-10gb-7d", size: "10GB", validity: "7 days", price: 2000 },
+    { id: "glo-200mb-14d", size: "45MB", validity: "1 day", price: 60 },
+  ]
+};
+
+let currentNetwork = "mtn";
+let selectedPaymentMethod = "bank_transfer";
+
+function fmtNaira(n) {
+  return "₦" + n.toLocaleString("en-NG", { minimumFractionDigits: n % 1 === 0 ? 0 : 1 });
+}
+
+function renderPlans() {
+  const grid = document.getElementById("planGrid");
+  grid.innerHTML = "";
+  plans[currentNetwork].forEach(plan => {
+    const card = document.createElement("div");
+    card.className = "plan-card";
+    const infoIcon = plan.tooltip
+      ? `<button class="info-icon" data-tooltip="${plan.tooltip.replace(/"/g, '&quot;')}" onclick="event.stopPropagation(); toggleTooltip(this)">i</button>`
+      : "";
+    const comboBadge = plan.combo
+      ? `<div class="combo-badge">${plan.combo}${plan.comboExtra ? " + " + plan.comboExtra : ""}</div>`
+      : "";
+    card.innerHTML = `
+      <div class="plan-card-top">
+        <div class="plan-size">${plan.size}</div>
+        ${infoIcon}
+      </div>
+      <div class="plan-validity">${plan.validity} validity</div>
+      ${comboBadge}
+      <div class="plan-price">${fmtNaira(plan.price)}</div>
+    `;
+    card.onclick = () => openCheckout(plan);
+    grid.appendChild(card);
+  });
+}
+
+function toggleTooltip(btn) {
+  document.querySelectorAll(".tooltip-bubble").forEach(t => t.remove());
+  const bubble = document.createElement("div");
+  bubble.className = "tooltip-bubble";
+  bubble.textContent = btn.dataset.tooltip;
+  btn.parentElement.appendChild(bubble);
+  setTimeout(() => {
+    document.addEventListener("click", function handler(e) {
+      if (!bubble.contains(e.target) && e.target !== btn) {
+        bubble.remove();
+        document.removeEventListener("click", handler);
+      }
+    });
+  }, 0);
+}
+
+document.querySelectorAll(".network-btn").forEach(btn => {
+  btn.onclick = () => {
+    document.querySelectorAll(".network-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    currentNetwork = btn.dataset.network;
+    renderPlans();
+  };
+});
+
+function openCheckout(plan) {
+  const overlay = document.getElementById("overlay");
+  const sheet = document.getElementById("sheet");
+  overlay.classList.add("show");
+  sheet.innerHTML = `
+    <div class="sheet-head">
+      <h2>Confirm order</h2>
+      <button class="close" onclick="closeCheckout()">&times;</button>
+    </div>
+    <div class="sheet-summary">
+      <div>
+        <div class="sz">${plan.size} · ${currentNetwork.toUpperCase()}</div>
+        <div style="color:var(--text-faint);font-size:12px;margin-top:2px;">${plan.validity} validity</div>
+      </div>
+      <div class="pr">${fmtNaira(plan.price)}</div>
+    </div>
+    <label for="mobileInput">Recipient's phone number</label>
+    <input type="tel" id="mobileInput" placeholder="080XXXXXXXX" oninput="this.value = this.value.replace(/\D/g, '').slice(0, 11)" />
+    <label>Pay with</label>
+    <div class="pay-methods">
+      <button class="active" data-m="bank_transfer">Bank Transfer</button>
+      <button data-m="card">Card</button>
+    </div>
+    <div class="pay-methods-note">Bank Transfer works from any bank app — including Opay, PalmPay, and Moniepoint.</div>
+    <button class="pay-btn" id="payBtn" onclick="startPayment('${plan.id}', ${plan.price}, '${plan.size}')">
+      Pay ${fmtNaira(plan.price)}
+    </button>
+  `;
+  selectedPaymentMethod = "bank_transfer";
+  sheet.querySelectorAll(".pay-methods button").forEach(b => {
+    b.onclick = () => {
+      sheet.querySelectorAll(".pay-methods button").forEach(x => x.classList.remove("active"));
+      b.classList.add("active");
+      selectedPaymentMethod = b.dataset.m;
+    };
+  });
+}
+
+function closeCheckout() {
+  document.getElementById("overlay").classList.remove("show");
+}
+
+async function startPayment(planId, price, size) {
+  const mobile = document.getElementById("mobileInput").value.trim();
+  if (mobile.length < 11) {
+    document.getElementById("mobileInput").style.borderColor = "#FF6B6B";
+    return;
+  }
+  const sheet = document.getElementById("sheet");
+  sheet.innerHTML = `
+    <div class="state-view">
+      <div class="spinner"></div>
+      <p>Creating your order…</p>
+    </div>
+  `;
+
+  try {
+    const res = await fetch(`${BACKEND_URL}/api/orders`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "ngrok-skip-browser-warning": "true",
+      },
+      body: JSON.stringify({ planId, mobileNumber: mobile, paymentMethod: selectedPaymentMethod }),
+    });
+    const data = await res.json();
+
+    if (!res.ok) {
+      sheet.innerHTML = `
+        <div class="state-view">
+          <p style="color:var(--red);">${data.error || "Something went wrong. Please try again."}</p>
+          <button class="done-btn" onclick="closeCheckout()">Close</button>
+        </div>
+      `;
+      return;
+    }
+
+    // Redirect the customer to the real Paystack checkout page to pay.
+    window.location.href = data.checkoutUrl;
+  } catch (err) {
+    sheet.innerHTML = `
+      <div class="state-view">
+        <p style="color:var(--red);">Couldn't reach the server. Check your connection and try again.</p>
+        <button class="done-btn" onclick="closeCheckout()">Close</button>
+      </div>
+    `;
+  }
+}
+
+renderPlans();
+</script>
+
+</body>
+</html>

@@ -23,6 +23,7 @@ const statusRouter = require("./routes/status");
 const app = express();
 
 app.use(cors());
+app.use(express.static("public"));
 
 // NOTE: webhooks.js applies its own express.json() with raw-body capture
 // (needed for Paystack signature verification), so we don't apply a global
@@ -34,13 +35,7 @@ app.use("/", webhooksRouter);
 app.use("/", statusRouter);
 app.use("/api/admin", adminRouter);
 
-app.get("/", (req, res) => {
-  res.json({
-    status: "ok",
-    service: "MichaelStack Telecoms backend",
-    endpoints: ["/health", "/api/orders", "/webhooks/paystack", "/webhooks/gladtidings"],
-  });
-});
+
 
 app.get("/health", (req, res) => res.json({ status: "ok" }));
 
