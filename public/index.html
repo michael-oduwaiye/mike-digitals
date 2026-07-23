@@ -250,7 +250,7 @@
 // SET THIS to your backend's current public URL (ngrok while testing,
 // your real domain once deployed). Update this any time your ngrok URL
 // changes (it changes every time you restart ngrok on the free plan).
-const BACKEND_URL = "https://michael-stack-telecoms.onrender.com";
+const BACKEND_URL = "";
 
 const plans = {
   mtn: [
@@ -396,7 +396,7 @@ async function startPayment(planId, price, size) {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "ngrok-skip-browser-warning": "true",
+		  // No need for "ngrok-skip-browser-warning" on Render
       },
       body: JSON.stringify({ planId, mobileNumber: mobile, paymentMethod: selectedPaymentMethod }),
     });
