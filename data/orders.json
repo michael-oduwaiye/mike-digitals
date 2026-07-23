@@ -1,0 +1,258 @@
+[
+  {
+    "id": "4aWN020sugUo",
+    "planId": "mtn-1gb-1d",
+    "network": "mtn",
+    "size": "1GB",
+    "validity": "1 day",
+    "mobileNumber": "08012345678",
+    "sellingPrice": 270,
+    "wholesaleCost": 215,
+    "profit": 55,
+    "paystackReference": "mst_4aWN020sugUo",
+    "paymentStatus": "paid",
+    "fulfillmentStatus": "failed",
+    "createdAt": "2026-07-18T15:41:26.357Z",
+    "paidAt": "2026-07-18T15:47:02.817Z",
+    "updatedAt": "2026-07-18T15:47:04.875Z",
+    "fulfillmentResults": [
+      {
+        "dataId": 789,
+        "success": false,
+        "raw": {
+          "detail": "Invalid token."
+        },
+        "error": "Request failed with status code 401"
+      }
+    ],
+    "needsManualReview": true
+  },
+  {
+    "id": "3fiZPAGsZmJB",
+    "planId": "mtn-1gb-1d",
+    "network": "mtn",
+    "size": "1GB",
+    "validity": "1 day",
+    "mobileNumber": "08012345678",
+    "sellingPrice": 270,
+    "wholesaleCost": 215,
+    "profit": 55,
+    "paystackReference": "mst_3fiZPAGsZmJB",
+    "paymentStatus": "paid",
+    "fulfillmentStatus": "failed",
+    "createdAt": "2026-07-18T15:59:05.819Z",
+    "paidAt": "2026-07-18T15:59:56.558Z",
+    "updatedAt": "2026-07-18T15:59:57.632Z",
+    "fulfillmentResults": [
+      {
+        "dataId": 789,
+        "success": false,
+        "raw": {
+          "detail": "Invalid token."
+        },
+        "error": "Request failed with status code 401"
+      }
+    ],
+    "needsManualReview": true
+  },
+  {
+    "id": "pF8tHP6y8Q-c",
+    "planId": "mtn-1gb-1d",
+    "network": "mtn",
+    "size": "1GB",
+    "validity": "1 day",
+    "mobileNumber": "08012345678",
+    "sellingPrice": 270,
+    "wholesaleCost": 215,
+    "profit": 55,
+    "paystackReference": "mst_pF8tHP6y8Q-c",
+    "paymentStatus": "pending",
+    "fulfillmentStatus": "not_started",
+    "createdAt": "2026-07-18T17:02:46.372Z"
+  },
+  {
+    "id": "UEAXVNk9Dvnw",
+    "planId": "glo-200mb-14d",
+    "network": "glo",
+    "size": "200MB",
+    "validity": "14 days",
+    "mobileNumber": "09150964586",
+    "sellingPrice": 100,
+    "wholesaleCost": 82,
+    "profit": 18,
+    "paystackReference": "mst_UEAXVNk9Dvnw",
+    "paymentStatus": "paid",
+    "fulfillmentStatus": "failed",
+    "createdAt": "2026-07-18T18:17:25.379Z",
+    "paidAt": "2026-07-18T18:20:13.761Z",
+    "updatedAt": "2026-07-18T18:20:15.692Z",
+    "fulfillmentResults": [
+      {
+        "dataId": 333,
+        "success": false,
+        "raw": {
+          "detail": "Invalid token."
+        },
+        "error": "Request failed with status code 401"
+      }
+    ],
+    "needsManualReview": true
+  },
+  {
+    "id": "-VDi_FVQGBEu",
+    "planId": "glo-200mb-14d",
+    "network": "glo",
+    "size": "200MB",
+    "validity": "14 days",
+    "mobileNumber": "09150964586",
+    "sellingPrice": 100,
+    "wholesaleCost": 82,
+    "profit": 18,
+    "paystackReference": "mst_-VDi_FVQGBEu",
+    "paymentStatus": "paid",
+    "fulfillmentStatus": "failed",
+    "createdAt": "2026-07-18T19:23:13.614Z",
+    "paidAt": "2026-07-18T19:24:20.446Z",
+    "updatedAt": "2026-07-18T19:24:21.404Z",
+    "fulfillmentResults": [
+      {
+        "dataId": 333,
+        "success": false,
+        "raw": {
+          "detail": "Invalid token."
+        },
+        "error": "Request failed with status code 401"
+      }
+    ],
+    "needsManualReview": true
+  },
+  {
+    "id": "g9i0MIxNGHgA",
+    "planId": "glo-200mb-14d",
+    "network": "glo",
+    "size": "200MB",
+    "validity": "14 days",
+    "mobileNumber": "09150964586",
+    "sellingPrice": 100,
+    "wholesaleCost": 82,
+    "profit": 18,
+    "paystackReference": "mst_g9i0MIxNGHgA",
+    "paymentStatus": "paid",
+    "fulfillmentStatus": "failed",
+    "createdAt": "2026-07-18T19:34:40.015Z",
+    "paidAt": "2026-07-18T19:35:01.514Z",
+    "updatedAt": "2026-07-18T19:35:08.278Z",
+    "fulfillmentResults": [
+      {
+        "dataId": 333,
+        "success": false,
+        "raw": {
+          "detail": "Invalid token."
+        },
+        "error": "Request failed with status code 401"
+      }
+    ],
+    "needsManualReview": true
+  },
+  {
+    "id": "2mNKvMMdRSGi",
+    "planId": "glo-200mb-14d",
+    "network": "glo",
+    "size": "200MB",
+    "validity": "14 days",
+    "mobileNumber": "09150964586",
+    "sellingPrice": 100,
+    "wholesaleCost": 82,
+    "profit": 18,
+    "paystackReference": "mst_2mNKvMMdRSGi",
+    "paymentStatus": "paid",
+    "fulfillmentStatus": "failed",
+    "createdAt": "2026-07-18T19:41:00.373Z",
+    "paidAt": "2026-07-18T19:41:11.245Z",
+    "updatedAt": "2026-07-18T19:42:25.656Z",
+    "fulfillmentResults": [
+      {
+        "dataId": 333,
+        "success": false,
+        "raw": null,
+        "error": "read ETIMEDOUT"
+      }
+    ],
+    "needsManualReview": true
+  },
+  {
+    "id": "IOUqD0DOUMUw",
+    "planId": "glo-200mb-14d",
+    "network": "glo",
+    "size": "200MB",
+    "validity": "14 days",
+    "mobileNumber": "09150964586",
+    "sellingPrice": 100,
+    "wholesaleCost": 82,
+    "profit": 18,
+    "paystackReference": "mst_IOUqD0DOUMUw",
+    "paymentStatus": "paid",
+    "fulfillmentStatus": "failed",
+    "createdAt": "2026-07-18T19:44:08.444Z",
+    "paidAt": "2026-07-18T19:47:06.114Z",
+    "updatedAt": "2026-07-18T19:47:06.920Z",
+    "fulfillmentResults": [
+      {
+        "dataId": 333,
+        "success": false,
+        "raw": {
+          "error": [
+            "You can't purchase this plan due to insufficient GLO CORPORATE GIFTING DATA BUCKET BALANCE or insufficient wallet balance, pls fund your GLO CORPORATE GIFTING DATA BUCKET or main wallet to retry"
+          ]
+        },
+        "error": "Request failed with status code 400"
+      }
+    ],
+    "needsManualReview": true
+  },
+  {
+    "id": "K9BNoVLF98FS",
+    "planId": "glo-200mb-14d",
+    "network": "glo",
+    "size": "45MB",
+    "validity": "1 days",
+    "mobileNumber": "09053765281",
+    "sellingPrice": 60,
+    "wholesaleCost": 46.5,
+    "profit": 13.5,
+    "paystackReference": "mst_K9BNoVLF98FS",
+    "paymentStatus": "paid",
+    "fulfillmentStatus": "delivered",
+    "createdAt": "2026-07-19T13:41:22.812Z",
+    "paidAt": "2026-07-19T13:41:54.670Z",
+    "updatedAt": "2026-07-19T13:41:58.360Z",
+    "fulfillmentResults": [
+      {
+        "dataId": 574,
+        "success": true,
+        "raw": {
+          "id": 171570137,
+          "ident": "Data9f54ecf6a-385",
+          "network": 2,
+          "balance_before": "185.72560000000033",
+          "payment_medium": "MAIN WALLET",
+          "balance_after": "139.22560000000033",
+          "mobile_number": "09053765281",
+          "plan_type": "SME",
+          "duration": "1 day",
+          "plan": 574,
+          "client_ip": "197.211.52.73",
+          "Status": "successful",
+          "api_response": "You have successfully gifted N50 45MB 1 Day to 09053765281. ref: 2026071914535087403274126",
+          "plan_network": "GLO",
+          "plan_name": "45MB",
+          "plan_amount": "46.5",
+          "create_date": "2026-07-19T14:41:55.899918",
+          "Ported_number": true,
+          "customer_reference": ""
+        }
+      }
+    ],
+    "deliveredAt": "2026-07-19T13:41:58.359Z"
+  }
+]

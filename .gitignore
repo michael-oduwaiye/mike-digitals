@@ -5,7 +5,7 @@
 node_modules/
 
 # Local order data (contains customer phone numbers — don't publish this)
-data/orders.json
+# data/orders.json
 
 # OS/editor junk
 .DS_Store
