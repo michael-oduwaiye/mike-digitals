@@ -37,10 +37,9 @@ router.post("/orders", async (req, res) => {
 		      const email = customerEmail || `${paystackReference}@michaelstacktelecoms.com`;
 
 		      const channelMap = {
-				        bank_transfer: ["bank_transfer"],
 				        card: ["card"],
 				      };
-		      const channels = channelMap[paymentMethod] || ["card", "bank_transfer"];
+		      const channels = channelMap[paymentMethod]; // undefined for bank_transfer - no restriction applied
 
 		      const { authorizationUrl, accessCode } = await initializeTransaction({
 				        email,
