@@ -22,7 +22,7 @@ router.get("/payment-complete", (req, res) => {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Order Status — MichaelStack Telecoms</title>
+<title>Order Status — Mike Digitals</title>
 <style>
   body {
     background: #0A0E1A; color: #E8EAF0; font-family: -apple-system, sans-serif;
@@ -100,7 +100,7 @@ router.get("/payment-complete", (req, res) => {
           '<p>This is taking longer than usual. If you were charged, your data will still arrive shortly.</p>' +
           '<div class="btn-row">' +
             '<a href="/" class="btn-primary">Return to Store</a>' +
-            '<a href="' + whatsappLink('Hello MichaelStack Telecoms, my payment (ref: ' + reference + ') is still processing after a while. Please check on it.') + '" class="btn-secondary" target="_blank">Chat on WhatsApp</a>' +
+            '<a href="' + whatsappLink('Hello Mike Digitals, my payment (ref: ' + reference + ') is still processing after a while. Please check on it.') + '" class="btn-secondary" target="_blank">Chat on WhatsApp</a>' +
           '</div>' +
           referenceBlock();
       }
@@ -113,7 +113,7 @@ router.get("/payment-complete", (req, res) => {
         card.innerHTML =
           '<div class="icon success">🎉</div>' +
           '<h1 class="success">Payment Successful</h1>' +
-          '<p>' + order.size + ' has been delivered to ' + order.mobileNumber + '.<br>Thank you for choosing MichaelStack Telecoms.</p>' +
+          '<p>' + order.size + ' has been delivered to ' + order.mobileNumber + '.<br>Thank you for choosing Mike Digitals.</p>' +
           '<div class="btn-row">' +
             '<a href="/" class="btn-primary">Buy Another Data Plan</a>' +
           '</div>' +
@@ -126,7 +126,7 @@ router.get("/payment-complete", (req, res) => {
           '<p>Your payment went through successfully. We\\'re currently resolving a delivery issue on our end — you do not need to pay again.</p>' +
           '<div class="btn-row">' +
             '<a href="/" class="btn-primary">Return to Store</a>' +
-            '<a href="' + whatsappLink('Hello MichaelStack Telecoms, my payment was successful (ref: ' + reference + ') but my order has not been delivered yet.') + '" class="btn-secondary" target="_blank">Chat on WhatsApp</a>' +
+            '<a href="' + whatsappLink('Hello Mike Digitals, my payment was successful (ref: ' + reference + ') but my order has not been delivered yet.') + '" class="btn-secondary" target="_blank">Chat on WhatsApp</a>' +
           '</div>' +
           referenceBlock();
 

@@ -1,4 +1,4 @@
-# MichaelStack Telecoms — Backend
+# Mike Digitals — Backend
 
 This is the backend server that connects your storefront to Paystack (payment
 collection) and Gladtidings (data delivery). It's the piece that makes orders
@@ -44,7 +44,7 @@ npm start
 
 You should see:
 ```
-MichaelStack Telecoms backend running on port 3000
+Mike Digitals backend running on port 3000
 ```
 
 ## Wiring up webhooks (important — do this before testing real payments)

@@ -1,7 +1,7 @@
 {
   "name": "michaelstack-backend",
   "version": "1.0.0",
-  "description": "Backend server for MichaelStack Telecoms — connects the storefront to Paystack (payment collection) and Gladtidings (data delivery).",
+  "description": "Backend server for Mike Digitals — connects the storefront to Paystack (payment collection) and Gladtidings (data delivery).",
   "main": "server.js",
   "type": "commonjs",
   "scripts": {

@@ -41,7 +41,7 @@ app.get("/health", (req, res) => res.json({ status: "ok" }));
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`MichaelStack Telecoms backend running on port ${PORT}`);
+  console.log(`Mike Digitals backend running on port ${PORT}`);
   if (!process.env.GLADTIDINGS_TOKEN) {
     console.warn("⚠️  GLADTIDINGS_TOKEN is not set — data delivery will fail until you add it to .env");
   }
