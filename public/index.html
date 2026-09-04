@@ -378,51 +378,60 @@ function closeCheckout() {
 }
 
 async function startPayment(planId, price, size) {
-  const mobile = document.getElementById("mobileInput").value.trim();
-  if (mobile.length < 11) {
-    document.getElementById("mobileInput").style.borderColor = "#FF6B6B";
-    return;
-  }
-  const sheet = document.getElementById("sheet");
-  sheet.innerHTML = `
-    <div class="state-view">
-      <div class="spinner"></div>
-      <p>Creating your order…</p>
-    </div>
-  `;
+	  const mobile = document.getElementById("mobileInput").value.trim();
+	  if (mobile.length < 11) {
+										    document.getElementById("mobileInput").style.borderColor = "#FF6B6B";
+										    return;
+										  }
+										  const sheet = document.getElementById("sheet");
+										  sheet.innerHTML = `
+										    <div class="state-view">
+	      <div class="spinner"></div>
+	      <p>Creating your order…</p>
+	      <p style="font-size:12px;color:var(--text-faint);margin-top:6px;">This can take up to 30 seconds if our server just woke up.</p>
+	      <button class="done-btn" onclick="closeCheckout()" style="margin-top:16px;">Cancel</button>
+	    </div>
+	  `;
 
-  try {
-    const res = await fetch(`${BACKEND_URL}/api/orders`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-		  // No need for "ngrok-skip-browser-warning" on Render
-      },
-      body: JSON.stringify({ planId, mobileNumber: mobile, paymentMethod: selectedPaymentMethod }),
-    });
-    const data = await res.json();
+	  const controller = new AbortController();
+	  const timeoutId = setTimeout(() => controller.abort(), 25000);
 
-    if (!res.ok) {
-      sheet.innerHTML = `
-        <div class="state-view">
-          <p style="color:var(--red);">${data.error || "Something went wrong. Please try again."}</p>
-          <button class="done-btn" onclick="closeCheckout()">Close</button>
-        </div>
-      `;
-      return;
-    }
-
-    // Redirect the customer to the real Paystack checkout page to pay.
-    window.location.href = data.checkoutUrl;
-  } catch (err) {
-    sheet.innerHTML = `
-      <div class="state-view">
-        <p style="color:var(--red);">Couldn't reach the server. Check your connection and try again.</p>
-        <button class="done-btn" onclick="closeCheckout()">Close</button>
-      </div>
-    `;
-  }
+	  try {
+		      const res = await fetch(`${BACKEND_URL}/api/orders`, {
+				        method: "POST",
+				        headers: {
+							        "Content-Type": "application/json",
+							      },
+				        body: JSON.stringify({ planId, mobileNumber: mobile, paymentMethod: selectedPaymentMethod }),
+				        signal: controller.signal,
+				      });
+		      clearTimeout(timeoutId);
+		      const data = await res.json();
+		      if (!res.ok) {
+				        sheet.innerHTML = `
+				          <div class="state-view">
+				            <p style="color:var(--red);">${data.error || "Something went wrong. Please try again."}</p>
+				            <button class="done-btn" onclick="closeCheckout()">Close</button>
+				          </div>
+				        `;
+				        return;
+				      }
+		      // Redirect the customer to the real Paystack checkout page to pay.
+			      window.location.href = data.checkoutUrl;
+		    } catch (err) {
+				    clearTimeout(timeoutId);
+				    const message = err.name === "AbortError"
+				      ? "This is taking longer than expected. Please check your connection and try again."
+				      : "Couldn't reach the server. Check your connection and try again.";
+				    sheet.innerHTML = `
+				      <div class="state-view">
+				        <p style="color:var(--red);">${message}</p>
+				        <button class="done-btn" onclick="closeCheckout()">Close</button>
+				      </div>
+				    `;
+				  }
 }
+
 
 renderPlans();
 </script>
