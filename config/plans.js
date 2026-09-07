@@ -74,7 +74,7 @@ const PLANS = [
     network: "glo",
     size: "3GB",
     validity: "3 days",
-    sellingPrice: 1300,
+    sellingPrice: 1100,
     fulfillment: [{ dataId: 633, wholesaleCost: 1005 }],
   },
   {
