@@ -21,13 +21,6 @@
  * needs to change.
  */
 
-/**
- * config/plans.js
- *
- * Single source of truth for the plans currently sold by MichaelStack Telecoms.
- * Fulfillment is handled through the Gladtidings wholesale API.
- */
-
 const NETWORK_IDS = {
   mtn: 1,
   glo: 2,
@@ -92,6 +85,55 @@ const PLANS = [
     validity: "1 day",
     sellingPrice: 50,
     fulfillment: [{ dataId: 574, wholesaleCost: 46.5 }],
+  },
+  // ---------------- NEW GLO PLANS ----------------
+  {
+    id: "glo-500mb-1d",
+    network: "glo",
+    size: "500MB",
+    validity: "1 day",
+    sellingPrice: 100,
+    fulfillment: [{ dataId: 810, wholesaleCost: 96 }],
+  },
+  {
+    id: "glo-1gb-1d",
+    network: "glo",
+    size: "1GB",
+    validity: "1 day",
+    sellingPrice: 200,
+    fulfillment: [{ dataId: 811, wholesaleCost: 195 }],
+  },
+  {
+    id: "glo-1gb-30d",
+    network: "glo",
+    size: "1GB",
+    validity: "30 days",
+    sellingPrice: 450,
+    fulfillment: [{ dataId: 334, wholesaleCost: 400 }],
+  },
+  {
+    id: "glo-1.5gb-1d",
+    network: "glo",
+    size: "1.5GB",
+    validity: "1 day",
+    sellingPrice: 300,
+    fulfillment: [{ dataId: 492, wholesaleCost: 290 }],
+  },
+  {
+    id: "glo-6gb-1d",
+    network: "glo",
+    size: "6GB",
+    validity: "1 day",
+    sellingPrice: 900,
+    fulfillment: [{ dataId: 813, wholesaleCost: 873 }],
+  },
+  {
+    id: "glo-335mb-social-7d",
+    network: "glo",
+    size: "335MB",
+    validity: "7 days",
+    sellingPrice: 100,
+    fulfillment: [{ dataId: 863, wholesaleCost: 90 }],
   },
 ];
 
