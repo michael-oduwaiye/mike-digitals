@@ -11,9 +11,13 @@
  *   GET  /api/admin/*             - admin dashboard data (password protected)
  */
 
+const dns = require("dns");
+dns.setServers(["8.8.8.8"]);
+
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
+const mongoose = require("mongoose");
 
 const ordersRouter = require("./routes/orders");
 const webhooksRouter = require("./routes/webhooks");
@@ -40,12 +44,30 @@ app.use("/api/admin", adminRouter);
 app.get("/health", (req, res) => res.json({ status: "ok" }));
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Mike Digitals backend running on port ${PORT}`);
-  if (!process.env.GLADTIDINGS_TOKEN) {
-    console.warn("⚠️  GLADTIDINGS_TOKEN is not set — data delivery will fail until you add it to .env");
-  }
-  if (!process.env.PAYSTACK_SECRET_KEY) {
-    console.warn("⚠️  PAYSTACK_SECRET_KEY is not set — payments will fail until you add it to .env");
-  }
-});
+
+// Connect to MongoDB before starting the server. If this fails, the server
+// won't start — better to fail loudly at boot than to silently accept
+// orders that can never be saved.
+if (!process.env.MONGODB_URI) {
+  console.error("❌ MONGODB_URI is not set — cannot start without a database connection.");
+  process.exit(1);
+}
+
+mongoose
+  .connect(process.env.MONGODB_URI)
+  .then(() => {
+    console.log("✅ Connected to MongoDB");
+    app.listen(PORT, () => {
+      console.log(`Mike Digitals backend running on port ${PORT}`);
+      if (!process.env.GLADTIDINGS_TOKEN) {
+        console.warn("⚠️  GLADTIDINGS_TOKEN is not set — data delivery will fail until you add it to .env");
+      }
+      if (!process.env.PAYSTACK_SECRET_KEY) {
+        console.warn("⚠️  PAYSTACK_SECRET_KEY is not set — payments will fail until you add it to .env");
+      }
+    });
+  })
+  .catch((err) => {
+    console.error("❌ MongoDB connection failed:", err.message);
+    process.exit(1);
+  });

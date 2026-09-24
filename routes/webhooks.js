@@ -56,7 +56,7 @@ router.post("/webhooks/paystack", express.json({
   if (event.event !== "charge.success") return;
 
   const reference = event.data.reference;
-  const order = db.findByReference(reference);
+  const order = await db.findByReference(reference);
   if (!order) {
     console.warn(`Webhook received for unknown order reference: ${reference}`);
     return;
@@ -69,38 +69,38 @@ router.post("/webhooks/paystack", express.json({
   // Double-check with Paystack directly rather than trusting the webhook body alone.
   const verification = await verifyTransaction(reference);
   if (verification.status !== "success") {
-    db.updateOrder(order.id, { paymentStatus: "failed" });
+    await db.updateOrder(order.id, { paymentStatus: "failed" });
     return;
   }
 
-  db.updateOrder(order.id, { paymentStatus: "paid", paidAt: new Date().toISOString() });
+  await db.updateOrder(order.id, { paymentStatus: "paid", paidAt: new Date().toISOString() });
 
   // Payment confirmed — now deliver the data.
   const plan = getPlanById(order.planId);
   if (!plan) {
     console.error(`Cannot fulfill order ${order.id}: plan ${order.planId} no longer exists in config.`);
-    db.updateOrder(order.id, { fulfillmentStatus: "failed", fulfillmentError: "Plan config missing." });
+    await db.updateOrder(order.id, { fulfillmentStatus: "failed", fulfillmentError: "Plan config missing." });
     return;
   }
 
   try {
     const result = await fulfillPlan(plan, order.mobileNumber);
     if (result.fullySuccessful) {
-      db.updateOrder(order.id, {
+      await db.updateOrder(order.id, {
         fulfillmentStatus: "delivered",
         fulfillmentResults: result.results,
         deliveredAt: new Date().toISOString(),
       });
     } else if (result.partiallyDelivered) {
       // Customer got SOME data but not all — needs manual follow-up.
-      db.updateOrder(order.id, {
+      await db.updateOrder(order.id, {
         fulfillmentStatus: "partial",
         fulfillmentResults: result.results,
         needsManualReview: true,
       });
       console.error(`⚠️  Order ${order.id} PARTIALLY delivered — needs manual follow-up.`);
     } else {
-      db.updateOrder(order.id, {
+      await db.updateOrder(order.id, {
         fulfillmentStatus: "failed",
         fulfillmentResults: result.results,
         needsManualReview: true,
@@ -109,7 +109,7 @@ router.post("/webhooks/paystack", express.json({
     }
   } catch (err) {
     console.error(`Error fulfilling order ${order.id}:`, err.message);
-    db.updateOrder(order.id, { fulfillmentStatus: "failed", fulfillmentError: err.message, needsManualReview: true });
+    await db.updateOrder(order.id, { fulfillmentStatus: "failed", fulfillmentError: err.message, needsManualReview: true });
   }
 });
 

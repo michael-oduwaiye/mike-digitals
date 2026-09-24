@@ -27,13 +27,13 @@ function requireAdminPassword(req, res, next) {
 
 router.use(requireAdminPassword);
 
-router.get("/orders", (req, res) => {
-  const orders = db.readAll().sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+router.get("/orders", async (req, res) => {
+  const orders = (await db.readAll()).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
   res.json(orders);
 });
 
-router.get("/summary", (req, res) => {
-  const orders = db.readAll();
+router.get("/summary", async (req, res) => {
+  const orders = await db.readAll();
   const delivered = orders.filter((o) => o.fulfillmentStatus === "delivered");
   const totalRevenue = delivered.reduce((sum, o) => sum + o.sellingPrice, 0);
   const totalCost = delivered.reduce((sum, o) => sum + o.wholesaleCost, 0);

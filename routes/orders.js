@@ -49,7 +49,7 @@ router.post("/orders", async (req, res) => {
 				        channels,
 				      });
 
-		      db.createOrder({
+		      await db.createOrder({
 				        id: orderId,
 				        planId: plan.id,
 				        network: plan.network,
@@ -75,14 +75,14 @@ router.post("/orders", async (req, res) => {
 				  }
 });
 
-router.get("/orders/by-reference/:ref", (req, res) => {
-	  const order = db.findByReference(req.params.ref);
+router.get("/orders/by-reference/:ref", async (req, res) => {
+	  const order = await db.findByReference(req.params.ref);
 	  if (!order) return res.status(404).json({ error: "Order not found." });
 	  res.json(order);
 });
 
-router.get("/orders/:id", (req, res) => {
-	  const order = db.findById(req.params.id);
+router.get("/orders/:id", async (req, res) => {
+	  const order = await db.findById(req.params.id);
 	  if (!order) return res.status(404).json({ error: "Order not found." });
 	  res.json(order);
 });
