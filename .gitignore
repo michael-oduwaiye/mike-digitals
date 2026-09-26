@@ -1,5 +1,6 @@
 # Never commit real secrets
 .env
+cookies.txt
 
 # Dependencies (reinstalled via npm install, no need to store in git)
 node_modules/
