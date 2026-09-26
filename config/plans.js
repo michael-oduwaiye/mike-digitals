@@ -37,6 +37,15 @@ const PLANS = [
     fulfillment: [{ dataId: 861, wholesaleCost: 380 }],
   },
 
+  {
+    id: "mtn-5gb-cg-30d",
+    network: "mtn",
+    size: "5GB",
+    validity: "30 days",
+    sellingPrice: 1600,
+    fulfillment: [{ dataId: 447, wholesaleCost: 1450 }],
+  },
+
   // ---------------- GLO ----------------
   {
     id: "glo-1gb-3d",
