@@ -23,6 +23,7 @@ const ordersRouter = require("./routes/orders");
 const webhooksRouter = require("./routes/webhooks");
 const adminRouter = require("./routes/admin");
 const statusRouter = require("./routes/status");
+const whatsappRouter = require("./routes/whatsapp");
 
 const app = express();
 
@@ -36,6 +37,7 @@ app.use("/api", express.json());
 
 app.use("/api", ordersRouter);
 app.use("/", webhooksRouter);
+app.use("/", whatsappRouter);
 app.use("/", statusRouter);
 app.use("/api/admin", adminRouter);
 
