@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Mike Digitals — Admin</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
@@ -338,14 +339,17 @@ function fmtNaira(n) {
   return "₦" + Number(n).toLocaleString("en-NG");
 }
 
-function timeAgo(iso) {
-  const diff = (Date.now() - new Date(iso)) / 1000;
-
-  if (diff < 60) return "just now";
-  if (diff < 3600) return Math.floor(diff / 60) + "m ago";
-  if (diff < 86400) return Math.floor(diff / 3600) + "h ago";
-
-  return Math.floor(diff / 86400) + "d ago";
+function formatDateTime(iso) {
+  return new Intl.DateTimeFormat("en-NG", {
+    timeZone: "Africa/Lagos",
+    weekday: "long",
+    day: "numeric",
+    month: "numeric",
+    year: "2-digit",
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+  }).format(new Date(iso));
 }
 
 async function loadData() {
@@ -457,7 +461,7 @@ function orderRowHtml(o) {
         </div>
 
         <div class="order-meta">
-          ${timeAgo(o.createdAt)} · ${o.paystackReference}
+          ${formatDateTime(o.createdAt)} · ${o.paystackReference}
         </div>
       </div>
 
