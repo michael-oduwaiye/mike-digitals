@@ -27,8 +27,14 @@ const whatsappRouter = require("./routes/whatsapp");
 
 const app = express();
 
+app.use((req, res, next) => {
+  console.log(`🌍 REQUEST: ${req.method} ${req.url}`);
+  next();
+});
+
 app.use(cors());
 app.use(express.static("public"));
+app.use(express.json());
 
 // NOTE: webhooks.js applies its own express.json() with raw-body capture
 // (needed for Paystack signature verification), so we don't apply a global
