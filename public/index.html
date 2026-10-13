@@ -254,28 +254,15 @@
 // changes (it changes every time you restart ngrok on the free plan).
 const BACKEND_URL = "https://michael-stack-telecoms.onrender.com";
 
+
 const plans = {
-  mtn: [
-    { id: "mtn-1gb-7d", size: "1GB", validity: "7 days", price: 500 },
-    { id: "mtn-2.5gb-1d", size: "2.5GB", validity: "1 day", price: 800 },
-    { id: "mtn-5gb-cg-30d", size: "5GB", validity: "30 days", price: 1600 },
-  ],
-  glo: [
-    { id: "glo-45mb-1d", size: "45MB", validity: "1 day", price: 50 },
-    // ---------------- NEW GLO PLANS ---------------- 
-    { id: "glo-500mb-1d", size: "500MB", validity: "1 day", price: 100 }, 
-    { id: "glo-1gb-1d", size: "1GB", validity: "1 day", price: 200 }, 
-    { id: "glo-1.5gb-1d", size: "1.5GB", validity: "1 day", price: 300 }, 
-    { id: "glo-1gb-3d", size: "1GB", validity: "3 days", price: 360 },
-    { id: "glo-1gb-7d", size: "1GB", validity: "7 days", price: 380 },
-    { id: "glo-1gb-30d", size: "1GB", validity: "30 days", price: 450 }, 
-    { id: "glo-2.5gb-2d", size: "2.5GB", validity: "2 days", price: 500 },
-    { id: "glo-3gb-1d", size: "3GB", validity: "1 day", price: 600 },
-    { id: "glo-6gb-1d", size: "6GB", validity: "1 day", price: 900 }, 
-    { id: "glo-3gb-3d", size: "3GB", validity: "3 days", price: 1100 },
-    { id: "glo-10gb-7d", size: "10GB", validity: "7 days", price: 2000 },
-  ]
+  mtn: [],
+  glo: [],
 };
+
+let plansLoaded = false;
+let plansLoadError = false;
+
 
 let currentNetwork = "mtn";
 let selectedPaymentMethod = "bank_transfer";
@@ -284,18 +271,95 @@ function fmtNaira(n) {
   return "₦" + n.toLocaleString("en-NG", { minimumFractionDigits: n % 1 === 0 ? 0 : 1 });
 }
 
+
+async function loadPlans() {
+  const grid = document.getElementById("planGrid");
+  grid.textContent = "Loading data plans...";
+
+  try {
+    const response = await fetch(`${BACKEND_URL}/api/plans`);
+
+    if (!response.ok) {
+      throw new Error(`Plans request failed with status ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    if (!Array.isArray(data)) {
+      throw new Error("The plans response was not a valid list.");
+    }
+
+    plans.mtn = [];
+    plans.glo = [];
+
+    data.forEach(item => {
+      const network = String(item.network || "").toLowerCase();
+
+      if (!plans[network]) {
+        return;
+      }
+
+      const price = Number(item.sellingPrice);
+
+      if (
+        !item.id ||
+        !item.size ||
+        !item.validity ||
+        !Number.isFinite(price) ||
+        price < 0
+      ) {
+        return;
+      }
+
+      plans[network].push({
+        id: item.id,
+        size: item.size,
+        validity: item.validity,
+        price,
+      });
+    });
+
+    plansLoaded = true;
+    renderPlans();
+  } catch (error) {
+    console.error("Unable to load data plans:", error);
+    plansLoadError = true;
+    renderPlans();
+  }
+}
+
+
+
 function renderPlans() {
   const grid = document.getElementById("planGrid");
   grid.innerHTML = "";
-  plans[currentNetwork].forEach(plan => {
+
+  if (!plansLoaded) {
+    grid.textContent = plansLoadError
+      ? "Unable to load data plans. Please refresh the page and try again."
+      : "Loading data plans...";
+    return;
+  }
+
+  const networkPlans = plans[currentNetwork] || [];
+
+  if (networkPlans.length === 0) {
+    grid.textContent = "No data plans are currently available for this network.";
+    return;
+  }
+
+  networkPlans.forEach(plan => {
     const card = document.createElement("div");
     card.className = "plan-card";
+
     const infoIcon = plan.tooltip
       ? `<button class="info-icon" data-tooltip="${plan.tooltip.replace(/"/g, '&quot;')}" onclick="event.stopPropagation(); toggleTooltip(this)">i</button>`
       : "";
+
     const comboBadge = plan.combo
       ? `<div class="combo-badge">${plan.combo}${plan.comboExtra ? " + " + plan.comboExtra : ""}</div>`
       : "";
+
     card.innerHTML = `
       <div class="plan-card-top">
         <div class="plan-size">${plan.size}</div>
@@ -305,10 +369,12 @@ function renderPlans() {
       ${comboBadge}
       <div class="plan-price">${fmtNaira(plan.price)}</div>
     `;
+
     card.onclick = () => openCheckout(plan);
     grid.appendChild(card);
   });
 }
+
 
 function toggleTooltip(btn) {
   document.querySelectorAll(".tooltip-bubble").forEach(t => t.remove());
@@ -433,7 +499,7 @@ async function startPayment(planId, price, size) {
 }
 
 
-renderPlans();
+loadPlans();
 </script>
 
 </body>

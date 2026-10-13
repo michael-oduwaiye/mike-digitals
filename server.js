@@ -1,3 +1,4 @@
+
 /**
  * server.js
  *
@@ -18,8 +19,10 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
+const db = require("./lib/db");
 
 const ordersRouter = require("./routes/orders");
+const plansRouter = require("./routes/plans");
 const webhooksRouter = require("./routes/webhooks");
 const adminRouter = require("./routes/admin");
 const statusRouter = require("./routes/status");
@@ -40,13 +43,12 @@ app.use(express.static("public"));
 // json() before it. Apply it here for all OTHER routes instead.
 app.use("/api", express.json());
 
+app.use("/api", plansRouter);
 app.use("/api", ordersRouter);
 app.use("/", webhooksRouter);
 app.use("/", whatsappRouter);
 app.use("/", statusRouter);
 app.use("/api/admin", adminRouter);
-
-
 
 app.get("/health", (req, res) => res.json({ status: "ok" }));
 
@@ -56,21 +58,44 @@ const PORT = process.env.PORT || 3000;
 // won't start — better to fail loudly at boot than to silently accept
 // orders that can never be saved.
 if (!process.env.MONGODB_URI) {
-  console.error("❌ MONGODB_URI is not set — cannot start without a database connection.");
+  console.error(
+    "❌ MONGODB_URI is not set — cannot start without a database connection."
+  );
   process.exit(1);
 }
 
 mongoose
   .connect(process.env.MONGODB_URI)
-  .then(() => {
+  .then(async () => {
     console.log("✅ Connected to MongoDB");
+
+    // Add configured plans that are missing from MongoDB.
+    // Existing plan records will not be overwritten.
+    try {
+      const seedResult = await db.seedPlansFromConfig();
+
+      console.log(
+        `📦 Plan seeding complete: ${seedResult.added} plan(s) added.`
+      );
+    } catch (err) {
+      console.error("❌ Plan seeding failed:", err.message);
+      process.exit(1);
+      return;
+    }
+
     app.listen(PORT, () => {
       console.log(`Mike Digitals backend running on port ${PORT}`);
+
       if (!process.env.GLADTIDINGS_TOKEN) {
-        console.warn("⚠️  GLADTIDINGS_TOKEN is not set — data delivery will fail until you add it to .env");
+        console.warn(
+          "⚠️  GLADTIDINGS_TOKEN is not set — data delivery will fail until you add it to .env"
+        );
       }
+
       if (!process.env.PAYSTACK_SECRET_KEY) {
-        console.warn("⚠️  PAYSTACK_SECRET_KEY is not set — payments will fail until you add it to .env");
+        console.warn(
+          "⚠️  PAYSTACK_SECRET_KEY is not set — payments will fail until you add it to .env"
+        );
       }
     });
   })
