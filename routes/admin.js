@@ -138,6 +138,129 @@ function requireAdminSession(req, res, next) {
 
 router.use(requireAdminSession);
 
+
+/**
+ * GET /api/admin/plans
+ *
+ * Return existing plans and editable fields for the admin dashboard.
+ * Wholesale costs and provider details are not exposed.
+ */
+router.get("/plans", async (req, res) => {
+  try {
+    const plans = await db.readPlans();
+
+    res.setHeader("Cache-Control", "no-store");
+
+    return res.json(
+      plans.map((plan) => ({
+        id: plan.id,
+        network: plan.network,
+        size: plan.size,
+        validity: plan.validity,
+        sellingPrice: plan.sellingPrice,
+        enabled: plan.enabled === true,
+      }))
+    );
+  } catch (err) {
+    console.error("Error reading admin plans:", err.message);
+
+    return res.status(500).json({
+      error: "Unable to retrieve data plans.",
+    });
+  }
+});
+
+/**
+ * PATCH /api/admin/plans/:id
+ *
+ * Update only the selling price and enabled status.
+ */
+router.patch("/plans/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const body = req.body || {};
+    const allowedFields = ["sellingPrice", "enabled"];
+
+    const submittedFields = Object.keys(body);
+
+    if (
+      submittedFields.length === 0 ||
+      submittedFields.some((field) => !allowedFields.includes(field))
+    ) {
+      return res.status(400).json({
+        error: "Submit a sellingPrice, enabled status, or both.",
+      });
+    }
+
+    const updates = {};
+
+    if (Object.prototype.hasOwnProperty.call(body, "sellingPrice")) {
+      const price = body.sellingPrice;
+
+      if (
+        typeof price !== "number" ||
+        !Number.isFinite(price) ||
+        !Number.isInteger(price) ||
+        price < 1 ||
+        price > 1000000
+      ) {
+        return res.status(400).json({
+          error: "Selling price must be a whole number from ₦1 to ₦1,000,000.",
+        });
+      }
+
+      updates.sellingPrice = price;
+    }
+
+    if (Object.prototype.hasOwnProperty.call(body, "enabled")) {
+      if (typeof body.enabled !== "boolean") {
+        return res.status(400).json({
+          error: "Enabled must be true or false.",
+        });
+      }
+
+      updates.enabled = body.enabled;
+    }
+
+    const existingPlan = await db.findPlanById(id);
+
+    if (!existingPlan) {
+      return res.status(404).json({
+        error: "Data plan not found.",
+      });
+    }
+
+    const updatedPlan = await db.updatePlan(id, updates);
+
+    if (!updatedPlan) {
+      return res.status(404).json({
+        error: "Data plan not found.",
+      });
+    }
+
+    res.setHeader("Cache-Control", "no-store");
+
+    return res.json({
+      success: true,
+      plan: {
+        id: updatedPlan.id,
+        network: updatedPlan.network,
+        size: updatedPlan.size,
+        validity: updatedPlan.validity,
+        sellingPrice: updatedPlan.sellingPrice,
+        enabled: updatedPlan.enabled === true,
+      },
+    });
+  } catch (err) {
+    console.error("Error updating admin plan:", err.message);
+
+    return res.status(500).json({
+      error: "Unable to update data plan.",
+    });
+  }
+});
+
+
 router.get("/orders", async (req, res) => {
   const orders = (await db.readAll()).sort(
     (a, b) => new Date(b.createdAt) - new Date(a.createdAt)

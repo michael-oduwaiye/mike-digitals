@@ -2,6 +2,11 @@
 .env
 cookies.txt
 
+# LLM / Repomix export files
+repomix-output.xml
+repomix-output.txt
+repomix-output.*
+
 # Dependencies (reinstalled via npm install, no need to store in git)
 node_modules/
 
