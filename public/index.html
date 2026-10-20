@@ -8,22 +8,40 @@
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
+  /* ---------- PAYVESSEL-INSPIRED DARK THEME (DEFAULT) ---------- */
   :root {
-    --bg: #0A0E1A;
-    --bg-card: #121729;
-    --bg-card-hover: #171E36;
-    --border: #232B45;
-    --amber: #FFB627;
-    --amber-dim: #997219;
-    --green: #3DDC97;
-    --red: #FF6B6B; /* Error message */
-    --text: #E8EAF0;
-    --text-muted: #8B93A7;
-    --text-faint: #4E5670;
+    --bg: #09090B;               /* Rich sleek fintech black */
+    --bg-card: #121215;          /* Deep elevated card surface */
+    --bg-card-hover: #1A1A1F;    /* Smooth hover surface */
+    --border: #27272A;           /* Refined subtle border */
+    --amber: #FF6600;            /* Payvessel Signature Bright Orange */
+    --amber-dim: #C24E00;        /* Deep accent orange */
+    --green: #10B981;            /* Professional success green */
+    --red: #EF4444;              /* Clean error red */
+    --text: #FAFAFA;             /* Crisp bright off-white text */
+    --text-muted: #A1A1AA;       /* Clean muted grey */
+    --text-faint: #52525B;       /* Faint subtext grey */
+    --btn-text: #FFFFFF;
     --radius: 14px;
     --font-display: 'Space Grotesk', sans-serif;
     --font-body: 'Inter', sans-serif;
     --font-mono: 'JetBrains Mono', monospace;
+  }
+
+  /* ---------- PAYVESSEL-INSPIRED LIGHT THEME ---------- */
+  [data-theme="light"] {
+    --bg: #F8FAFC;               /* Clean crisp light background */
+    --bg-card: #FFFFFF;          /* Pure white card blocks */
+    --bg-card-hover: #FFF7ED;    /* Soft orange tint on hover */
+    --border: #E2E8F0;           /* Clean light border */
+    --amber: #FF6600;            /* Payvessel Signature Bright Orange */
+    --amber-dim: #E05A00;
+    --green: #10B981;
+    --red: #EF4444;
+    --text: #0F172A;             /* Deep slate-black text */
+    --text-muted: #64748B;       /* Professional slate-grey */
+    --text-faint: #94A3B8;
+    --btn-text: #FFFFFF;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -34,6 +52,7 @@
     font-family: var(--font-body);
     min-height: 100vh;
     -webkit-font-smoothing: antialiased;
+    transition: background 0.25s, color 0.25s;
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -42,7 +61,7 @@
 
   .wrap { max-width: 780px; margin: 0 auto; padding: 32px 20px 80px; }
 
-  /* ---------- HERO ---------- */
+  /* ---------- HERO & HEADER ---------- */
   header.hero {
     display: flex; align-items: center; justify-content: space-between;
     margin-bottom: 40px;
@@ -63,9 +82,26 @@
   }
   .brand-name { font-family: var(--font-display); font-weight: 700; font-size: 18px; letter-spacing: -0.02em; line-height: 1.1; }
   .brand-sub { font-family: var(--font-mono); font-weight: 500; font-size: 10px; letter-spacing: 0.14em; color: var(--amber); line-height: 1.2; margin-top: 1px; }
-  .wallet-pill {
-    font-family: var(--font-mono); font-size: 13px; color: var(--text-muted);
-    border: 1px solid var(--border); padding: 6px 14px; border-radius: 100px;
+
+  /* ---------- THEME TOGGLE BUTTON ---------- */
+  .theme-toggle-btn {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    padding: 8px 14px;
+    border-radius: 100px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: background 0.2s, border-color 0.2s, color 0.2s;
+  }
+  .theme-toggle-btn:hover {
+    border-color: var(--amber);
+    color: var(--text);
   }
 
   .hero-copy { margin-bottom: 36px; }
@@ -76,7 +112,7 @@
   .hero-copy h1 em { color: var(--amber); font-style: normal; }
   .hero-copy p { color: var(--text-muted); font-size: 15px; max-width: 46ch; }
 
-  /* ---------- NETWORK TOGGLE (signature element) ---------- */
+  /* ---------- NETWORK TOGGLE ---------- */
   .network-toggle {
     display: flex; gap: 10px; margin-bottom: 28px;
   }
@@ -120,20 +156,20 @@
   }
   .info-icon:hover { border-color: var(--amber); color: var(--amber); }
   .combo-badge {
-    display: inline-block; font-size: 10.5px; color: var(--amber); background: rgba(255,182,39,0.1);
+    display: inline-block; font-size: 10.5px; color: var(--amber); background: rgba(255,107,0,0.1);
     border: 1px solid var(--amber-dim); border-radius: 6px; padding: 3px 7px; margin-bottom: 10px;
     line-height: 1.4;
   }
   .tooltip-bubble {
     position: absolute; top: 24px; right: 0; z-index: 5; width: 210px;
-    background: #060810; border: 1px solid var(--amber-dim); border-radius: 10px;
+    background: var(--bg-card); border: 1px solid var(--amber-dim); border-radius: 10px;
     padding: 12px; font-size: 12px; line-height: 1.5; color: var(--text); font-family: var(--font-body);
-    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.25);
   }
 
   /* ---------- CHECKOUT PANEL ---------- */
   .overlay {
-    position: fixed; inset: 0; background: rgba(6, 8, 15, 0.75);
+    position: fixed; inset: 0; background: rgba(0, 0, 0, 0.55);
     display: none; align-items: center; justify-content: center; padding: 20px; z-index: 10;
     backdrop-filter: blur(4px);
   }
@@ -149,10 +185,10 @@
     background: none; border: none; padding: 4px 8px; border-radius: 8px;
     transition: color 0.15s, background 0.15s;
   }
-  .sheet-head .close:hover { color: var(--text); background: rgba(255,255,255,0.06); }
+  .sheet-head .close:hover { color: var(--text); background: rgba(150,150,150,0.1); }
   .sheet-summary {
     display: flex; justify-content: space-between; align-items: center;
-    background: rgba(255,182,39,0.06); border: 1px solid var(--amber-dim);
+    background: rgba(255,107,0,0.06); border: 1px solid var(--amber-dim);
     border-radius: 10px; padding: 12px 14px; margin-bottom: 20px;
   }
   .sheet-summary .sz { font-family: var(--font-display); font-weight: 700; }
@@ -176,7 +212,7 @@
   .pay-methods button.active { border-color: var(--green); color: var(--text); }
 
   .pay-btn {
-    width: 100%; background: var(--amber); color: #1A1200; border: none; border-radius: 10px;
+    width: 100%; background: var(--amber); color: var(--btn-text); border: none; border-radius: 10px;
     padding: 15px; font-family: var(--font-display); font-weight: 700; font-size: 15px;
     cursor: pointer; transition: filter 0.15s;
   }
@@ -192,7 +228,7 @@
   .state-view p { color: var(--text-muted); font-size: 14px; }
 
   .success-icon {
-    width: 48px; height: 48px; border-radius: 50%; background: rgba(61,220,151,0.12);
+    width: 48px; height: 48px; border-radius: 50%; background: rgba(16,185,129,0.12);
     display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;
     color: var(--green); font-size: 22px;
   }
@@ -225,6 +261,11 @@
         <div class="brand-sub">DIGITALS</div>
       </div>
     </div>
+    
+    <!-- TOP RIGHT THEME TOGGLE BUTTON -->
+    <button class="theme-toggle-btn" id="themeToggleBtn" onclick="toggleTheme()">
+      <span id="themeIcon">☀️</span> <span id="themeText">Light</span>
+    </button>
   </header>
 
   <div class="hero-copy">
@@ -249,11 +290,39 @@
 </div>
 
 <script>
-// SET THIS to your backend's current public URL (ngrok while testing,
-// your real domain once deployed). Update this any time your ngrok URL
-// changes (it changes every time you restart ngrok on the free plan).
-const BACKEND_URL = "https://michael-stack-telecoms.onrender.com";
+// ---------- THEME TOGGLE LOGIC ----------
+function initTheme() {
+  const savedTheme = localStorage.getItem("md_theme") || "dark";
+  document.documentElement.setAttribute("data-theme", savedTheme);
+  updateThemeButtonUI(savedTheme);
+}
 
+function toggleTheme() {
+  const currentTheme = document.documentElement.getAttribute("data-theme");
+  const newTheme = currentTheme === "light" ? "dark" : "light";
+  document.documentElement.setAttribute("data-theme", newTheme);
+  localStorage.setItem("md_theme", newTheme);
+  updateThemeButtonUI(newTheme);
+}
+
+function updateThemeButtonUI(theme) {
+  const icon = document.getElementById("themeIcon");
+  const text = document.getElementById("themeText");
+  if (theme === "light") {
+    icon.textContent = "🌙";
+    text.textContent = "Dark";
+  } else {
+    icon.textContent = "☀️";
+    text.textContent = "Light";
+  }
+}
+
+// Initialize theme immediately on page load
+initTheme();
+
+
+// SET THIS to your backend's current public URL
+const BACKEND_URL = "https://michael-stack-telecoms.onrender.com";
 
 const plans = {
   mtn: [],
@@ -263,14 +332,12 @@ const plans = {
 let plansLoaded = false;
 let plansLoadError = false;
 
-
 let currentNetwork = "mtn";
 let selectedPaymentMethod = "bank_transfer";
 
 function fmtNaira(n) {
   return "₦" + n.toLocaleString("en-NG", { minimumFractionDigits: n % 1 === 0 ? 0 : 1 });
 }
-
 
 async function loadPlans() {
   const grid = document.getElementById("planGrid");
@@ -328,8 +395,6 @@ async function loadPlans() {
   }
 }
 
-
-
 function renderPlans() {
   const grid = document.getElementById("planGrid");
   grid.innerHTML = "";
@@ -374,7 +439,6 @@ function renderPlans() {
     grid.appendChild(card);
   });
 }
-
 
 function toggleTooltip(btn) {
   document.querySelectorAll(".tooltip-bubble").forEach(t => t.remove());
@@ -444,60 +508,58 @@ function closeCheckout() {
 }
 
 async function startPayment(planId, price, size) {
-	  const mobile = document.getElementById("mobileInput").value.trim();
-	  if (mobile.length < 11) {
-										    document.getElementById("mobileInput").style.borderColor = "#FF6B6B";
-										    return;
-										  }
-										  const sheet = document.getElementById("sheet");
-										  sheet.innerHTML = `
-										    <div class="state-view">
-	      <div class="spinner"></div>
-	      <p>Creating your order…</p>
-	      <p style="font-size:12px;color:var(--text-faint);margin-top:6px;">This can take up to 30 seconds if our server just woke up.</p>
-	      <button class="done-btn" onclick="closeCheckout()" style="margin-top:16px;">Cancel</button>
-	    </div>
-	  `;
+  const mobile = document.getElementById("mobileInput").value.trim();
+  if (mobile.length < 11) {
+    document.getElementById("mobileInput").style.borderColor = "var(--red)";
+    return;
+  }
+  const sheet = document.getElementById("sheet");
+  sheet.innerHTML = `
+    <div class="state-view">
+      <div class="spinner"></div>
+      <p>Creating your order…</p>
+      <p style="font-size:12px;color:var(--text-faint);margin-top:6px;">This can take up to 30 seconds if our server just woke up.</p>
+      <button class="done-btn" onclick="closeCheckout()" style="margin-top:16px;">Cancel</button>
+    </div>
+  `;
 
-	  const controller = new AbortController();
-	  const timeoutId = setTimeout(() => controller.abort(), 25000);
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 25000);
 
-	  try {
-		      const res = await fetch(`${BACKEND_URL}/api/orders`, {
-				        method: "POST",
-				        headers: {
-							        "Content-Type": "application/json",
-							      },
-				        body: JSON.stringify({ planId, mobileNumber: mobile, paymentMethod: selectedPaymentMethod }),
-				        signal: controller.signal,
-				      });
-		      clearTimeout(timeoutId);
-		      const data = await res.json();
-		      if (!res.ok) {
-				        sheet.innerHTML = `
-				          <div class="state-view">
-				            <p style="color:var(--red);">${data.error || "Something went wrong. Please try again."}</p>
-				            <button class="done-btn" onclick="closeCheckout()">Close</button>
-				          </div>
-				        `;
-				        return;
-				      }
-		      // Redirect the customer to the real Paystack checkout page to pay.
-			      window.location.href = data.checkoutUrl;
-		    } catch (err) {
-				    clearTimeout(timeoutId);
-				    const message = err.name === "AbortError"
-				      ? "This is taking longer than expected. Please check your connection and try again."
-				      : "Couldn't reach the server. Check your connection and try again.";
-				    sheet.innerHTML = `
-				      <div class="state-view">
-				        <p style="color:var(--red);">${message}</p>
-				        <button class="done-btn" onclick="closeCheckout()">Close</button>
-				      </div>
-				    `;
-				  }
+  try {
+    const res = await fetch(`${BACKEND_URL}/api/orders`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ planId, mobileNumber: mobile, paymentMethod: selectedPaymentMethod }),
+      signal: controller.signal,
+    });
+    clearTimeout(timeoutId);
+    const data = await res.json();
+    if (!res.ok) {
+      sheet.innerHTML = `
+        <div class="state-view">
+          <p style="color:var(--red);">${data.error || "Something went wrong. Please try again."}</p>
+          <button class="done-btn" onclick="closeCheckout()">Close</button>
+        </div>
+      `;
+      return;
+    }
+    window.location.href = data.checkoutUrl;
+  } catch (err) {
+    clearTimeout(timeoutId);
+    const message = err.name === "AbortError"
+      ? "This is taking longer than expected. Please check your connection and try again."
+      : "Couldn't reach the server. Check your connection and try again.";
+    sheet.innerHTML = `
+      <div class="state-view">
+        <p style="color:var(--red);">${message}</p>
+        <button class="done-btn" onclick="closeCheckout()">Close</button>
+      </div>
+    `;
+  }
 }
-
 
 loadPlans();
 </script>
