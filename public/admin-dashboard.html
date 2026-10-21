@@ -503,12 +503,40 @@
   <div class="section-title">Orders needing your attention</div>
   <div id="flaggedOrders"></div>
 
+  
   <div class="section-title" style="margin-top:20px;">Recent orders</div>
+
+  <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:12px;">
+    <input
+      id="orderSearch"
+      type="search"
+      placeholder="Search phone number or payment reference"
+      aria-label="Search orders by phone number or payment reference"
+      oninput="renderOrders(currentOrders)"
+      style="flex:1; min-width:220px; padding:11px 12px; border:1px solid var(--border); border-radius:9px; background:var(--bg-card); color:var(--text);"
+    >
+
+    <select
+      id="orderStatusFilter"
+      aria-label="Filter orders by status"
+      onchange="renderOrders(currentOrders)"
+      style="min-width:150px; padding:11px 12px; border:1px solid var(--border); border-radius:9px; background:var(--bg-card); color:var(--text);"
+    >
+      <option value="all">All statuses</option>
+      <option value="delivered">Delivered</option>
+      <option value="failed">Failed</option>
+      <option value="pending">Pending</option>
+    </select>
+  </div>
+
   <div id="ordersList"></div>
+
 
 </div>
 
 <script>
+
+let currentOrders = [];
 
 async function login() {
   const passwordInput = document.getElementById("passwordInput");
@@ -649,7 +677,8 @@ async function loadData() {
     document.getElementById("dashboard").style.display = "block";
 
     renderSummary(summary);
-    renderOrders(orders);
+    currentOrders = orders;
+    renderOrders(currentOrders);
     renderPlans(plans);
 
   } catch (e) {
@@ -712,21 +741,24 @@ function renderSummary(s) {
   `;
 }
 
-function orderRowHtml(o) {
-  const statusClass =
-    "status-" +
-    (o.fulfillmentStatus || "pending").replace("not_started", "pending");
+
+function orderRowHtml(o, showDoneButton = false) {
+  const status = (o.fulfillmentStatus || "pending")
+    .replace("not_started", "pending");
+
+  const statusClass = "status-" + status;
 
   return `
-    <div class="order-row ${o.needsManualReview ? "flagged" : ""}">
-
+    <div class="order-row ${o.needsManualReview && !o.reviewResolved ? "flagged" : ""}">
       <div class="order-info">
         <div class="order-plan">
-          ${o.size} · ${(o.network || "").toUpperCase()} · ${o.mobileNumber}
+          ${escapeHtml(o.size)} · ${escapeHtml((o.network || "").toUpperCase())}
+          · ${escapeHtml(o.mobileNumber)}
         </div>
 
         <div class="order-meta">
-          ${formatDateTime(o.createdAt)} · ${o.paystackReference}
+          ${escapeHtml(formatDateTime(o.createdAt))}
+          · ${escapeHtml(o.paystackReference || "No payment reference")}
         </div>
       </div>
 
@@ -736,32 +768,138 @@ function orderRowHtml(o) {
         </div>
 
         <div class="order-status ${statusClass}">
-          ${(o.fulfillmentStatus || "pending").replace("_", " ")}
+          ${escapeHtml(status.replace(/_/g, " "))}
         </div>
-      </div>
 
+        ${showDoneButton ? `
+          <div style="margin-top:8px;">
+            <button
+              type="button"
+              onclick="resolveReview('${escapeHtml(o.id)}', this)"
+              style="background:var(--green);color:white;border:0;border-radius:7px;padding:8px 12px;cursor:pointer;"
+            >Done</button>
+          </div>
+        ` : ""}
+      </div>
     </div>
   `;
 }
 
 function renderOrders(orders) {
-  const flagged = orders.filter((o) => o.needsManualReview);
+  const flagged = orders.filter(
+    (o) => o.needsManualReview && !o.reviewResolved
+  );
 
   const flaggedEl = document.getElementById("flaggedOrders");
 
   flaggedEl.innerHTML = flagged.length
-    ? flagged.map(orderRowHtml).join("")
+    ? flagged.map((o) => orderRowHtml(o, true)).join("")
     : `<div class="empty-state" style="padding:20px;">
          Nothing needs attention right now.
        </div>`;
 
+  const searchTerm = (
+    document.getElementById("orderSearch")?.value || ""
+  ).trim().toLowerCase();
+
+  const statusFilter =
+    document.getElementById("orderStatusFilter")?.value || "all";
+
+  const filteredOrders = orders.filter((o) => {
+    const phone = String(o.mobileNumber || "").toLowerCase();
+    const reference = String(o.paystackReference || "").toLowerCase();
+    const status = (o.fulfillmentStatus || "pending")
+      .replace("not_started", "pending");
+
+    const matchesSearch =
+      phone.includes(searchTerm) || reference.includes(searchTerm);
+
+    const matchesStatus =
+      statusFilter === "all" || status === statusFilter;
+
+    return matchesSearch && matchesStatus;
+  });
+
   const listEl = document.getElementById("ordersList");
 
-  listEl.innerHTML = orders.length
-    ? orders.slice(0, 30).map(orderRowHtml).join("")
-    : `<div class="empty-state">
-         No orders yet. Once your first customer pays, it'll show up here.
+  listEl.innerHTML = filteredOrders.length
+    ? filteredOrders.slice(0, 30).map(orderRowHtml).join("")
+    : `<div class="empty-state" style="padding:20px;">
+         No orders match your search or status filter.
        </div>`;
+}
+
+
+async function resolveReview(orderId, button) {
+  const confirmed = window.confirm(
+    "Mark this order as reviewed?\n\n" +
+    "This will remove it from the attention list only. " +
+    "It will not change delivery status, payment details, or financial records."
+  );
+
+  if (!confirmed) return;
+
+  button.disabled = true;
+  button.textContent = "Saving...";
+
+  try {
+    const response = await fetch(
+      `/api/admin/orders/${encodeURIComponent(orderId)}/resolve-review`,
+      {
+        method: "PATCH",
+        credentials: "same-origin"
+      }
+    );
+
+    if (response.status === 401) {
+      document.getElementById("dashboard").style.display = "none";
+      document.getElementById("loginScreen").style.display = "block";
+      document.getElementById("passwordInput").value = "";
+      document.getElementById("loginError").textContent =
+        "Your session has expired. Please log in again.";
+      return;
+    }
+
+    const result = await response.json().catch(() => ({}));
+
+    if (!response.ok || !result.success) {
+      throw new Error(result.error || "Could not resolve this order.");
+    }
+
+    // Update the display only after the server confirms the database update.
+    currentOrders = currentOrders.map((order) =>
+      order.id === orderId
+        ? { ...order, reviewResolved: true }
+        : order
+    );
+
+    renderOrders(currentOrders);
+
+    // Refresh the summary count from the server.
+    const summaryResponse = await fetch("/api/admin/summary", {
+      credentials: "same-origin"
+    });
+
+    if (summaryResponse.status === 401) {
+      document.getElementById("dashboard").style.display = "none";
+      document.getElementById("loginScreen").style.display = "block";
+      document.getElementById("passwordInput").value = "";
+      document.getElementById("loginError").textContent =
+        "Your session has expired. Please log in again.";
+      return;
+    }
+
+    if (summaryResponse.ok) {
+      renderSummary(await summaryResponse.json());
+    }
+  } catch (err) {
+    window.alert(err.message || "Could not resolve this order.");
+  } finally {
+    if (button.isConnected) {
+      button.disabled = false;
+      button.textContent = "Done";
+    }
+  }
 }
 
 

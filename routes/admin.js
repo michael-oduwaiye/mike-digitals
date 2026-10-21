@@ -278,6 +278,58 @@ router.get("/orders", async (req, res) => {
   }
 });
 
+
+/**
+ * PATCH /api/admin/orders/:id/resolve-review
+ *
+ * Mark a flagged order as reviewed without changing its
+ * fulfillment status, payment reference, or financial fields.
+ */
+router.patch("/orders/:id/resolve-review", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const order = await db.findById(id);
+
+    if (!order) {
+      return res.status(404).json({
+        error: "Order not found.",
+      });
+    }
+
+    if (!order.needsManualReview) {
+      return res.status(400).json({
+        error: "This order is not flagged for manual review.",
+      });
+    }
+
+    const updatedOrder = await db.updateOrder(id, {
+      reviewResolved: true,
+      reviewResolvedAt: new Date().toISOString(),
+    });
+
+    if (!updatedOrder) {
+      return res.status(404).json({
+        error: "Order not found.",
+      });
+    }
+
+    res.setHeader("Cache-Control", "no-store");
+
+    return res.json({
+      success: true,
+      order: updatedOrder,
+    });
+  } catch (err) {
+    console.error("Error resolving order review:", err.message);
+
+    return res.status(500).json({
+      error: "Unable to mark order as reviewed.",
+    });
+  }
+});
+
+
 router.get("/summary", async (req, res) => {
   try {
     const orders = await db.readAll();
@@ -326,7 +378,7 @@ router.get("/summary", async (req, res) => {
         : 0;
 
     const needsReview = orders.filter(
-      (o) => o.needsManualReview
+      (o) => o.needsManualReview && !o.reviewResolved
     ).length;
 
     res.setHeader("Cache-Control", "no-store");
@@ -348,5 +400,7 @@ router.get("/summary", async (req, res) => {
     });
   }
 });
+
+
 
 module.exports = router;
