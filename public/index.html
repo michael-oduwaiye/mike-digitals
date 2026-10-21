@@ -408,6 +408,9 @@ function renderPlans() {
 
   const networkPlans = plans[currentNetwork] || [];
 
+  // Display plans from lowest to highest selling price.
+  networkPlans.sort((a, b) => a.price - b.price);
+
   if (networkPlans.length === 0) {
     grid.textContent = "No data plans are currently available for this network.";
     return;
