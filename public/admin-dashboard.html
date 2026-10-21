@@ -168,6 +168,39 @@
     margin-bottom: 10px;
   }
 
+  .plans-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 20px;
+    margin-bottom: 10px;
+  }
+
+  .plans-heading .section-title {
+    margin-bottom: 0;
+  }
+
+  .section-toggle {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: 8px;
+    padding: 9px 12px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  .section-toggle:hover {
+    border-color: var(--amber);
+  }
+
+  .plans-panel[hidden] {
+    display: none;
+  }
+
   .order-row {
     background: var(--bg-card);
     border: 1px solid var(--border);
@@ -304,8 +337,108 @@
   .plan-details {
     grid-column: 1 / -1;
   }
+
+  .plans-heading {
+    align-items: flex-start;
+  }
+
+  .section-toggle {
+    padding: 8px 10px;
+  }
 }
 
+
+
+  /* Mike Digitals professional dashboard refresh */
+  :root {
+    color-scheme: light;
+    --bg: #f5f7fb;
+    --bg-card: #ffffff;
+    --border: #e7eaf0;
+    --amber: #ff7417;
+    --green: #16845b;
+    --red: #d93636;
+    --text: #182230;
+    --text-muted: #596579;
+    --text-faint: #7d8798;
+    --font-display: 'Inter', sans-serif;
+    --font-body: 'Inter', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+  }
+
+  body { background: var(--bg); color: var(--text); font-size: 14px; }
+  .wrap { max-width: 1440px; padding: 28px clamp(16px, 3vw, 42px) 56px; }
+  header { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 20px 24px; margin-bottom: 22px; box-shadow: 0 4px 18px rgba(22,34,51,.035); }
+  header h1 { font-size: 22px; font-weight: 750; letter-spacing: -.6px; color: var(--text); }
+  .header-actions { align-items: center; flex-wrap: wrap; }
+  .refresh-btn, .logout-btn, .section-toggle { background: var(--bg-card); border: 1px solid var(--border); color: var(--text-muted); border-radius: 9px; padding: 10px 14px; font-family: var(--font-body); font-size: 12px; font-weight: 650; transition: .18s ease; }
+  .refresh-btn:hover, .section-toggle:hover { color: var(--amber); border-color: var(--amber); transform: translateY(-1px); }
+  .logout-btn:hover { background: #fff1f0; }
+  .theme-toggle { color: var(--text); }
+  .summary-grid { grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 16px; margin-bottom: 26px; }
+  .summary-card { position: relative; overflow: hidden; background: var(--bg-card); border: 1px solid var(--border); border-radius: 15px; padding: 22px; box-shadow: 0 4px 18px rgba(22,34,51,.035); }
+  .summary-card::before { content: ""; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: var(--amber); opacity: .9; }
+  .summary-card .label { color: var(--text-faint); font-size: 11px; font-weight: 700; letter-spacing: .07em; margin-bottom: 12px; }
+  .summary-card .value { color: var(--text); font-family: var(--font-display); font-size: clamp(20px, 2vw, 27px); font-weight: 750; letter-spacing: -.7px; overflow-wrap: anywhere; }
+  .summary-card.profit .value { color: var(--green); }
+  .summary-card.review .value { color: var(--red); }
+  .section-title { color: var(--text); font-family: var(--font-display); font-size: 16px; font-weight: 750; margin-bottom: 13px; letter-spacing: -.2px; }
+  .plans-heading { background: var(--bg-card); border: 1px solid var(--border); border-radius: 13px; padding: 17px 20px; margin-top: 26px; margin-bottom: 12px; }
+  .plans-heading .section-title { margin: 0; }
+  .section-toggle { color: #fff; background: var(--amber); border-color: var(--amber); }
+  .section-toggle:hover { color: #fff; background: #e9630d; }
+  .plans-panel { background: var(--bg-card); border: 1px solid var(--border); border-radius: 13px; padding: 16px; margin-bottom: 25px; }
+  .order-row, .plan-row { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 17px 19px; margin-bottom: 10px; box-shadow: 0 3px 12px rgba(22,34,51,.025); }
+  .order-row.flagged { border-color: #f0a3a3; background: var(--bg-card); box-shadow: inset 3px 0 #d93636; }
+  .order-plan, .plan-name { color: var(--text); }
+  .order-meta, .plan-meta { color: var(--text-faint); line-height: 1.6; }
+  .plan-price { background: var(--bg); }
+  .empty-state { background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; padding: 64px 20px; color: var(--text-faint); }
+  .login-screen { max-width: 410px; margin: clamp(60px, 12vh, 130px) auto; padding: 34px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 18px; box-shadow: 0 16px 50px rgba(22,34,51,.08); }
+  .login-screen h1 { color: var(--text); font-size: 25px; letter-spacing: -.7px; }
+  .login-screen input { background: var(--bg); border: 1px solid var(--border); border-radius: 10px; color: var(--text); font-family: var(--font-body); }
+  .login-screen button { background: var(--amber); color: #fff; border-radius: 10px; }
+  .server-url-hint { color: var(--text-faint); }
+  button { transition: background .18s ease, border-color .18s ease, transform .18s ease; }
+  button:focus-visible, input:focus-visible { outline: 3px solid rgba(255,116,23,.25); outline-offset: 2px; }
+
+  body[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #0b1120;
+    --bg-card: #121b2d;
+    --border: #26344b;
+    --amber: #ff8a32;
+    --green: #42d6a0;
+    --red: #ff7777;
+    --text: #edf2fa;
+    --text-muted: #a6b2c5;
+    --text-faint: #8290a6;
+  }
+  body[data-theme="dark"] header,
+  body[data-theme="dark"] .summary-card,
+  body[data-theme="dark"] .plans-heading,
+  body[data-theme="dark"] .plans-panel,
+  body[data-theme="dark"] .order-row,
+  body[data-theme="dark"] .plan-row,
+  body[data-theme="dark"] .empty-state,
+  body[data-theme="dark"] .login-screen { box-shadow: 0 5px 20px rgba(0,0,0,.14); }
+  body[data-theme="dark"] .logout-btn:hover { background: rgba(255,119,119,.1); }
+  body[data-theme="dark"] .order-row.flagged { border-color: #74414a; }
+  body[data-theme="dark"] .login-screen input { background: var(--bg); color: var(--text); }
+  @media (max-width: 640px) {
+    .wrap { padding: 14px 12px 36px; }
+    header { align-items: flex-start; gap: 15px; padding: 17px; flex-direction: column; }
+    header h1 { font-size: 20px; }
+    .header-actions { width: 100%; }
+    .header-actions button { flex: 1; }
+    .summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+    .summary-card { padding: 16px 13px; }
+    .summary-card .value { font-size: 18px; }
+    .order-row { align-items: flex-start; padding: 13px; }
+    .plan-row { grid-template-columns: minmax(0, 1fr) auto; }
+    .plan-row > :last-child { grid-column: 1 / -1; }
+    .login-screen { margin: 45px 14px; padding: 25px 20px; }
+  }
 
 </style>
 </head>
@@ -337,6 +470,7 @@
     <h1>Mike Digitals — Admin</h1>
 
     <div class="header-actions">
+      <button class="refresh-btn theme-toggle" id="themeToggle" onclick="toggleTheme()" aria-label="Switch dashboard theme">☾ Dark mode</button>
       <button class="refresh-btn" onclick="loadData()">↻ Refresh</button>
       <button class="logout-btn" onclick="logout()">Logout</button>
     </div>
@@ -344,9 +478,26 @@
 
   <div class="summary-grid" id="summaryGrid"></div>
   
-<div class="section-title" style="margin-top:20px;">Manage Data Plans</div>
-<div id="plansMessage" role="status" style="margin-bottom:10px;"></div>
-<div id="plansList"></div>
+<section aria-labelledby="plansSectionTitle">
+  <div class="plans-heading">
+    <div class="section-title" id="plansSectionTitle">Data Plans</div>
+    <button
+      class="section-toggle"
+      id="togglePlansBtn"
+      type="button"
+      aria-expanded="false"
+      aria-controls="plansPanel"
+      onclick="togglePlans()"
+    >
+      Manage Plans <span id="plansToggleIcon" aria-hidden="true">+</span>
+    </button>
+  </div>
+
+  <div class="plans-panel" id="plansPanel" hidden>
+    <div id="plansMessage" role="status" aria-live="polite" style="margin-bottom:10px;"></div>
+    <div id="plansList"></div>
+  </div>
+</section>
 
 
   <div class="section-title">Orders needing your attention</div>
@@ -404,8 +555,44 @@ async function login() {
   }
 }
 
-function fmtNaira(n) {
-  return "₦" + Number(n).toLocaleString("en-NG");
+function fmtNaira(n, decimals = 0) {
+  return "₦" + Number(n || 0).toLocaleString("en-NG", {
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals,
+  });
+}
+
+function togglePlans() {
+  const panel = document.getElementById("plansPanel");
+  const button = document.getElementById("togglePlansBtn");
+  const icon = document.getElementById("plansToggleIcon");
+  const isOpening = panel.hidden;
+
+  panel.hidden = !isOpening;
+  button.setAttribute("aria-expanded", String(isOpening));
+  icon.textContent = isOpening ? "−" : "+";
+}
+
+function applyTheme(theme) {
+  const selectedTheme = theme === "dark" ? "dark" : "light";
+  document.body.dataset.theme = selectedTheme;
+  const button = document.getElementById("themeToggle");
+  if (button) {
+    button.textContent = selectedTheme === "dark" ? "☀ Light mode" : "☾ Dark mode";
+    button.setAttribute("aria-label", selectedTheme === "dark" ? "Switch to light theme" : "Switch to dark theme");
+  }
+}
+
+function toggleTheme() {
+  const nextTheme = document.body.dataset.theme === "dark" ? "light" : "dark";
+  applyTheme(nextTheme);
+  try { localStorage.setItem("md-admin-theme", nextTheme); } catch (_) {}
+}
+
+try {
+  applyTheme(localStorage.getItem("md-admin-theme") || "light");
+} catch (_) {
+  applyTheme("light");
 }
 
 function formatDateTime(iso) {
@@ -509,8 +696,13 @@ function renderSummary(s) {
     </div>
 
     <div class="summary-card profit">
-      <div class="label">Profit</div>
-      <div class="value">${fmtNaira(s.totalProfit)}</div>
+      <div class="label">Net Profit</div>
+      <div class="value">${fmtNaira(s.totalProfit, 2)}</div>
+    </div>
+
+    <div class="summary-card">
+      <div class="label">Profit Margin</div>
+      <div class="value">${Number(s.profitMargin || 0).toFixed(2)}%</div>
     </div>
 
     <div class="summary-card review">
@@ -540,7 +732,7 @@ function orderRowHtml(o) {
 
       <div class="order-right">
         <div class="order-profit">
-          +${fmtNaira(o.profit)}
+          ${Number(o.profit) >= 0 ? "+" : "−"}${fmtNaira(Math.abs(Number(o.profit) || 0), 2)}
         </div>
 
         <div class="order-status ${statusClass}">

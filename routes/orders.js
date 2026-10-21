@@ -11,6 +11,7 @@ const {
   getPlanById,
   totalWholesaleCost,
 } = require("../config/plans");
+const { calculateProfit } = require("../lib/profit");
 const { initializeTransaction } = require("../lib/paystack");
 const db = require("../lib/db");
 
@@ -64,6 +65,11 @@ router.post("/orders", async (req, res) => {
     const sellingPrice = databasePlan.sellingPrice;
     const wholesaleCost = totalWholesaleCost(configuredPlan);
 
+    const profitDetails = calculateProfit({
+      sellingPrice,
+      wholesaleCost,
+    });
+
     const orderId = nanoid(12);
     const paystackReference = `mst_${orderId}`;
     const email =
@@ -95,7 +101,12 @@ router.post("/orders", async (req, res) => {
       mobileNumber,
       sellingPrice,
       wholesaleCost,
-      profit: sellingPrice - wholesaleCost,
+      paystackFee: profitDetails.paystackFee,
+      amountAfterPaystack: profitDetails.amountAfterPaystack,
+      walletFundingFee: profitDetails.walletFundingFee,
+      totalFees: profitDetails.totalFees,
+      profit: profitDetails.profit,
+      profitMargin: profitDetails.profitMargin,
       paystackReference,
       paymentStatus: "pending",
       fulfillmentStatus: "not_started",

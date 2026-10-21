@@ -1,3 +1,4 @@
+
 /**
  * routes/admin.js
  *
@@ -15,6 +16,7 @@
 const crypto = require("crypto");
 const express = require("express");
 const db = require("../lib/db");
+const { calculateProfit } = require("../lib/profit");
 
 const router = express.Router();
 
@@ -138,7 +140,6 @@ function requireAdminSession(req, res, next) {
 
 router.use(requireAdminSession);
 
-
 /**
  * GET /api/admin/plans
  *
@@ -260,52 +261,92 @@ router.patch("/plans/:id", async (req, res) => {
   }
 });
 
-
 router.get("/orders", async (req, res) => {
-  const orders = (await db.readAll()).sort(
-    (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-  );
+  try {
+    const orders = (await db.readAll()).sort(
+      (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+    );
 
-  res.setHeader("Cache-Control", "no-store");
-  res.json(orders);
+    res.setHeader("Cache-Control", "no-store");
+    return res.json(orders);
+  } catch (err) {
+    console.error("Error reading admin orders:", err.message);
+
+    return res.status(500).json({
+      error: "Unable to retrieve admin orders.",
+    });
+  }
 });
 
 router.get("/summary", async (req, res) => {
-  const orders = await db.readAll();
+  try {
+    const orders = await db.readAll();
 
-  const delivered = orders.filter(
-    (o) => o.fulfillmentStatus === "delivered"
-  );
+    const delivered = orders.filter(
+      (o) => o.fulfillmentStatus === "delivered"
+    );
 
-  const totalRevenue = delivered.reduce(
-    (sum, o) => sum + o.sellingPrice,
-    0
-  );
+    const totalRevenue = delivered.reduce(
+      (sum, o) => sum + Number(o.sellingPrice || 0),
+      0
+    );
 
-  const totalCost = delivered.reduce(
-    (sum, o) => sum + o.wholesaleCost,
-    0
-  );
+    const totalCost = delivered.reduce(
+      (sum, o) => sum + Number(o.wholesaleCost || 0),
+      0
+    );
 
-  const totalProfit = delivered.reduce(
-    (sum, o) => sum + o.profit,
-    0
-  );
+    let totalProfit = 0;
 
-  const needsReview = orders.filter(
-    (o) => o.needsManualReview
-  ).length;
+    for (const order of delivered) {
+      const sellingPrice = Number(order.sellingPrice);
+      const wholesaleCost = Number(order.wholesaleCost);
 
-  res.setHeader("Cache-Control", "no-store");
+      // Exclude orders without reliable cost data from the profit calculation.
+      if (
+        !Number.isFinite(sellingPrice) ||
+        !Number.isFinite(wholesaleCost) ||
+        sellingPrice < 0 ||
+        wholesaleCost < 0
+      ) {
+        continue;
+      }
 
-  res.json({
-    totalOrders: orders.length,
-    deliveredOrders: delivered.length,
-    totalRevenue,
-    totalCost,
-    totalProfit,
-    needsManualReview: needsReview,
-  });
+      const { profit } = calculateProfit({
+        sellingPrice,
+        wholesaleCost,
+      });
+
+      totalProfit += profit;
+    }
+
+    const profitMargin =
+      totalRevenue > 0
+        ? (totalProfit / totalRevenue) * 100
+        : 0;
+
+    const needsReview = orders.filter(
+      (o) => o.needsManualReview
+    ).length;
+
+    res.setHeader("Cache-Control", "no-store");
+
+    return res.json({
+      totalOrders: orders.length,
+      deliveredOrders: delivered.length,
+      totalRevenue,
+      totalCost,
+      totalProfit,
+      profitMargin,
+      needsManualReview: needsReview,
+    });
+  } catch (err) {
+    console.error("Error generating admin summary:", err.message);
+
+    return res.status(500).json({
+      error: "Unable to retrieve admin summary.",
+    });
+  }
 });
 
 module.exports = router;
