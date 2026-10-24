@@ -330,6 +330,159 @@ router.patch("/orders/:id/resolve-review", async (req, res) => {
 });
 
 
+function getLagosDateString(date = new Date()) {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Africa/Lagos",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(date);
+
+  const values = Object.fromEntries(
+    parts.map((part) => [part.type, part.value])
+  );
+
+  return `${values.year}-${values.month}-${values.day}`;
+}
+
+function shiftDate(dateString, days) {
+  const date = new Date(`${dateString}T00:00:00Z`);
+  date.setUTCDate(date.getUTCDate() + days);
+  return date.toISOString().slice(0, 10);
+}
+
+
+function getPeriodDates(period) {
+  const today = getLagosDateString();
+  let startDate;
+  let endDate;
+
+  if (period === "today") {
+    startDate = today;
+    endDate = shiftDate(today, 1);
+  } else if (period === "week") {
+    const day = new Date(`${today}T00:00:00Z`).getUTCDay();
+    startDate = shiftDate(today, -((day + 6) % 7));
+    endDate = shiftDate(startDate, 7);
+  } else if (period === "month") {
+    startDate = `${today.slice(0, 7)}-01`;
+
+    const nextMonth = new Date(
+      `${startDate}T00:00:00Z`
+    );
+    nextMonth.setUTCMonth(nextMonth.getUTCMonth() + 1);
+    endDate = nextMonth.toISOString().slice(0, 10);
+  } else if (period === "annual") {
+    startDate = `${today.slice(0, 4)}-01-01`;
+    endDate = `${Number(today.slice(0, 4)) + 1}-01-01`;
+  } else if (period === "all") {
+    return { start: null, end: null };
+  } else {
+    return null;
+  }
+
+  return {
+    start: new Date(`${startDate}T00:00:00+01:00`),
+    end: new Date(`${endDate}T00:00:00+01:00`),
+  };
+}
+
+router.get("/summary/transactions", async (req, res) => {
+  try {
+    const { period = "today", startDate, endDate } = req.query;
+    let start;
+    let end;
+
+    if (period === "custom") {
+      if (
+        typeof startDate !== "string" ||
+        typeof endDate !== "string" ||
+        !/^\d{4}-\d{2}-\d{2}$/.test(startDate) ||
+        !/^\d{4}-\d{2}-\d{2}$/.test(endDate) ||
+        startDate > endDate
+      ) {
+        return res.status(400).json({
+          error: "Provide a valid custom start and end date.",
+        });
+      }
+
+      start = new Date(`${startDate}T00:00:00+01:00`);
+      end = new Date(
+        `${shiftDate(endDate, 1)}T00:00:00+01:00`
+      );
+    } else {
+      const dates = getPeriodDates(period);
+
+      if (!dates) {
+        return res.status(400).json({
+          error: "Unsupported transaction summary period.",
+        });
+      }
+
+      start = dates.start;
+      end = dates.end;
+    }
+
+    const orders = await db.readAll();
+
+    const delivered = orders.filter((order) => {
+      if (order.fulfillmentStatus !== "delivered") return false;
+
+      const createdAt = new Date(order.createdAt);
+      if (Number.isNaN(createdAt.getTime())) return false;
+
+      return (
+        (!start || createdAt >= start) &&
+        (!end || createdAt < end)
+      );
+    });
+
+    const totalRevenue = delivered.reduce(
+      (sum, order) => sum + Number(order.sellingPrice || 0),
+      0
+    );
+
+    let totalProfit = 0;
+
+    for (const order of delivered) {
+      const sellingPrice = Number(order.sellingPrice);
+      const wholesaleCost = Number(order.wholesaleCost);
+
+      if (
+        !Number.isFinite(sellingPrice) ||
+        !Number.isFinite(wholesaleCost) ||
+        sellingPrice < 0 ||
+        wholesaleCost < 0
+      ) {
+        continue;
+      }
+
+      const { profit } = calculateProfit({
+        sellingPrice,
+        wholesaleCost,
+      });
+
+      totalProfit += profit;
+    }
+
+    res.setHeader("Cache-Control", "no-store");
+
+    return res.json({
+      period,
+      totalRevenue,
+      totalProfit,
+    });
+  } catch (err) {
+    console.error("Error generating transaction summary:", err.message);
+
+    return res.status(500).json({
+      error: "Unable to retrieve transaction summary.",
+    });
+  }
+});
+
+
+
 router.get("/summary", async (req, res) => {
   try {
     const orders = await db.readAll();

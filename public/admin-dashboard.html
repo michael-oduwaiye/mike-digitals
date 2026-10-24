@@ -132,6 +132,132 @@
     margin-bottom: 24px;
   }
 
+  
+/* Transaction Summary */
+.transaction-summary {
+  margin-bottom: 24px;
+  padding: 22px;
+  background: var(--card, #ffffff);
+  border: 1px solid var(--border, #e5e7eb);
+  border-radius: 14px;
+}
+
+.transaction-summary-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.transaction-summary-heading h2 {
+  margin: 0;
+  font-size: 19px;
+  font-weight: 700;
+  color: var(--text, #1f2937);
+}
+
+.transaction-periods {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.period-btn,
+.apply-period-btn {
+  padding: 8px 12px;
+  border: 1px solid var(--border, #e5e7eb);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text, #374151);
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.period-btn:hover,
+.apply-period-btn:hover {
+  border-color: #f97316;
+}
+
+.period-btn.active,
+.apply-period-btn {
+  background: #f97316;
+  border-color: #f97316;
+  color: #ffffff;
+}
+
+.custom-summary-dates {
+  display: flex;
+  align-items: end;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 0 0 20px;
+}
+
+.custom-summary-dates[hidden] {
+  display: none;
+}
+
+.custom-summary-dates label {
+  display: grid;
+  gap: 6px;
+  color: var(--muted, #6b7280);
+  font-size: 13px;
+}
+
+.custom-summary-dates input {
+  min-height: 38px;
+  padding: 7px 10px;
+  border: 1px solid var(--border, #e5e7eb);
+  border-radius: 8px;
+  background: var(--card, #ffffff);
+  color: var(--text, #1f2937);
+  font: inherit;
+}
+
+#transactionSummaryGrid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+#transactionSummaryGrid .summary-card {
+  min-width: 0;
+}
+
+#transactionSummaryGrid .value {
+  overflow-wrap: anywhere;
+}
+
+#transactionSummaryMessage {
+  margin-top: 10px;
+  color: var(--muted, #6b7280);
+  font-size: 13px;
+}
+
+@media (max-width: 600px) {
+  .transaction-summary {
+    padding: 15px;
+  }
+
+  .transaction-summary-heading {
+    align-items: flex-start;
+  }
+
+  .transaction-periods {
+    width: 100%;
+  }
+
+  .period-btn {
+    flex: 1 1 auto;
+  }
+
+  #transactionSummaryGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+
   .summary-card {
     background: var(--bg-card);
     border: 1px solid var(--border);
@@ -476,7 +602,50 @@
     </div>
   </header>
 
-  <div class="summary-grid" id="summaryGrid"></div>
+  
+<section class="transaction-summary" aria-labelledby="transactionSummaryTitle">
+  <div class="transaction-summary-heading">
+    <h2 id="transactionSummaryTitle">Transaction Summary</h2>
+
+    <div class="transaction-periods" role="group" aria-label="Transaction summary period">
+      <button type="button" class="period-btn active" data-period="today" onclick="selectSummaryPeriod(this)">Today</button>
+      <button type="button" class="period-btn" data-period="week" onclick="selectSummaryPeriod(this)">Week</button>
+      <button type="button" class="period-btn" data-period="month" onclick="selectSummaryPeriod(this)">Month</button>
+      <button type="button" class="period-btn" data-period="annual" onclick="selectSummaryPeriod(this)">Annual</button>
+      <button type="button" class="period-btn" data-period="all" onclick="selectSummaryPeriod(this)">All Time</button>
+      <button type="button" class="period-btn" data-period="custom" onclick="selectSummaryPeriod(this)">Custom</button>
+    </div>
+  </div>
+
+  <div id="customSummaryDates" class="custom-summary-dates" hidden>
+    <label>
+      From
+      <input type="date" id="summaryStartDate">
+    </label>
+    <label>
+      To
+      <input type="date" id="summaryEndDate">
+    </label>
+    <button type="button" class="apply-period-btn" onclick="applyCustomSummaryPeriod()">Apply</button>
+  </div>
+
+  <div class="summary-grid" id="transactionSummaryGrid">
+    <div class="summary-card">
+      <div class="label">Total Revenue</div>
+      <div class="value" id="periodRevenue">₦0.00</div>
+    </div>
+
+    <div class="summary-card profit">
+      <div class="label">Total Net Profit</div>
+      <div class="value" id="periodProfit">₦0.00</div>
+    </div>
+  </div>
+
+  <div id="transactionSummaryMessage" role="status" aria-live="polite"></div>
+</section>
+
+<div class="summary-grid" id="summaryGrid"></div>
+
   
 <section aria-labelledby="plansSectionTitle">
   <div class="plans-heading">
@@ -636,6 +805,88 @@ function formatDateTime(iso) {
   }).format(new Date(iso));
 }
 
+async function loadTransactionSummary(
+  period = "today",
+  startDate = "",
+  endDate = ""
+) {
+  const message = document.getElementById("transactionSummaryMessage");
+  message.textContent = "Loading totals...";
+
+  const params = new URLSearchParams({ period });
+
+  if (period === "custom") {
+    if (!startDate || !endDate || startDate > endDate) {
+      message.textContent = "Select a valid start date and end date.";
+      return;
+    }
+
+    params.set("startDate", startDate);
+    params.set("endDate", endDate);
+  }
+
+  try {
+    const response = await fetch(
+      `/api/admin/summary/transactions?${params.toString()}`,
+      { credentials: "same-origin", cache: "no-store" }
+    );
+
+    if (response.status === 401) {
+      document.getElementById("dashboard").style.display = "none";
+      document.getElementById("loginScreen").style.display = "block";
+      document.getElementById("passwordInput").value = "";
+      document.getElementById("loginError").textContent =
+        "Your session has expired. Please log in again.";
+      return;
+    }
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || "Unable to load totals.");
+    }
+
+    document.getElementById("periodRevenue").textContent =
+      fmtNaira(data.totalRevenue, 2);
+
+    document.getElementById("periodProfit").textContent =
+      fmtNaira(data.totalProfit, 2);
+
+    message.textContent =
+      period === "custom"
+        ? `Showing ${startDate} to ${endDate}`
+        : `Period: ${
+            period === "all"
+              ? "All Time"
+              : period.charAt(0).toUpperCase() + period.slice(1)
+          }`;
+  } catch (error) {
+    message.textContent = error.message || "Unable to load totals.";
+  }
+}
+
+function selectSummaryPeriod(button) {
+  document.querySelectorAll(".period-btn").forEach((item) => {
+    item.classList.toggle("active", item === button);
+  });
+
+  const period = button.dataset.period;
+  const customDates = document.getElementById("customSummaryDates");
+
+  customDates.hidden = period !== "custom";
+
+  if (period !== "custom") {
+    loadTransactionSummary(period);
+  }
+}
+
+function applyCustomSummaryPeriod() {
+  const startDate = document.getElementById("summaryStartDate").value;
+  const endDate = document.getElementById("summaryEndDate").value;
+
+  loadTransactionSummary("custom", startDate, endDate);
+}
+
 async function loadData() {
   const errEl = document.getElementById("loginError");
   errEl.textContent = "";
@@ -680,6 +931,7 @@ async function loadData() {
     currentOrders = orders;
     renderOrders(currentOrders);
     renderPlans(plans);
+    loadTransactionSummary("today");
 
   } catch (e) {
     errEl.textContent = "Couldn't reach the server. Please try again.";

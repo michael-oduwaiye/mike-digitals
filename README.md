@@ -21,7 +21,6 @@ This project is built with:
 - Node.js
 - JavaScript
 - Paystack
-- Gladtidings
 - HTML, CSS and JavaScript
 
 ## Project Status
