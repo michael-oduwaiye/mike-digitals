@@ -1,4 +1,3 @@
-
 /**
  * server.js
  *
@@ -19,6 +18,22 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
+// MongoDB connection monitoring
+mongoose.connection.on("connected", () => {
+  console.log("🟢 MongoDB connection established.");
+});
+
+mongoose.connection.on("disconnected", () => {
+  console.error("🔴 MongoDB connection disconnected.");
+});
+
+mongoose.connection.on("reconnected", () => {
+  console.log("🟢 MongoDB connection restored.");
+});
+
+mongoose.connection.on("error", (err) => {
+  console.error("⚠️ MongoDB connection error:", err.message);
+});
 const db = require("./lib/db");
 
 const ordersRouter = require("./routes/orders");

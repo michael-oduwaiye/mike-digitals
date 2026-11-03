@@ -566,6 +566,167 @@
     .login-screen { margin: 45px 14px; padding: 25px 20px; }
   }
 
+
+.business-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 22px;
+}
+
+.business-nav-btn {
+  padding: 11px 17px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: var(--bg-card);
+  color: var(--text-muted);
+  cursor: pointer;
+  font: inherit;
+  font-weight: 650;
+}
+
+.business-nav-btn.active {
+  color: #fff;
+  background: var(--amber);
+  border-color: var(--amber);
+}
+
+.inventory-help {
+  margin-top: 6px;
+  color: var(--text-muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.inventory-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 14px;
+}
+
+.inventory-form label {
+  display: grid;
+  gap: 7px;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.inventory-form input,
+.inventory-form select,
+.inventory-toolbar input,
+.inventory-toolbar select {
+  width: 100%;
+  min-width: 0;
+  padding: 10px 11px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text);
+  font: inherit;
+}
+
+.inventory-primary-btn {
+  align-self: end;
+  padding: 11px 15px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--amber);
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.inventory-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.inventory-toolbar > input,
+.inventory-toolbar > select {
+  flex: 1 1 180px;
+}
+
+.inventory-check {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.inventory-check input {
+  width: auto;
+}
+
+.inventory-table-wrap {
+  overflow-x: auto;
+  width: 100%;
+}
+
+.inventory-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  text-align: left;
+}
+
+.inventory-table th,
+.inventory-table td {
+  padding: 12px 10px;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.inventory-table th {
+  color: var(--text-muted);
+  font-weight: 700;
+}
+
+.inventory-table button {
+  margin: 2px;
+  padding: 6px 9px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg-card);
+  color: var(--text);
+  cursor: pointer;
+}
+
+.inventory-status-low {
+  color: var(--red);
+  font-weight: 700;
+}
+
+.inventory-status-ok {
+  color: var(--green);
+  font-weight: 700;
+}
+
+#inventoryMessage {
+  margin-bottom: 12px;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+#inventorySection[hidden] {
+  display: none;
+}
+
+@media (max-width: 600px) {
+  .inventory-form {
+    grid-template-columns: 1fr;
+  }
+
+  .inventory-table th,
+  .inventory-table td {
+    padding: 10px 8px;
+  }
+}
+
 </style>
 </head>
 
@@ -603,7 +764,7 @@
   </header>
 
   
-<section class="transaction-summary" aria-labelledby="transactionSummaryTitle">
+<section id="transactionSummary" class="transaction-summary" aria-labelledby="transactionSummaryTitle">
   <div class="transaction-summary-heading">
     <h2 id="transactionSummaryTitle">Transaction Summary</h2>
 
@@ -646,6 +807,146 @@
 
 <div class="summary-grid" id="summaryGrid"></div>
 
+<!-- Business Management Navigation -->
+<nav class="business-nav" aria-label="Business management">
+  <button type="button" class="business-nav-btn active"
+    onclick="showBusinessSection('overview', this)">Overview</button>
+  <button type="button" class="business-nav-btn"
+    onclick="showBusinessSection('inventory', this)">Inventory</button>
+</nav>
+
+<!-- Inventory Section -->
+<section id="inventorySection" hidden>
+  <div class="plans-heading">
+    <div>
+      <h2 class="section-title">Inventory Management</h2>
+      <p class="inventory-help">Manage accessories, spare parts, stock quantities and stock movements.</p>
+    </div>
+    <button type="button" class="section-toggle"
+      onclick="loadInventory()">Refresh Inventory</button>
+  </div>
+
+  <div id="inventoryMessage" role="status" aria-live="polite"></div>
+
+  <div class="plans-panel">
+    <h3 class="section-title">Add Inventory Item</h3>
+    <form id="inventoryItemForm" class="inventory-form">
+      <label>Item name
+        <input name="itemName" required maxlength="120" placeholder="e.g. USB charging cable">
+      </label>
+
+      <label>Category
+        <select name="category" required>
+          <option value="accessory">Accessory</option>
+          <option value="spare-part">Spare part</option>
+          <option value="tool">Tool</option>
+          <option value="other">Other</option>
+        </select>
+      </label>
+
+      <label>Variant / description
+        <input name="variant" maxlength="120" placeholder="e.g. Type-C, black">
+      </label>
+
+      <label>Opening quantity
+        <input name="quantity" type="number" min="0" step="1" value="0" required>
+      </label>
+
+      <label>Unit cost (₦)
+        <input name="costPrice" type="number" min="0" step="0.01" required>
+      </label>
+
+      <label>Unit selling price (₦)
+        <input name="sellingPrice" type="number" min="0" step="0.01" required>
+      </label>
+
+      <label>Low-stock threshold
+        <input name="lowStockThreshold" type="number" min="0" step="1" value="3" required>
+      </label>
+
+      <button type="submit" class="inventory-primary-btn">Add Item</button>
+    </form>
+  </div>
+
+  <div class="plans-panel">
+    <h3 class="section-title">Stock Inventory</h3>
+
+    <div class="inventory-toolbar">
+      <input id="inventorySearch" type="search"
+        placeholder="Search item or variant"
+        aria-label="Search inventory"
+        oninput="renderInventory()">
+
+      <select id="inventoryCategory" aria-label="Filter inventory category"
+        onchange="loadInventory()">
+        <option value="">All categories</option>
+        <option value="accessory">Accessories</option>
+        <option value="spare-part">Spare parts</option>
+        <option value="tool">Tools</option>
+        <option value="other">Other</option>
+      </select>
+
+      <label class="inventory-check">
+        <input id="inventoryLowStock" type="checkbox" onchange="loadInventory()">
+        Low stock only
+      </label>
+    </div>
+
+    <div class="inventory-table-wrap">
+      <table class="inventory-table">
+        <thead>
+          <tr>
+            <th>Item</th>
+            <th>Quantity</th>
+            <th>Unit cost</th>
+            <th>Selling price</th>
+            <th>Stock value</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="inventoryTableBody">
+          <tr><td colspan="7">Inventory has not been loaded yet.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="plans-panel">
+    <h3 class="section-title">Stock Movement History</h3>
+    <div class="inventory-toolbar">
+      <select id="movementTypeFilter" onchange="loadStockMovements()">
+        <option value="">All movement types</option>
+        <option value="opening-stock">Opening stock</option>
+        <option value="purchase">Restock / purchase</option>
+        <option value="sale">Sale</option>
+        <option value="repair-usage">Repair usage</option>
+        <option value="return">Return</option>
+        <option value="adjustment">Adjustment</option>
+      </select>
+    </div>
+
+    <div class="inventory-table-wrap">
+      <table class="inventory-table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Item</th>
+            <th>Movement</th>
+            <th>Quantity change</th>
+            <th>Unit cost</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody id="stockMovementsBody">
+          <tr><td colspan="6">Stock movement history has not been loaded yet.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+
   
 <section aria-labelledby="plansSectionTitle">
   <div class="plans-heading">
@@ -669,8 +970,10 @@
 </section>
 
 
+ <div id="flaggedOrdersSection">
   <div class="section-title">Orders needing your attention</div>
   <div id="flaggedOrders"></div>
+</div>
 
   
   <div class="section-title" style="margin-top:20px;">Recent orders</div>
@@ -706,6 +1009,41 @@
 <script>
 
 let currentOrders = [];
+
+let inventoryItems = [];
+
+function showBusinessSection(section, button) {
+  const inventorySelected = section === "inventory";
+
+  document.getElementById("transactionSummary").hidden = inventorySelected;
+  document.getElementById("summaryGrid").hidden = inventorySelected;
+
+  document.querySelector('section[aria-labelledby="plansSectionTitle"]').hidden =
+    inventorySelected;
+
+  document.getElementById("flaggedOrders").previousElementSibling.hidden =
+    inventorySelected;
+  document.getElementById("flaggedOrders").hidden = inventorySelected;
+
+  document.getElementById("ordersList").previousElementSibling.hidden =
+    inventorySelected;
+
+  document.getElementById("orderSearch").parentElement.hidden =
+    inventorySelected;
+  document.getElementById("ordersList").hidden = inventorySelected;
+
+  document.getElementById("inventorySection").hidden = !inventorySelected;
+
+  document.querySelectorAll(".business-nav-btn").forEach((navButton) => {
+    navButton.classList.toggle("active", navButton === button);
+  });
+
+  if (inventorySelected) {
+    loadInventory();
+    loadStockMovements();
+  }
+}
+
 
 async function login() {
   const passwordInput = document.getElementById("passwordInput");
@@ -1309,6 +1647,496 @@ async function savePlan(button) {
   } finally {
     button.disabled = false;
     button.textContent = "Save";
+  }
+}
+
+// ==========================================
+// MIKE DIGITALS — INVENTORY MANAGEMENT
+// ==========================================
+
+window.inventoryItems = window.inventoryItems || [];
+
+function inventoryMoney(value) {
+  return "₦" + Number(value || 0).toLocaleString("en-NG", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  });
+}
+
+function inventoryDate(value) {
+  if (!value) return "—";
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) return "—";
+
+  return date.toLocaleString("en-NG", {
+    dateStyle: "medium",
+    timeStyle: "short",
+    timeZone: "Africa/Lagos"
+  });
+}
+
+function inventoryName(item) {
+  return item.itemName || item.name || "Unnamed item";
+}
+
+function inventoryMessage(message, isError = false) {
+  const element = document.getElementById("inventoryMessage");
+
+  if (!element) return;
+
+  element.textContent = message;
+  element.style.color = isError ? "var(--red)" : "var(--text-muted)";
+}
+
+async function inventoryRequest(url, options = {}) {
+  const response = await fetch(url, {
+    credentials: "same-origin",
+    cache: "no-store",
+    ...options,
+    headers: {
+      ...(options.headers || {}),
+      ...(options.body ? { "Content-Type": "application/json" } : {})
+    }
+  });
+
+  let result = {};
+
+  try {
+    result = await response.json();
+  } catch {
+    result = {};
+  }
+
+  if (response.status === 401) {
+    inventoryMessage(
+      "Your admin session has expired. Please log in again.",
+      true
+    );
+    throw new Error("Admin session expired.");
+  }
+
+  if (!response.ok) {
+    throw new Error(
+      result.error || result.message || "The inventory request failed."
+    );
+  }
+
+  return result;
+}
+
+
+// 1. LOAD INVENTORY ITEMS
+async function loadInventory() {
+  const body = document.getElementById("inventoryTableBody");
+
+  if (body) {
+    body.innerHTML =
+      '<tr><td colspan="7">Loading inventory...</td></tr>';
+  }
+
+  try {
+    const params = new URLSearchParams();
+
+    const category =
+      document.getElementById("inventoryCategory")?.value || "";
+
+    const lowStock =
+      document.getElementById("inventoryLowStock")?.checked || false;
+
+    if (category) params.set("category", category);
+    if (lowStock) params.set("lowStock", "true");
+
+    const query = params.toString();
+
+    const result = await inventoryRequest(
+      "/api/admin/inventory" + (query ? "?" + query : "")
+    );
+
+    window.inventoryItems = Array.isArray(result)
+      ? result
+      : result.items || result.inventory || [];
+
+    renderInventory();
+
+    inventoryMessage(
+      `${window.inventoryItems.length} inventory item(s) loaded.`
+    );
+  } catch (error) {
+    if (body) {
+      body.innerHTML =
+        '<tr><td colspan="7">Unable to load inventory.</td></tr>';
+    }
+
+    if (error.message !== "Admin session expired.") {
+      inventoryMessage(error.message, true);
+    }
+  }
+}
+
+
+// 2. DISPLAY AND SEARCH INVENTORY
+function renderInventory() {
+  const body = document.getElementById("inventoryTableBody");
+
+  if (!body) return;
+
+  const search = (
+    document.getElementById("inventorySearch")?.value || ""
+  ).trim().toLowerCase();
+
+  const items = window.inventoryItems.filter((item) => {
+    const searchableText = [
+      inventoryName(item),
+      item.variant,
+      item.category
+    ].join(" ").toLowerCase();
+
+    return searchableText.includes(search);
+  });
+
+  if (!items.length) {
+    body.innerHTML =
+      '<tr><td colspan="7">No matching inventory items found.</td></tr>';
+    return;
+  }
+
+  body.innerHTML = items.map((item) => {
+    const id = escapeHtml(String(item._id || item.id || ""));
+    const name = escapeHtml(inventoryName(item));
+    const variant = escapeHtml(item.variant || "");
+    const category = escapeHtml(item.category || "other");
+
+    const quantity = Number(item.quantity || 0);
+    const cost = Number(item.costPrice || 0);
+    const sellingPrice = Number(item.sellingPrice || 0);
+    const threshold = Number(item.lowStockThreshold ?? 3);
+
+    const lowStock = quantity <= threshold;
+
+    return `
+      <tr>
+        <td>
+          <strong>${name}</strong>
+          ${variant ? `<br><small>${variant}</small>` : ""}
+          <br><small>${category}</small>
+        </td>
+        <td>${quantity.toLocaleString("en-NG")}</td>
+        <td>${inventoryMoney(cost)}</td>
+        <td>${inventoryMoney(sellingPrice)}</td>
+        <td>${inventoryMoney(quantity * cost)}</td>
+        <td>
+          <span class="${lowStock
+            ? "inventory-status-low"
+            : "inventory-status-ok"}">
+            ${lowStock ? "Low stock" : "In stock"}
+          </span>
+        </td>
+        <td>
+          <button type="button"
+            onclick="restockInventoryItem('${id}')">Restock</button>
+          <button type="button"
+            onclick="editInventoryItem('${id}')">Edit</button>
+        </td>
+      </tr>
+    `;
+  }).join("");
+}
+
+
+// 3. ADD A NEW ITEM
+const inventoryForm = document.getElementById("inventoryItemForm");
+
+if (inventoryForm) {
+  inventoryForm.addEventListener("submit", async function (event) {
+    event.preventDefault();
+
+    const submitButton = inventoryForm.querySelector(
+      'button[type="submit"]'
+    );
+
+    const formData = new FormData(inventoryForm);
+
+    const item = {
+      itemName: String(formData.get("itemName") || "").trim(),
+      category: String(formData.get("category") || ""),
+      variant: String(formData.get("variant") || "").trim(),
+      quantity: Number(formData.get("quantity")),
+      costPrice: Number(formData.get("costPrice")),
+      sellingPrice: Number(formData.get("sellingPrice")),
+      lowStockThreshold: Number(formData.get("lowStockThreshold"))
+    };
+
+    if (
+      !item.itemName ||
+      !Number.isFinite(item.quantity) ||
+      item.quantity < 0 ||
+      !Number.isFinite(item.costPrice) ||
+      item.costPrice < 0 ||
+      !Number.isFinite(item.sellingPrice) ||
+      item.sellingPrice < 0 ||
+      !Number.isInteger(item.quantity) ||
+      !Number.isInteger(item.lowStockThreshold) ||
+      item.lowStockThreshold < 0
+    ) {
+      inventoryMessage(
+        "Please check the item name, quantities and prices.",
+        true
+      );
+      return;
+    }
+
+    if (submitButton) submitButton.disabled = true;
+
+    try {
+      await inventoryRequest("/api/admin/inventory", {
+        method: "POST",
+        body: JSON.stringify(item)
+      });
+
+      inventoryForm.reset();
+
+      const quantityInput = inventoryForm.elements.namedItem("quantity");
+      const thresholdInput =
+        inventoryForm.elements.namedItem("lowStockThreshold");
+
+      if (quantityInput) quantityInput.value = "0";
+      if (thresholdInput) thresholdInput.value = "3";
+
+      inventoryMessage("Inventory item added successfully.");
+
+      await loadInventory();
+      await loadStockMovements();
+    } catch (error) {
+      if (error.message !== "Admin session expired.") {
+        inventoryMessage(error.message, true);
+      }
+    } finally {
+      if (submitButton) submitButton.disabled = false;
+    }
+  });
+}
+
+
+// 4. EDIT ITEM DETAILS
+async function editInventoryItem(id) {
+  const item = window.inventoryItems.find(
+    (entry) => String(entry._id || entry.id) === String(id)
+  );
+
+  if (!item) {
+    inventoryMessage("Inventory item not found. Refresh and try again.", true);
+    return;
+  }
+
+  const itemName = prompt("Item name:", inventoryName(item));
+  if (itemName === null) return;
+
+  const variant = prompt("Variant / description:", item.variant || "");
+  if (variant === null) return;
+
+  const sellingPriceText = prompt(
+    "Unit selling price (₦):",
+    String(item.sellingPrice ?? 0)
+  );
+  if (sellingPriceText === null) return;
+
+  const thresholdText = prompt(
+    "Low-stock threshold:",
+    String(item.lowStockThreshold ?? 3)
+  );
+  if (thresholdText === null) return;
+
+  const sellingPrice = Number(sellingPriceText);
+  const lowStockThreshold = Number(thresholdText);
+
+  if (
+    !itemName.trim() ||
+    sellingPriceText.trim() === "" ||
+    !Number.isFinite(sellingPrice) ||
+    sellingPrice < 0 ||
+    thresholdText.trim() === "" ||
+    !Number.isInteger(lowStockThreshold) ||
+    lowStockThreshold < 0
+  ) {
+    inventoryMessage("Please enter valid item details.", true);
+    return;
+  }
+
+  try {
+    await inventoryRequest(
+      `/api/admin/inventory/${encodeURIComponent(id)}`,
+      {
+        method: "PATCH",
+        body: JSON.stringify({
+          itemName: itemName.trim(),
+          variant: variant.trim(),
+          sellingPrice,
+          lowStockThreshold
+        })
+      }
+    );
+
+    inventoryMessage("Inventory item updated successfully.");
+    await loadInventory();
+  } catch (error) {
+    if (error.message !== "Admin session expired.") {
+      inventoryMessage(error.message, true);
+    }
+  }
+}
+
+
+// 5. RESTOCK AN ITEM
+async function restockInventoryItem(id) {
+  const item = window.inventoryItems.find(
+    (entry) => String(entry._id || entry.id) === String(id)
+  );
+
+  if (!item) {
+    inventoryMessage("Inventory item not found. Refresh and try again.", true);
+    return;
+  }
+
+  const quantityText = prompt(
+    `Quantity to add for ${inventoryName(item)}:`,
+    "1"
+  );
+  if (quantityText === null) return;
+
+  const quantity = Number(quantityText);
+
+  if (
+    quantityText.trim() === "" ||
+    !Number.isInteger(quantity) ||
+    quantity <= 0
+  ) {
+    inventoryMessage("Restock quantity must be a whole number above zero.", true);
+    return;
+  }
+
+  const costText = prompt(
+    "Purchase cost per unit (₦):",
+    String(item.costPrice ?? 0)
+  );
+  if (costText === null) return;
+
+  const unitCostPrice = Number(costText);
+
+  if (
+    costText.trim() === "" ||
+    !Number.isFinite(unitCostPrice) ||
+    unitCostPrice < 0
+  ) {
+    inventoryMessage("Enter a valid purchase cost per unit.", true);
+    return;
+  }
+
+  const notes = prompt("Optional purchase notes:", "") ?? "";
+
+  try {
+    await inventoryRequest(
+      `/api/admin/inventory/${encodeURIComponent(id)}/restock`,
+      {
+        method: "POST",
+        body: JSON.stringify({
+          quantity,
+          unitCostPrice,
+          notes: notes.trim()
+        })
+      }
+    );
+
+    inventoryMessage("Stock replenished successfully.");
+    await loadInventory();
+    await loadStockMovements();
+  } catch (error) {
+    if (error.message !== "Admin session expired.") {
+      inventoryMessage(error.message, true);
+    }
+  }
+}
+
+
+// 6. LOAD STOCK MOVEMENT HISTORY
+async function loadStockMovements() {
+  const body = document.getElementById("stockMovementsBody");
+
+  if (!body) return;
+
+  body.innerHTML =
+    '<tr><td colspan="6">Loading stock movements...</td></tr>';
+
+  try {
+    const params = new URLSearchParams();
+
+    const movementType =
+      document.getElementById("movementTypeFilter")?.value || "";
+
+    if (movementType) {
+      params.set("movementType", movementType);
+    }
+
+    const query = params.toString();
+
+    const result = await inventoryRequest(
+      "/api/admin/inventory/movements" +
+      (query ? "?" + query : "")
+    );
+
+    const movements = Array.isArray(result)
+      ? result
+      : result.movements || result.entries || [];
+
+    if (!movements.length) {
+      body.innerHTML =
+        '<tr><td colspan="6">No stock movements found.</td></tr>';
+      return;
+    }
+
+    body.innerHTML = movements.map((movement) => {
+      const name = escapeHtml(
+        movement.itemNameSnapshot ||
+        movement.itemName ||
+        movement.name ||
+        "Inventory item"
+      );
+
+      const type = escapeHtml(
+        String(movement.movementType || "—").replace(/-/g, " ")
+      );
+
+      const quantityChange = Number(
+        movement.quantityChange ?? movement.quantity ?? 0
+      );
+
+      const unitCost = Number(
+        movement.unitCostPrice ?? movement.costPrice ?? 0
+      );
+
+      const notes = escapeHtml(movement.notes || "—");
+
+      return `
+        <tr>
+          <td>${inventoryDate(
+            movement.createdAt || movement.date
+          )}</td>
+          <td>${name}</td>
+          <td>${type}</td>
+          <td>${quantityChange > 0 ? "+" : ""}${quantityChange}</td>
+          <td>${inventoryMoney(unitCost)}</td>
+          <td>${notes}</td>
+        </tr>
+      `;
+    }).join("");
+  } catch (error) {
+    body.innerHTML =
+      '<tr><td colspan="6">Unable to load stock movements.</td></tr>';
+
+    if (error.message !== "Admin session expired.") {
+      inventoryMessage(error.message, true);
+    }
   }
 }
 

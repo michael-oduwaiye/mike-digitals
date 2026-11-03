@@ -1,6 +1,9 @@
 # Never commit real secrets
 .env
 cookies.txt
+.env.production-backup
+test-cookies.txt
+login-response.json
 
 # LLM / Repomix export files
 repomix-output.xml

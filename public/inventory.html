@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mike Digitals — Inventory</title>
+  <style>
+    :root {
+      --orange: #f47721;
+      --border: #e5e7eb;
+      --muted: #667085;
+      --bg: #f7f8fa;
+      --danger: #b42318;
+      --green: #067647;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: #202124;
+      font: 14px/1.5 Arial, sans-serif;
+    }
+
+    header {
+      background: #fff;
+      border-bottom: 1px solid var(--border);
+      padding: 18px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    header h1 { font-size: 21px; margin: 0; }
+    header p { margin: 4px 0 0; color: var(--muted); }
+
+    nav { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    nav a {
+      color: #333;
+      text-decoration: none;
+      padding: 9px 12px;
+      border-radius: 7px;
+    }
+
+    nav a.active { background: #fff0e5; color: #b94b00; }
+
+    main { max-width: 1200px; margin: 24px auto; padding: 0 18px; }
+
+    .panel {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    h2 { font-size: 17px; margin: 0 0 16px; }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    label { display: block; font-weight: 600; margin-bottom: 5px; }
+
+    input, select {
+      width: 100%;
+      min-width: 0;
+      padding: 10px;
+      border: 1px solid #d0d5dd;
+      border-radius: 6px;
+      background: #fff;
+      font: inherit;
+    }
+
+    button {
+      padding: 9px 12px;
+      border: 0;
+      border-radius: 6px;
+      cursor: pointer;
+      font: inherit;
+      font-weight: 600;
+    }
+
+    button:disabled { opacity: .6; cursor: wait; }
+
+    .primary { background: var(--orange); color: white; }
+    .secondary { background: #f2f4f7; color: #344054; }
+    .small { padding: 6px 9px; margin: 2px; }
+
+    .form-actions {
+      margin-top: 16px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 15px;
+    }
+
+    .toolbar input { flex: 1; min-width: 180px; }
+    .toolbar select { width: auto; min-width: 150px; }
+
+    .table-wrap { overflow-x: auto; }
+
+    table { border-collapse: collapse; width: 100%; background: white; }
+
+    th, td {
+      text-align: left;
+      padding: 11px 10px;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+
+    th { background: #f9fafb; font-size: 12px; color: #475467; }
+
+    .badge {
+      display: inline-block;
+      border-radius: 20px;
+      padding: 3px 8px;
+      font-size: 12px;
+      background: #ecfdf3;
+      color: var(--green);
+    }
+
+    .badge.low { background: #fef3f2; color: var(--danger); }
+    .muted { color: var(--muted); }
+    #message { margin-bottom: 14px; }
+    .error { color: var(--danger); }
+    .success { color: var(--green); }
+
+    .hidden { display: none; }
+
+    @media (max-width: 800px) {
+      .form-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      header { padding: 16px; }
+    }
+
+    @media (max-width: 480px) {
+      .form-grid { grid-template-columns: 1fr; }
+      main { padding: 0 10px; }
+      .panel { padding: 14px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>Mike Digitals</h1>
+      <p>Inventory Management</p>
+    </div>
+    <nav>
+      <a href="/admin-dashboard.html">Dashboard</a>
+      <a href="/inventory.html" class="active">Inventory</a>
+      <a href="/admin-dashboard.html">Transactions</a>
+    </nav>
+  </header>
+
+  <main>
+    <div id="message" role="status" aria-live="polite"></div>
+
+    <section class="panel">
+      <h2 id="formTitle">Add Inventory Item</h2>
+
+      <form id="itemForm">
+        <div class="form-grid">
+          <div>
+            <label for="itemName">Item name *</label>
+            <input id="itemName" maxlength="150" required
+                   placeholder="e.g. Type-C charging port">
+          </div>
+
+          <div>
+            <label for="category">Category *</label>
+            <select id="category" required>
+              <option value="accessory">Accessory</option>
+              <option value="spare-part">Spare part</option>
+              <option value="tool">Tool</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="variant">Variant / description</label>
+            <input id="variant" maxlength="150"
+                   placeholder="e.g. Samsung A12">
+          </div>
+
+          <div>
+            <label for="quantity">Opening quantity *</label>
+            <input id="quantity" type="number" min="0" step="1"
+                   value="0" required>
+          </div>
+
+          <div>
+            <label for="costPrice">Unit cost price (₦) *</label>
+            <input id="costPrice" type="number" min="0" step="0.01"
+                   required>
+          </div>
+
+          <div>
+            <label for="sellingPrice">Unit selling price (₦) *</label>
+            <input id="sellingPrice" type="number" min="0" step="0.01"
+                   required>
+          </div>
+
+          <div>
+            <label for="threshold">Low-stock alert quantity *</label>
+            <input id="threshold" type="number" min="0" step="1"
+                   value="5" required>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button class="primary" id="saveItem" type="submit">
+            Save Item
+          </button>
+          <button class="secondary hidden" id="cancelEdit" type="button">
+            Cancel Edit
+          </button>
+        </div>
+      </form>
+    </section>
+
+    <section class="panel">
+      <h2>Stock Inventory</h2>
+
+      <div class="toolbar">
+        <input id="search" placeholder="Search item or variant...">
+        <select id="categoryFilter">
+          <option value="">All categories</option>
+          <option value="accessory">Accessories</option>
+          <option value="spare-part">Spare parts</option>
+          <option value="tool">Tools</option>
+          <option value="other">Other</option>
+        </select>
+        <button id="lowStockFilter" class="secondary" type="button">
+          Low Stock Only: Off
+        </button>
+        <button id="refresh" class="secondary" type="button">
+          Refresh
+        </button>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Item</th>
+              <th>Category</th>
+              <th>Quantity</th>
+              <th>Cost Price</th>
+              <th>Selling Price</th>
+              <th>Stock Value</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="inventoryRows">
+            <tr><td colspan="8">Loading inventory...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Stock Movement History</h2>
+      <p class="muted">
+        View opening stock and recorded purchases. Sales and repair usage
+        will appear here when those modules are connected.
+      </p>
+
+      <div class="toolbar">
+        <select id="movementFilter">
+          <option value="">All movement types</option>
+          <option value="opening-stock">Opening stock</option>
+          <option value="purchase">Purchases</option>
+          <option value="sale">Sales</option>
+          <option value="repair-usage">Repair usage</option>
+          <option value="return">Returns</option>
+          <option value="adjustment">Adjustments</option>
+        </select>
+        <button id="loadMovements" class="secondary" type="button">
+          Load History
+        </button>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Date & Time</th>
+              <th>Item</th>
+              <th>Movement</th>
+              <th>Quantity Change</th>
+              <th>Unit Cost</th>
+              <th>Notes</th>
+            </tr>
+          </thead>
+          <tbody id="movementRows">
+            <tr><td colspan="6">Click Load History to view records.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+
+    let inventory = [];
+    let editingId = null;
+    let showLowStock = false;
+
+    const money = (value) =>
+      "₦" + Number(value || 0).toLocaleString("en-NG", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      });
+
+    function escapeHtml(value) {
+      return String(value ?? "").replace(/[&<>"']/g, (char) => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+      })[char]);
+    }
+
+    function showMessage(message, type = "success") {
+      $("message").className = type;
+      $("message").textContent = message;
+    }
+
+    async function api(url, options = {}) {
+      const response = await fetch(url, {
+        credentials: "same-origin",
+        cache: "no-store",
+        ...options,
+        headers: {
+          ...(options.body ? { "Content-Type": "application/json" } : {}),
+          ...(options.headers || {})
+        }
+      });
+
+      const data = await response.json().catch(() => ({}));
+
+      if (response.status === 401) {
+        showMessage(
+          "Your admin session has expired. Return to the admin dashboard and log in again.",
+          "error"
+        );
+        throw new Error("Admin session expired.");
+      }
+
+      if (!response.ok) {
+        throw new Error(data.error || "Request failed.");
+      }
+
+      return data;
+    }
+
+    function categoryLabel(category) {
+      return ({
+        accessory: "Accessory",
+        "spare-part": "Spare part",
+        tool: "Tool",
+        other: "Other"
+      })[category] || category;
+    }
+
+    async function loadInventory() {
+      const params = new URLSearchParams();
+
+      if ($("search").value.trim()) {
+        params.set("search", $("search").value.trim());
+      }
+
+      if ($("categoryFilter").value) {
+        params.set("category", $("categoryFilter").value);
+      }
+
+      if (showLowStock) params.set("lowStock", "true");
+
+      try {
+        const data = await api("/api/admin/inventory?" + params.toString());
+        inventory = data.items || [];
+        renderInventory();
+      } catch (error) {
+        $("inventoryRows").innerHTML =
+          '<tr><td colspan="8">Unable to load inventory.</td></tr>';
+
+        if (error.message !== "Admin session expired.") {
+          showMessage(error.message, "error");
+        }
+      }
+    }
+
+    function renderInventory() {
+      if (!inventory.length) {
+        $("inventoryRows").innerHTML =
+          '<tr><td colspan="8">No matching inventory items found.</td></tr>';
+        return;
+      }
+
+      $("inventoryRows").innerHTML = inventory.map((item) => {
+        const id = escapeHtml(item._id);
+        const low = item.lowStock;
+
+        return `
+          <tr>
+            <td>
+              <strong>${escapeHtml(item.itemName)}</strong>
+              ${item.variant
+                ? `<br><span class="muted">${escapeHtml(item.variant)}</span>`
+                : ""}
+            </td>
+            <td>${escapeHtml(categoryLabel(item.category))}</td>
+            <td>${Number(item.quantity)}</td>
+            <td>${money(item.costPrice)}</td>
+            <td>${money(item.sellingPrice)}</td>
+            <td>${money(Number(item.quantity) * Number(item.costPrice))}</td>
+            <td>
+              <span class="badge ${low ? "low" : ""}">
+                ${low ? "Low stock" : "In stock"}
+              </span>
+            </td>
+            <td>
+              <button class="secondary small" data-action="restock"
+                data-id="${id}">Restock</button>
+              <button class="secondary small" data-action="edit"
+                data-id="${id}">Edit</button>
+              <button class="secondary small" data-action="history"
+                data-id="${id}">History</button>
+            </td>
+          </tr>
+        `;
+      }).join("");
+    }
+
+    function resetForm() {
+      editingId = null;
+      $("itemForm").reset();
+      $("quantity").disabled = false;
+      $("quantity").value = "0";
+      $("threshold").value = "5";
+      $("formTitle").textContent = "Add Inventory Item";
+      $("saveItem").textContent = "Save Item";
+      $("cancelEdit").classList.add("hidden");
+    }
+
+    $("itemForm").addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      const body = {
+        itemName: $("itemName").value.trim(),
+        category: $("category").value,
+        variant: $("variant").value.trim(),
+        costPrice: Number($("costPrice").value),
+        sellingPrice: Number($("sellingPrice").value),
+        lowStockThreshold: Number($("threshold").value)
+      };
+
+      if (!editingId) body.quantity = Number($("quantity").value);
+
+      $("saveItem").disabled = true;
+
+      try {
+        if (editingId) {
+          await api("/api/admin/inventory/" + encodeURIComponent(editingId), {
+            method: "PATCH",
+            body: JSON.stringify(body)
+          });
+
+          showMessage("Inventory item updated successfully.");
+        } else {
+          await api("/api/admin/inventory", {
+            method: "POST",
+            body: JSON.stringify(body)
+          });
+
+          showMessage("Inventory item registered successfully.");
+        }
+
+        resetForm();
+        await loadInventory();
+      } catch (error) {
+        showMessage(error.message, "error");
+      } finally {
+        $("saveItem").disabled = false;
+      }
+    });
+
+    $("inventoryRows").addEventListener("click", async (event) => {
+      const button = event.target.closest("button[data-action]");
+      if (!button) return;
+
+      const item = inventory.find(
+        (entry) => String(entry._id) === button.dataset.id
+      );
+
+      if (!item) return;
+
+      if (button.dataset.action === "edit") {
+        editingId = String(item._id);
+        $("itemName").value = item.itemName;
+        $("category").value = item.category;
+        $("variant").value = item.variant || "";
+        $("costPrice").value = item.costPrice;
+        $("sellingPrice").value = item.sellingPrice;
+        $("threshold").value = item.lowStockThreshold;
+        $("quantity").value = item.quantity;
+        $("quantity").disabled = true;
+
+        $("formTitle").textContent = "Edit Inventory Item";
+        $("saveItem").textContent = "Save Changes";
+        $("cancelEdit").classList.remove("hidden");
+
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        return;
+      }
+
+      if (button.dataset.action === "restock") {
+        const quantityText = prompt(
+          `Current stock: ${item.quantity}\nEnter quantity purchased:`
+        );
+
+        if (quantityText === null) return;
+
+        const quantity = Number(quantityText);
+
+        if (!Number.isInteger(quantity) || quantity <= 0) {
+          showMessage("Enter a positive whole-number quantity.", "error");
+          return;
+        }
+
+        const costText = prompt(
+          "Enter the purchase cost per unit in naira:",
+          String(item.costPrice)
+        );
+
+        if (costText === null) return;
+
+        const unitCostPrice = Number(costText);
+
+        if (!Number.isFinite(unitCostPrice) || unitCostPrice < 0) {
+          showMessage("Enter a valid non-negative unit cost.", "error");
+          return;
+        }
+
+        const notes = prompt("Supplier or purchase notes (optional):") || "";
+
+        try {
+          await api(
+            "/api/admin/inventory/" + encodeURIComponent(item._id) + "/restock",
+            {
+              method: "POST",
+              body: JSON.stringify({ quantity, unitCostPrice, notes })
+            }
+          );
+
+          showMessage("Stock purchase recorded successfully.");
+          await loadInventory();
+        } catch (error) {
+          showMessage(error.message, "error");
+        }
+
+        return;
+      }
+
+      if (button.dataset.action === "history") {
+        $("movementFilter").value = "";
+        await loadMovements(String(item._id));
+        $("movementRows").scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+    });
+
+    async function loadMovements(itemId = "") {
+      const params = new URLSearchParams();
+
+      if (itemId) params.set("itemId", itemId);
+      if ($("movementFilter").value) {
+        params.set("movementType", $("movementFilter").value);
+      }
+
+      try {
+        const data = await api(
+          "/api/admin/inventory/movements?" + params.toString()
+        );
+
+        if (!data.movements.length) {
+          $("movementRows").innerHTML =
+            '<tr><td colspan="6">No stock movements found.</td></tr>';
+          return;
+        }
+
+        $("movementRows").innerHTML = data.movements.map((movement) => `
+          <tr>
+            <td>${escapeHtml(new Date(movement.createdAt).toLocaleString("en-NG"))}</td>
+            <td>${escapeHtml(movement.itemNameSnapshot)}</td>
+            <td>${escapeHtml(movement.movementType)}</td>
+            <td>${Number(movement.quantityChange) > 0 ? "+" : ""}${Number(movement.quantityChange)}</td>
+            <td>${money(movement.unitCostPrice)}</td>
+            <td>${escapeHtml(movement.notes || "—")}</td>
+          </tr>
+        `).join("");
+      } catch (error) {
+        showMessage(error.message, "error");
+      }
+    }
+
+    $("cancelEdit").addEventListener("click", resetForm);
+    $("refresh").addEventListener("click", loadInventory);
+    $("loadMovements").addEventListener("click", () => loadMovements());
+    $("categoryFilter").addEventListener("change", loadInventory);
+
+    $("search").addEventListener("input", () => {
+      clearTimeout(window.searchTimer);
+      window.searchTimer = setTimeout(loadInventory, 250);
+    });
+
+    $("lowStockFilter").addEventListener("click", () => {
+      showLowStock = !showLowStock;
+      $("lowStockFilter").textContent =
+        "Low Stock Only: " + (showLowStock ? "On" : "Off");
+      loadInventory();
+    });
+
+    loadInventory();
+  </script>
+</body>
+</html>
