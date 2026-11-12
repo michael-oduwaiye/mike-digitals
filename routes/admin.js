@@ -15,7 +15,10 @@
 const crypto = require("crypto");
 const express = require("express");
 const db = require("../lib/db");
-const { calculateProfit } = require("../lib/profit");
+const {
+  calculateProfit,
+  calculateManualProfit,
+} = require("../lib/profit");
 
 const mongoose = require("mongoose");
 const {
@@ -24,6 +27,7 @@ const {
   StockMovement,
   Sale,
   BusinessExpense,
+  SequenceCounter,
 } = require("../lib/phone-business");
 
 const router = express.Router();
@@ -147,6 +151,373 @@ function requireAdminSession(req, res, next) {
 }
 
 router.use(requireAdminSession);
+
+
+router.get("/shop/overview", async (req, res) => {
+  try {
+    const now = new Date();
+    const period = ["today", "week", "month"].includes(req.query.period)
+      ? req.query.period
+      : "today";
+
+    // Get today's date in Lagos.
+    const parts = new Intl.DateTimeFormat("en-CA", {
+      timeZone: "Africa/Lagos",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    }).formatToParts(now);
+
+    const dateParts = Object.fromEntries(
+      parts.map(part => [part.type, part.value])
+    );
+
+    const year = Number(dateParts.year);
+    const month = Number(dateParts.month);
+    const day = Number(dateParts.day);
+
+    const MS_PER_DAY = 24 * 60 * 60 * 1000;
+
+    // Convert Lagos midnight to UTC (Nigeria is UTC+1).
+    const todayUtc = Date.UTC(year, month - 1, day) - 60 * 60 * 1000;
+
+    let startUtc;
+    let endUtc;
+
+    if (period === "today") {
+      startUtc = todayUtc;
+      endUtc = todayUtc + MS_PER_DAY;
+    } else if (period === "week") {
+      const weekday = new Date(Date.UTC(year, month - 1, day)).getUTCDay();
+      const mondayOffset = (weekday + 6) % 7;
+
+      startUtc = todayUtc - mondayOffset * MS_PER_DAY;
+      endUtc = startUtc + 7 * MS_PER_DAY;
+    } else {
+      startUtc = Date.UTC(year, month - 1, 1) - 60 * 60 * 1000;
+      endUtc = Date.UTC(year, month, 1) - 60 * 60 * 1000;
+    }
+
+    const startDate = new Date(startUtc);
+    const endDate = new Date(endUtc);
+
+    const inPeriod = date =>
+      date && new Date(date) >= startDate && new Date(date) < endDate;
+
+    const [
+      repairs,
+      sales,
+      inventory,
+      expenses,
+    ] = await Promise.all([
+      RepairJob.find({ isArchived: { $ne: true } }).lean(),
+      Sale.find({}).lean(),
+      InventoryItem.find({}).lean(),
+      BusinessExpense.find({}).lean(),
+    ]);
+
+        // REPAIR INCOME: actual payments received during the selected period.
+    const repairIncome = repairs
+      .filter(job => job.status !== "cancelled")
+      .reduce((total, job) => {
+        const received = (job.payments || [])
+          .filter(payment => inPeriod(payment.paidAt))
+          .reduce(
+            (sum, payment) => sum + Number(payment.amount || 0),
+            0
+          );
+
+        return total + received;
+      }, 0);
+
+    // PRODUCT SALES: payments received during the selected period.
+    // Legacy sales without categorySnapshot are treated as accessories.
+    const periodSales = sales.filter(sale => inPeriod(sale.soldAt));
+
+    const productCategorySales = {
+      accessory: 0,
+      "spare-part": 0,
+      tool: 0,
+    };
+
+    const productSalesReceived = sales.reduce((total, sale) => {
+      const paymentsReceived = (sale.payments || [])
+        .filter(payment => inPeriod(payment.paidAt))
+        .reduce(
+          (sum, payment) => sum + Number(payment.amount || 0),
+          0
+        );
+
+      if (paymentsReceived <= 0) return total;
+
+      const items = sale.items || [];
+
+      const categoryTotals = {
+        accessory: 0,
+        "spare-part": 0,
+        tool: 0,
+      };
+
+      let eligibleSubtotal = 0;
+
+      for (const item of items) {
+        const category = item.categorySnapshot || "accessory";
+
+        if (!Object.hasOwn(categoryTotals, category)) continue;
+
+        const lineTotal = Number(item.lineTotal || 0);
+
+        categoryTotals[category] += lineTotal;
+        eligibleSubtotal += lineTotal;
+      }
+
+      if (eligibleSubtotal > 0) {
+        const discount = Number(sale.discount || 0);
+        const eligibleDiscount = Math.min(
+          discount,
+          eligibleSubtotal
+        );
+
+        for (const category of Object.keys(categoryTotals)) {
+          const categoryRevenue = categoryTotals[category];
+
+          const allocatedDiscount =
+            eligibleSubtotal > 0
+              ? eligibleDiscount * (categoryRevenue / eligibleSubtotal)
+              : 0;
+
+          const netCategoryRevenue = Math.max(
+            0,
+            categoryRevenue - allocatedDiscount
+          );
+
+          productCategorySales[category] +=
+            paymentsReceived * (netCategoryRevenue / eligibleSubtotal);
+        }
+      }
+
+      return total + paymentsReceived;
+    }, 0);
+
+    const accessorySales = Number(
+      productCategorySales.accessory.toFixed(2)
+    );
+
+    const sparePartSales = Number(
+      productCategorySales["spare-part"].toFixed(2)
+    );
+
+    const toolSales = Number(
+      productCategorySales.tool.toFixed(2)
+    );
+
+    const totalProductSales = Number(
+      (accessorySales + sparePartSales + toolSales).toFixed(2)
+    );
+
+    // COST OF PRODUCTS SOLD: recognised on the original sale date.
+    const productCostOfGoodsSold = periodSales.reduce(
+      (total, sale) => {
+        const cost = (sale.items || []).reduce(
+          (sum, item) =>
+            sum +
+            Number(item.quantity || 0) *
+            Number(item.unitCostPrice || 0),
+          0
+        );
+
+        return total + cost;
+      },
+      0
+    );
+
+    // COST OF SPARE PARTS USED IN REPAIRS:
+    // recognised using the repair job's received date.
+    const repairPartsCost = repairs
+      .filter(job =>
+        job.status !== "cancelled" &&
+        inPeriod(job.receivedAt)
+      )
+      .reduce((total, job) => {
+        const partsCost = (job.partsUsed || []).reduce(
+          (sum, part) =>
+            sum +
+            Number(part.quantity || 0) *
+            Number(part.unitCostPrice || 0),
+          0
+        );
+
+        return total + partsCost;
+      }, 0);
+
+    // TOTAL COST OF ITEMS SOLD AND PARTS USED.
+    const totalItemAndPartsCost =
+      productCostOfGoodsSold + repairPartsCost;
+
+    // SALES PAYMENTS RECEIVED.
+    const accessoryIncomeReceived = productSalesReceived;
+
+    // TOTAL INCOME: actual product and repair payments received.
+    const totalIncome = totalProductSales + repairIncome;
+
+    // OPERATING EXPENSES: count by expense date.
+    const periodExpenses = expenses.filter(
+      expense => inPeriod(expense.incurredAt)
+    );
+
+    const operatingExpenses = periodExpenses.reduce(
+      (sum, expense) => sum + Number(expense.amount || 0),
+      0
+    );
+
+    // NET PROFIT: income less item/parts costs and operating expenses.
+    const netProfit =
+      totalIncome -
+      totalItemAndPartsCost -
+      operatingExpenses;
+
+    // OUTSTANDING BALANCES: all currently outstanding records.
+    const outstandingRepairs = repairs.filter(
+      job =>
+        job.status !== "cancelled" &&
+        Number(job.balance || 0) > 0
+    );
+
+    const outstandingSales = sales.filter(
+      sale => Number(sale.balance || 0) > 0
+    );
+
+    const repairOutstanding = outstandingRepairs.reduce(
+      (sum, job) => sum + Number(job.balance || 0),
+      0
+    );
+
+    const accessoryOutstanding = outstandingSales.reduce(
+      (sum, sale) => sum + Number(sale.balance || 0),
+      0
+    );
+
+    // INVENTORY VALUE AND STOCK ALERTS.
+    const inventoryValue = inventory.reduce(
+      (sum, item) =>
+        sum + Number(item.quantity || 0) * Number(item.costPrice || 0),
+      0
+    );
+
+    const lowStockItems = inventory.filter(
+      item => Number(item.quantity || 0) <= Number(item.lowStockThreshold || 0)
+    );
+
+    const outOfStockItems = inventory.filter(
+      item => Number(item.quantity || 0) === 0
+    );
+
+    // REPAIR STATUS COUNTS.
+    const activeStatuses = [
+      "received",
+      "diagnosing",
+      "awaiting-parts",
+      "in-progress",
+      "repaired",
+    ];
+
+    const activeRepairs = repairs.filter(
+      job => activeStatuses.includes(job.status)
+    ).length;
+
+    const awaitingParts = repairs.filter(
+      job => job.status === "awaiting-parts"
+    ).length;
+
+    // DAILY PAYMENT REMINDERS: not restricted by the selected period.
+    const paymentReminders = [
+      ...outstandingRepairs.map(job => ({
+        type: "repair",
+        id: job._id,
+        reference: job.jobNumber,
+        customerName: job.customerName,
+        customerPhone: job.customerPhone,
+        totalAmount: Number(job.repairCost || 0),
+        amountPaid: Number(job.amountPaid || 0),
+        balance: Number(job.balance || 0),
+        date: job.receivedAt,
+      })),
+
+      ...outstandingSales.map(sale => ({
+        type: "accessory-sale",
+        id: sale._id,
+        reference: sale.saleNumber,
+        customerName: sale.customerName || "Walk-in Customer",
+        customerPhone: sale.customerPhone || "",
+        totalAmount: Number(sale.totalAmount || 0),
+        amountPaid: Number(sale.amountPaid || 0),
+        balance: Number(sale.balance || 0),
+        date: sale.soldAt,
+      })),
+    ].sort((a, b) => new Date(a.date) - new Date(b.date));
+
+    // RECENT RECORDS.
+    const recentRepairs = repairs
+      .filter(job => inPeriod(job.receivedAt))
+      .sort((a, b) => new Date(b.receivedAt) - new Date(a.receivedAt))
+      .slice(0, 8);
+
+    const recentSales = periodSales
+      .slice()
+      .sort((a, b) => new Date(b.soldAt) - new Date(a.soldAt))
+      .slice(0, 8);
+
+    const recentExpenses = periodExpenses
+      .slice()
+      .sort((a, b) => new Date(b.incurredAt) - new Date(a.incurredAt))
+      .slice(0, 8);
+
+    return res.json({
+      success: true,
+      period,
+      dateRange: {
+        start: startDate,
+        end: endDate,
+      },
+      metrics: {
+        repairIncome,
+        accessorySales,
+        sparePartSales,
+        toolSales,
+        totalProductSales,
+        accessoryIncomeReceived,
+        productCostOfGoodsSold,
+        repairPartsCost,
+        totalItemAndPartsCost,
+        totalIncome,
+        operatingExpenses,
+        netProfit,
+        repairOutstanding,
+        accessoryOutstanding,
+        totalOutstanding: repairOutstanding + accessoryOutstanding,
+        inventoryValue,
+        activeRepairs,
+        awaitingParts,
+        lowStockCount: lowStockItems.length,
+        outOfStockCount: outOfStockItems.length,
+      },
+      paymentReminders,
+      lowStockItems,
+      recent: {
+        repairs: recentRepairs,
+        sales: recentSales,
+        expenses: recentExpenses,
+      },
+    });
+  } catch (error) {
+    console.error("Shop overview error:", error);
+
+    return res.status(500).json({
+      error: "Could not load Shop Overview.",
+    });
+  }
+});
+
 
 /**
  * GET /api/admin/plans
@@ -282,6 +653,126 @@ router.get("/orders", async (req, res) => {
 
     return res.status(500).json({
       error: "Unable to retrieve admin orders.",
+    });
+  }
+});
+
+
+
+// Record a VTU transaction completed outside the online storefront.
+router.post("/orders/manual", async (req, res) => {
+  try {
+    const {
+      customerName,
+      mobileNumber,
+      network,
+      size,
+      validity,
+      sellingPrice: rawSellingPrice,
+      wholesaleCost: rawWholesaleCost,
+      paymentMethod,
+      transactionDate,
+      notes,
+    } = req.body;
+
+    const sellingPrice = Number(rawSellingPrice);
+    const wholesaleCost = Number(rawWholesaleCost);
+
+    // Validate required transaction details.
+    if (
+      typeof mobileNumber !== "string" ||
+      !mobileNumber.trim() ||
+      typeof network !== "string" ||
+      !network.trim() ||
+      typeof size !== "string" ||
+      !size.trim()
+    ) {
+      return res.status(400).json({
+        error: "Mobile number, network and data size are required.",
+      });
+    }
+
+    if (
+      !Number.isFinite(sellingPrice) ||
+      sellingPrice <= 0 ||
+      !Number.isFinite(wholesaleCost) ||
+      wholesaleCost < 0
+    ) {
+      return res.status(400).json({
+        error: "Enter valid selling and wholesale costs.",
+      });
+    }
+
+    const allowedPaymentMethods = [
+      "cash",
+      "transfer",
+      "pos",
+      "other",
+    ];
+
+    if (!allowedPaymentMethods.includes(paymentMethod)) {
+      return res.status(400).json({
+        error: "Select a valid payment method.",
+      });
+    }
+
+    const createdAt = transactionDate
+      ? new Date(transactionDate)
+      : new Date();
+
+    if (Number.isNaN(createdAt.getTime())) {
+      return res.status(400).json({
+        error: "Enter a valid transaction date.",
+      });
+    }
+
+    const profitDetails = calculateManualProfit({
+      sellingPrice,
+      wholesaleCost,
+    });
+
+    const orderId = new mongoose.Types.ObjectId().toString();
+
+    const order = await db.createOrder({
+      id: orderId,
+      source: "manual",
+      customerName: String(customerName || "").trim(),
+      mobileNumber: mobileNumber.trim(),
+      network: network.trim(),
+      size: size.trim(),
+      validity: String(validity || "").trim(),
+
+      sellingPrice,
+      wholesaleCost,
+
+      paystackFee: profitDetails.paystackFee,
+      amountAfterPaystack: profitDetails.amountAfterPaystack,
+      walletFundingFee: profitDetails.walletFundingFee,
+      totalFees: profitDetails.totalFees,
+      profit: profitDetails.profit,
+      profitMargin: profitDetails.profitMargin,
+
+      paymentMethod,
+      paymentStatus: "paid",
+      fulfillmentStatus: "delivered",
+
+      notes: String(notes || "").trim(),
+      createdAt: createdAt.toISOString(),
+      deliveredAt: createdAt.toISOString(),
+    });
+
+    res.setHeader("Cache-Control", "no-store");
+
+    return res.status(201).json({
+      success: true,
+      message: "Manual VTU transaction recorded successfully.",
+      order,
+    });
+  } catch (err) {
+    console.error("Error recording manual VTU transaction:", err.message);
+
+    return res.status(500).json({
+      error: "Unable to record manual VTU transaction.",
     });
   }
 });
@@ -465,10 +956,16 @@ router.get("/summary/transactions", async (req, res) => {
         continue;
       }
 
-      const { profit } = calculateProfit({
-        sellingPrice,
-        wholesaleCost,
-      });
+      const { profit } =
+        order.source === "manual"
+          ? calculateManualProfit({
+              sellingPrice,
+              wholesaleCost,
+              })
+          : calculateProfit({
+              sellingPrice,
+              wholesaleCost,
+              });
 
       totalProfit += profit;
     }
@@ -525,10 +1022,16 @@ router.get("/summary", async (req, res) => {
         continue;
       }
 
-      const { profit } = calculateProfit({
-        sellingPrice,
-        wholesaleCost,
-      });
+      const { profit } =
+        order.source === "manual"
+          ? calculateManualProfit({
+              sellingPrice,
+              wholesaleCost,
+            })
+          : calculateProfit({
+              sellingPrice,
+              wholesaleCost,
+            });
 
       totalProfit += profit;
     }
@@ -1147,8 +1650,9 @@ function validateRepairFields(body, creating = false) {
   }
 
   const allowedFields = [
-    ...REPAIR_EDITABLE_FIELDS,
-    "partsUsed",
+  ...REPAIR_EDITABLE_FIELDS,
+  "partsUsed",
+  ...(creating ? ["paymentMethod"] : []),
   ];
 
   if (submittedFields.some((field) => !allowedFields.includes(field))) {
@@ -1194,6 +1698,25 @@ function validateRepairFields(body, creating = false) {
       return `${field} must be a valid amount between ₦0 and ₦100,000,000.`;
     }
   }
+
+
+const validPaymentMethods = ["cash", "transfer", "pos", "other"];
+
+if (
+  Object.hasOwn(body, "paymentMethod") &&
+  !validPaymentMethods.includes(body.paymentMethod)
+) {
+  return "Invalid payment method.";
+}
+
+if (
+  creating &&
+  Number(body.amountPaid || 0) > 0 &&
+  !validPaymentMethods.includes(body.paymentMethod)
+) {
+  return "A valid payment method is required when an initial payment is received.";
+}
+
 
   if (Object.hasOwn(body, "warrantyDays")) {
     if (
@@ -1375,7 +1898,7 @@ async function deductRepairParts(job, parts, session) {
         },
       },
       {
-        new: true,
+        returnDocument: "after",
         session,
         runValidators: true,
       }
@@ -1455,6 +1978,24 @@ router.post("/repairs", async (req, res) => {
     return res.status(400).json({ error: validationError });
   }
 
+  const { paymentMethod, ...repairFields } = body;
+
+  const initialAmountPaid = Number(body.amountPaid || 0);
+
+  const initialPayments = initialAmountPaid > 0
+    ? [
+        {
+          amount: initialAmountPaid,
+          paymentMethod,
+          paidAt: new Date(),
+        },
+      ]
+    : [];
+
+  const receivedAt = body.receivedAt
+    ? new Date(body.receivedAt)
+    : new Date();
+
   const session = await mongoose.startSession();
 
   try {
@@ -1468,19 +2009,21 @@ router.post("/repairs", async (req, res) => {
         session
       );
 
-      const [job] = await RepairJob.create(
-        [
-          {
-            ...body,
-            jobNumber,
-            partsUsed,
-            receivedAt: body.receivedAt
-              ? new Date(body.receivedAt)
-              : new Date(),
-          },
-        ],
-        { session }
-      );
+    const [job] = await RepairJob.create(
+      [
+        {
+          ...repairFields,
+          jobNumber,
+          partsUsed,
+          receivedAt,
+
+          openingAmountPaid: 0,
+          payments: initialPayments,
+          amountPaid: initialAmountPaid,
+        },
+      ],
+      { session }
+    );
 
       updateRepairFinancials(job);
       updateRepairWarranty(job);
@@ -1627,6 +2170,242 @@ function findRepairJobByIdentifier(identifier, session) {
   return RepairJob.findOne(query).session(session);
 }
 
+
+router.post("/repairs/:id/payments", async (req, res) => {
+  const { id } = req.params;
+  const body = req.body || {};
+
+  const amount = Number(body.amount);
+  const validMethods = ["cash", "transfer", "pos", "other"];
+
+  if (!Number.isFinite(amount) || amount <= 0) {
+    return res.status(400).json({ error: "Enter a valid payment amount." });
+  }
+
+  if (!validMethods.includes(body.paymentMethod)) {
+    return res.status(400).json({ error: "Invalid payment method." });
+  }
+
+  const paidAt = body.paidAt ? new Date(body.paidAt) : new Date();
+
+  if (Number.isNaN(paidAt.getTime())) {
+    return res.status(400).json({ error: "Invalid payment date." });
+  }
+
+  const session = await mongoose.startSession();
+
+  try {
+    let updatedJob;
+
+    await session.withTransaction(async () => {
+      const job = await findRepairJobByIdentifier(id, session);
+
+      if (!job) throw new Error("REPAIR_JOB_NOT_FOUND");
+      if (job.isArchived) throw new Error("REPAIR_JOB_ARCHIVED");
+      if (job.status === "cancelled") throw new Error("REPAIR_JOB_CANCELLED");
+
+      if (amount > Number(job.balance || 0)) {
+        throw new Error("PAYMENT_EXCEEDS_BALANCE");
+      }
+
+      const existingPayments = job.payments || [];
+
+      const paymentsTotal = existingPayments.reduce(
+        (sum, payment) => sum + Number(payment.amount || 0),
+        0
+      );
+
+      if (job.openingAmountPaid == null) {
+        job.openingAmountPaid = Math.max(
+          0,
+          Number(job.amountPaid || 0) - paymentsTotal
+        );
+      }
+
+      job.payments.push({
+        amount,
+        paymentMethod: body.paymentMethod,
+        paidAt,
+        reference: String(body.reference || "").trim(),
+        notes: String(body.notes || "").trim(),
+      });
+
+      job.amountPaid =
+        Number(job.openingAmountPaid || 0) +
+        job.payments.reduce(
+          (sum, payment) => sum + Number(payment.amount || 0),
+          0
+        );
+
+      updateRepairFinancials(job);
+
+      await job.save({ session });
+
+      updatedJob = job;
+    });
+
+    return res.json({
+      success: true,
+      message: "Repair payment recorded successfully.",
+      repair: updatedJob,
+    });
+  } catch (error) {
+    const errors = {
+      REPAIR_JOB_NOT_FOUND: [404, "Repair job not found."],
+      REPAIR_JOB_ARCHIVED: [400, "This repair job is archived."],
+      REPAIR_JOB_CANCELLED: [400, "Cannot record payment for a cancelled job."],
+      PAYMENT_EXCEEDS_BALANCE: [400, "Payment cannot exceed the outstanding balance."],
+    };
+
+    const result = errors[error.message];
+
+    if (result) {
+      return res.status(result[0]).json({ error: result[1] });
+    }
+
+    console.error("Record repair payment error:", error);
+
+    return res.status(500).json({
+      error: "Could not record repair payment.",
+    });
+  } finally {
+    await session.endSession();
+  }
+});
+
+
+router.post("/sales/:id/payments", async (req, res) => {
+  const { id } = req.params;
+  const body = req.body || {};
+
+  const amount = Number(body.amount);
+  const validMethods = ["cash", "transfer", "pos", "other"];
+
+  if (!Number.isFinite(amount) || amount <= 0) {
+    return res.status(400).json({
+      success: false,
+      message: "Enter a valid payment amount.",
+    });
+  }
+
+  if (!validMethods.includes(body.paymentMethod)) {
+    return res.status(400).json({
+      success: false,
+      message: "Select a valid payment method.",
+    });
+  }
+
+  const paidAt = body.paidAt ? new Date(body.paidAt) : new Date();
+
+  if (Number.isNaN(paidAt.getTime())) {
+    return res.status(400).json({
+      success: false,
+      message: "Enter a valid payment date.",
+    });
+  }
+
+  const session = await mongoose.startSession();
+
+  try {
+    let updatedSale;
+
+    await session.withTransaction(async () => {
+      const saleFilter = mongoose.isValidObjectId(id)
+        ? { _id: id }
+        : { saleNumber: id };
+
+      const sale = await Sale.findOne(saleFilter).session(session);
+
+      if (!sale) {
+        throw new Error("SALE_NOT_FOUND");
+      }
+
+      const currentBalance = Number(sale.balance || 0);
+
+      if (currentBalance <= 0) {
+        throw new Error("SALE_ALREADY_PAID");
+      }
+
+      if (amount > currentBalance) {
+        throw new Error("SALE_PAYMENT_EXCEEDS_BALANCE");
+      }
+
+      sale.payments = sale.payments || [];
+
+      const existingPaymentsTotal = sale.payments.reduce(
+        (sum, payment) => sum + Number(payment.amount || 0),
+        0
+      );
+
+      // Preserve older payments whose dates were not recorded.
+      if (sale.openingAmountPaid == null) {
+        sale.openingAmountPaid = Math.max(
+          0,
+          Number(sale.amountPaid || 0) - existingPaymentsTotal
+        );
+      }
+
+      sale.payments.push({
+        amount,
+        paymentMethod: body.paymentMethod,
+        paidAt,
+        reference: body.reference || "",
+        notes: body.notes || "",
+      });
+
+      const paymentsTotal = sale.payments.reduce(
+        (sum, payment) => sum + Number(payment.amount || 0),
+        0
+      );
+
+      sale.amountPaid = Number(
+        (Number(sale.openingAmountPaid || 0) + paymentsTotal).toFixed(2)
+      );
+
+      sale.balance = Number(
+        (Number(sale.totalAmount || 0) - sale.amountPaid).toFixed(2)
+      );
+
+      await sale.save({ session });
+
+      updatedSale = sale;
+    });
+
+    return res.json({
+      success: true,
+      message: "Sale payment recorded successfully.",
+      sale: updatedSale,
+    });
+
+  } catch (error) {
+    const messages = {
+      SALE_NOT_FOUND: "Sale not found.",
+      SALE_ALREADY_PAID: "This sale has already been fully paid.",
+      SALE_PAYMENT_EXCEEDS_BALANCE: "Payment cannot exceed the outstanding balance.",
+    };
+
+    const knownError = messages[error.message];
+
+    if (knownError) {
+      return res.status(error.message === "SALE_NOT_FOUND" ? 404 : 400).json({
+        success: false,
+        message: knownError,
+      });
+    }
+
+    console.error("Record sale payment error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Unable to record sale payment.",
+    });
+
+  } finally {
+    await session.endSession();
+  }
+});
+
+
 // PATCH /api/admin/repairs/:id
 // Edit any permitted field in an existing repair record.
 router.patch("/repairs/:id", async (req, res) => {
@@ -1687,6 +2466,8 @@ router.patch("/repairs/:id", async (req, res) => {
             ? body[field].trim()
             : body[field];
       }
+
+      updateRepairFinancials(job);
 
       const enteredCompletedStatus =
         ["repaired", "collected"].includes(job.status) &&
@@ -1928,20 +2709,74 @@ function getBusinessReferencePrefix(date = new Date()) {
   return `MD-${day}-${month}-${year}`;
 }
 
-async function generateSaleNumber(session) {
+async function generateSaleNumber() {
   const prefix = getBusinessReferencePrefix();
+  const counterId = `sale:${prefix}`;
 
-  const latestSale = await Sale.findOne({
-    saleNumber: new RegExp(`^${prefix}-S-\\d+$`),
-  })
-    .sort({ saleNumber: -1 })
-    .session(session);
+  const salePattern = new RegExp(`^${prefix}-S-(\\d+)$`);
 
-  const nextNumber = latestSale
-    ? Number(latestSale.saleNumber.split("-S-").pop()) + 1
-    : 1;
+  // Initialise the counter from existing sales if this is
+  // the first time the counter is being used for this date.
+  const counterExists = await SequenceCounter.exists({
+    _id: counterId,
+  });
 
-  return `${prefix}-S-${nextNumber}`;
+  if (!counterExists) {
+    const existingSales = await Sale.find({
+      saleNumber: salePattern,
+    })
+      .select("saleNumber")
+      .lean();
+
+    const highestExistingNumber = existingSales.reduce(
+      (highest, sale) => {
+        const match = sale.saleNumber.match(salePattern);
+
+        if (!match) return highest;
+
+        const number = Number(match[1]);
+
+        return Number.isSafeInteger(number)
+          ? Math.max(highest, number)
+          : highest;
+      },
+      0
+    );
+
+    try {
+      await SequenceCounter.updateOne(
+        { _id: counterId },
+        {
+          $setOnInsert: {
+            sequence: highestExistingNumber,
+          },
+        },
+        { upsert: true }
+      );
+    } catch (error) {
+      // Another request may have created the counter first.
+      // Ignore only that duplicate-key race.
+      if (error.code !== 11000) {
+        throw error;
+      }
+    }
+  }
+
+  // Atomically allocate the next number.
+  const counter = await SequenceCounter.findOneAndUpdate(
+    { _id: counterId },
+    { $inc: { sequence: 1 } },
+    {
+      returnDocument: "after",
+      upsert: true,
+    }
+  );
+
+  if (!counter || !Number.isSafeInteger(counter.sequence)) {
+    throw new Error("SALE_NUMBER_GENERATION_FAILED");
+  }
+
+  return `${prefix}-S-${counter.sequence}`;
 }
 
 
@@ -2053,15 +2888,17 @@ router.post("/sales", async (req, res) => {
       quantities.set(id, combinedQuantity);
     }
 
-    const session = await mongoose.startSession();
-    let createdSale;
+      // Allocate a unique sale number before starting the stock transaction.
+      // Failed transactions may leave a skipped number, which is acceptable.
+      const saleNumber = await generateSaleNumber();
 
-    try {
-      await session.withTransaction(async () => {
-        const saleItems = [];
-        let subtotal = 0;
+      const session = await mongoose.startSession();
+      let createdSale;
 
-        saleNumber = await generateSaleNumber(session);
+      try {
+        await session.withTransaction(async () => {
+          const saleItems = [];
+          let subtotal = 0;
 
         for (const [inventoryItemId, quantity] of quantities) {
           // Atomic deduction prevents selling stock that is no longer available.
@@ -2069,13 +2906,12 @@ router.post("/sales", async (req, res) => {
             {
               _id: inventoryItemId,
               quantity: { $gte: quantity },
-              category: "accessory",
             },
             {
               $inc: { quantity: -quantity },
             },
             {
-              new: true,
+              returnDocument: "after",
               session,
             }
           );
@@ -2097,6 +2933,7 @@ router.post("/sales", async (req, res) => {
           saleItems.push({
             inventoryItemId: item._id,
             itemNameSnapshot: item.itemName,
+            categorySnapshot: item.category,
             quantity,
             unitSellingPrice,
             unitCostPrice,
@@ -2114,7 +2951,7 @@ router.post("/sales", async (req, res) => {
                 unitSellingPrice,
                 referenceType: "sale",
                 referenceId: saleNumber,
-                notes: "Accessory sale",
+                notes: `Product sale (${item.category})`,
               },
             ],
             { session }
@@ -2125,39 +2962,51 @@ router.post("/sales", async (req, res) => {
           throw new Error("SALE_DISCOUNT_EXCEEDS_TOTAL");
         }
 
-        const totalAmount = Number(
-          (subtotal - discount).toFixed(2)
-        );
+        const totalAmount = Number((subtotal - discount).toFixed(2));
+    const paid = amountPaid === null ? totalAmount : amountPaid;
 
-        const paid = amountPaid === null ? totalAmount : amountPaid;
+    if (paid > totalAmount) {
+      throw new Error("SALE_PAYMENT_EXCEEDS_TOTAL");
+    }
 
-        if (paid > totalAmount) {
-          throw new Error("SALE_PAYMENT_EXCEEDS_TOTAL");
-        }
+    const balance = Number((totalAmount - paid).toFixed(2));
+    
 
-        const balance = Number(
-          (totalAmount - paid).toFixed(2)
-        );
+    const soldAt = new Date();
 
-        const [sale] = await Sale.create(
-          [
-            {
-              saleNumber,
-              customerName,
-              customerPhone,
-              items: saleItems,
-              subtotal,
-              discount,
-              totalAmount,
-              amountPaid: paid,
-              balance,
-              paymentMethod,
-              notes,
-              soldAt: new Date(),
-            },
-          ],
-          { session }
-        );
+    const initialPayments = paid > 0
+      ? [
+          {
+            amount: paid,
+            paymentMethod,
+            paidAt: soldAt,
+          },
+        ]
+      : [];
+
+    const [sale] = await Sale.create(
+      [
+        {
+          saleNumber,
+          customerName,
+          customerPhone,
+          items: saleItems,
+          subtotal,
+          discount,
+          totalAmount,
+
+          openingAmountPaid: 0,
+          payments: initialPayments,
+
+          amountPaid: paid,
+          balance,
+          paymentMethod,
+          notes,
+          soldAt,
+        },
+      ],
+      { session }
+    );
 
         createdSale = sale;
       });
@@ -2175,7 +3024,7 @@ router.post("/sales", async (req, res) => {
   } catch (err) {
     if (err.message === "SALE_STOCK_UNAVAILABLE") {
       return res.status(400).json({
-        error: "Insufficient stock, or an item is not classified as an accessory.",
+        error: "Insufficient stock, or the inventory item is unavailable.",
         inventoryItemId: err.inventoryItemId,
       });
     }
@@ -2195,7 +3044,7 @@ router.post("/sales", async (req, res) => {
     console.error("Error recording sale:", err.message);
 
     return res.status(500).json({
-      error: "Unable to record accessory sale.",
+      error: "Unable to record product sale.",
     });
   }
 });

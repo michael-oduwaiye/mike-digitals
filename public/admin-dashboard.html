@@ -6,14 +6,91 @@
 <title>Mike Digitals — Admin</title>
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
-  :root {
-    --bg: #0A0E1A; --bg-card: #121729; --border: #232B45;
-    --amber: #FFB627; --green: #3DDC97; --red: #FF6B6B;
-    --text: #E8EAF0; --text-muted: #8B93A7; --text-faint: #4E5670;
-    --font-display: 'Space Grotesk', sans-serif; --font-body: 'Inter', sans-serif; --font-mono: 'JetBrains Mono', monospace;
-  }
+  
+:root {
+  color-scheme: light;
+
+  /* Base surfaces */
+  --bg: #f5f7fb;
+  --bg-card: #ffffff;
+  --card: #ffffff;
+  --border: #e7eaf0;
+
+  /* Brand */
+  --amber: #ff7417;
+  --amber-soft: rgba(255, 116, 23, 0.10);
+
+  /* Status colours */
+  --green: #16845b;
+  --green-soft: rgba(22, 132, 91, 0.10);
+  --red: #d93636;
+  --red-soft: rgba(217, 54, 54, 0.09);
+  --yellow: #b7791f;
+  --yellow-soft: rgba(183, 121, 31, 0.12);
+
+  /* Text */
+  --text: #182230;
+  --text-muted: #596579;
+  --text-faint: #7d8798;
+  --muted: #596579;
+
+  /* Supporting elements */
+  --grey-bar: #b8c0cf;
+  --side-bg: #ffffff;
+  --side-text: #46536a;
+  --side-faint: #8a94a6;
+  --side-border: #e7eaf0;
+  --side-hover: #fff3ea;
+  --side-strong: #182230;
+
+  /* Typography */
+  --font-display: 'Inter', system-ui, sans-serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --font: 'Inter', system-ui, sans-serif;
+  --mono: 'JetBrains Mono', monospace;
+
+  /* Effects */
+  --shadow: 0 4px 18px rgba(22, 34, 51, 0.045);
+}
+
+/* Dark theme */
+body[data-theme="dark"] {
+  color-scheme: dark;
+
+  --bg: #0b1120;
+  --bg-card: #121b2d;
+  --card: #121b2d;
+  --border: #26344b;
+
+  --amber: #ff8a32;
+  --amber-soft: rgba(255, 138, 50, 0.13);
+
+  --green: #42d6a0;
+  --green-soft: rgba(66, 214, 160, 0.12);
+  --red: #ff7777;
+  --red-soft: rgba(255, 119, 119, 0.12);
+  --yellow: #f0b95a;
+  --yellow-soft: rgba(240, 185, 90, 0.13);
+
+  --text: #edf2fa;
+  --text-muted: #a6b2c5;
+  --text-faint: #8290a6;
+  --muted: #a6b2c5;
+
+  --grey-bar: #4a5873;
+  --side-bg: #0f1729;
+  --side-text: #aab4c8;
+  --side-faint: #7d8ba3;
+  --side-border: #232f4a;
+  --side-hover: #18233d;
+  --side-strong: #ffffff;
+
+  --shadow: 0 5px 20px rgba(0, 0, 0, 0.18);
+}
+
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -25,9 +102,11 @@
   }
 
   .wrap {
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 28px 18px 60px;
+    width: 100%;
+    max-width: none;
+    min-height: 100vh;
+    margin: 0;
+    padding: 28px 30px 60px;
   }
 
   .login-screen {
@@ -727,6 +806,2734 @@
   }
 }
 
+
+/* ==========================================
+   MIKE DIGITALS — UNIFIED DASHBOARD LAYOUT
+========================================== */
+
+.dashboard-layout {
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr);
+  min-height: 100vh;
+  gap: 0;
+}
+
+.dashboard-sidebar {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  padding: 26px 16px;
+  background: var(--bg-card);
+  border-right: 1px solid var(--border);
+}
+
+.sidebar-brand {
+  font-family: var(--font-display);
+  font-size: 21px;
+  font-weight: 700;
+  padding: 0 12px 28px;
+}
+
+.sidebar-group {
+  margin-bottom: 26px;
+}
+
+.sidebar-group-title {
+  padding: 0 12px;
+  margin-bottom: 10px;
+  color: var(--text-muted);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+}
+
+.sidebar-link {
+  display: block;
+  width: 100%;
+  padding: 11px 12px;
+  margin-bottom: 4px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-muted);
+  font: inherit;
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.sidebar-link:hover,
+.sidebar-link.active {
+  background: rgba(255, 182, 39, 0.12);
+  color: var(--amber);
+}
+
+.dashboard-main {
+  min-width: 0;
+  padding: 28px 30px 60px;
+}
+
+@media (max-width: 800px) {
+  .dashboard-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-sidebar {
+    position: relative;
+    height: auto;
+    border-right: 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .dashboard-main {
+    padding: 20px 14px 40px;
+  }
+}
+
+
+
+/* ==========================================
+   MIKE DIGITALS — GLOBAL LAYOUT UPGRADE
+   Stage 1: Shell, sidebar, header and mobile
+========================================== */
+
+/* Dashboard outer container */
+#dashboard.wrap {
+  width: 100%;
+  max-width: none;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+}
+
+/* Main two-column layout */
+#dashboard .dashboard-layout {
+  display: grid;
+  grid-template-columns: 272px minmax(0, 1fr);
+  min-height: 100vh;
+  gap: 0;
+}
+
+/* Sidebar */
+#dashboard .dashboard-sidebar {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 28px 16px;
+  background: var(--bg-card);
+  border-right: 1px solid var(--border);
+  scrollbar-width: thin;
+}
+
+#dashboard .sidebar-brand {
+  padding: 4px 12px 30px;
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+#dashboard .sidebar-group {
+  margin-bottom: 28px;
+}
+
+#dashboard .sidebar-group-title {
+  padding: 0 12px;
+  margin-bottom: 10px;
+  color: var(--text-faint);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.1px;
+  line-height: 1.5;
+  text-transform: uppercase;
+}
+
+#dashboard .sidebar-link {
+  display: block;
+  width: 100%;
+  padding: 11px 12px;
+  margin-bottom: 4px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--text-muted);
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.4;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.18s ease, color 0.18s ease,
+              border-color 0.18s ease;
+}
+
+#dashboard .sidebar-link:hover {
+  background: rgba(255, 182, 39, 0.07);
+  color: var(--text);
+}
+
+#dashboard .sidebar-link.active {
+  background: rgba(255, 182, 39, 0.13);
+  border-color: rgba(255, 182, 39, 0.12);
+  color: var(--amber);
+  font-weight: 600;
+}
+
+/* Main content */
+#dashboard .dashboard-main {
+  min-width: 0;
+  width: 100%;
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 30px 34px 60px;
+}
+
+/* Main dashboard header */
+#dashboard .dashboard-main > header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  min-height: 68px;
+  margin: -30px -34px 30px;
+  padding: 14px 34px;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+}
+
+#dashboard .dashboard-main > header h1 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 21px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  line-height: 1.3;
+}
+
+#dashboard .header-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 9px;
+}
+
+#dashboard .refresh-btn,
+#dashboard .logout-btn {
+  min-height: 36px;
+  padding: 8px 13px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-card);
+  color: var(--text-muted);
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: border-color 0.18s ease, color 0.18s ease;
+}
+
+#dashboard .refresh-btn:hover {
+  border-color: var(--amber);
+  color: var(--text);
+}
+
+#dashboard .logout-btn:hover {
+  border-color: var(--red);
+  color: var(--red);
+}
+
+/* Tablet and mobile navigation */
+@media (max-width: 800px) {
+  #dashboard .dashboard-layout {
+    display: flex;
+    flex-direction: column;
+  }
+
+  #dashboard .dashboard-sidebar {
+    position: sticky;
+    top: 0;
+    z-index: 30;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    width: 100%;
+    height: auto;
+    max-height: none;
+    padding: 10px 14px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    border-right: 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  #dashboard .sidebar-brand {
+    flex: 0 0 auto;
+    padding: 0 12px 0 0;
+    font-size: 16px;
+  }
+
+  #dashboard .sidebar-group {
+    display: flex;
+    align-items: center;
+    flex: 0 0 auto;
+    gap: 4px;
+    margin: 0;
+  }
+
+  #dashboard .sidebar-group-title {
+    display: none;
+  }
+
+  #dashboard .sidebar-link {
+    width: auto;
+    flex: 0 0 auto;
+    margin: 0;
+    padding: 9px 11px;
+    white-space: nowrap;
+  }
+
+  #dashboard .dashboard-main {
+    max-width: none;
+    padding: 20px 18px 40px;
+  }
+
+  #dashboard .dashboard-main > header {
+    margin: -20px -18px 24px;
+    padding: 12px 18px;
+  }
+}
+
+@media (max-width: 520px) {
+  #dashboard .dashboard-main > header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  #dashboard .dashboard-main > header h1 {
+    font-size: 19px;
+  }
+
+  #dashboard .header-actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  #dashboard .refresh-btn,
+  #dashboard .logout-btn {
+    padding: 8px 10px;
+    font-size: 11px;
+  }
+
+  #dashboard .dashboard-main {
+    padding-right: 12px;
+    padding-left: 12px;
+  }
+
+  #dashboard .dashboard-main > header {
+    margin-right: -12px;
+    margin-left: -12px;
+    padding-right: 12px;
+    padding-left: 12px;
+  }
+}
+
+
+
+/* ==========================================
+   MIKE DIGITALS — GLOBAL DESIGN SYSTEM
+   Stage 2: Colours, typography and surfaces
+========================================== */
+
+html {
+  background: var(--bg);
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+#dashboard {
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* Consistent headings */
+#dashboard h1,
+#dashboard h2,
+#dashboard h3,
+#dashboard h4 {
+  color: var(--text);
+  font-family: var(--font-display);
+}
+
+#dashboard p,
+#dashboard label,
+#dashboard span {
+  /* Inherit text colour unless a component defines its own */
+}
+
+/* Card and panel surfaces */
+#dashboard .transaction-summary,
+#dashboard .summary-card,
+#dashboard .dashboard-card,
+#dashboard .panel,
+#dashboard .card {
+  background: var(--bg-card);
+  border-color: var(--border);
+  box-shadow: var(--shadow);
+  color: var(--text);
+}
+
+/* General form controls */
+#dashboard input,
+#dashboard select,
+#dashboard textarea {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-family: var(--font-body);
+}
+
+#dashboard input::placeholder,
+#dashboard textarea::placeholder {
+  color: var(--text-faint);
+  opacity: 1;
+}
+
+#dashboard input:focus,
+#dashboard select:focus,
+#dashboard textarea:focus {
+  border-color: var(--amber);
+  outline: none;
+  box-shadow: 0 0 0 3px var(--amber-soft);
+}
+
+/* Tables */
+#dashboard table {
+  color: var(--text);
+}
+
+#dashboard th {
+  color: var(--text-muted);
+}
+
+#dashboard td {
+  border-color: var(--border);
+}
+
+/* Consistent muted text */
+#dashboard .muted,
+#dashboard .text-muted {
+  color: var(--text-muted);
+}
+
+/* Consistent action colour */
+#dashboard a {
+  color: var(--amber);
+}
+
+#dashboard a:hover {
+  opacity: 0.85;
+}
+
+/* Smooth surface transitions */
+#dashboard .transaction-summary,
+#dashboard .summary-card,
+#dashboard .dashboard-card,
+#dashboard .panel,
+#dashboard .card,
+#dashboard .dashboard-sidebar,
+#dashboard .sidebar-link,
+#dashboard button,
+#dashboard input,
+#dashboard select,
+#dashboard textarea {
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+/* Keep numerical values visually consistent */
+#dashboard .value,
+#dashboard .amount,
+#dashboard .money,
+#dashboard .price {
+  font-variant-numeric: tabular-nums;
+}
+
+
+
+/* ==========================================
+   MIKE DIGITALS — SHOP OVERVIEW
+   Stage 3: Dashboard presentation
+========================================== */
+
+#shopOverviewSection {
+  min-width: 0;
+}
+
+/* Page heading and period selector */
+#shopOverviewSection > .section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 18px;
+  margin-bottom: 12px;
+}
+
+#shopOverviewSection > .section-header h2 {
+  margin: 0 0 6px;
+  font-size: 25px;
+  font-weight: 750;
+  letter-spacing: -0.7px;
+}
+
+#shopOverviewSection > .section-header p {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+#shopOverviewPeriod {
+  min-width: 145px;
+  min-height: 40px;
+  padding: 9px 34px 9px 12px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: var(--bg-card);
+  color: var(--text);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* Selected reporting period */
+#shopOverviewDateRange {
+  margin: 0 0 20px;
+  color: var(--text-faint);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* KPI grid */
+#shopOverviewMetrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 26px;
+}
+
+/* Individual KPI cards */
+#shopOverviewMetrics > .card {
+  position: relative;
+  min-width: 0;
+  min-height: 125px;
+  margin: 0;
+  padding: 19px 18px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 13px;
+  background: var(--bg-card);
+  box-shadow: var(--shadow);
+}
+
+#shopOverviewMetrics > .card::before {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 3px;
+  height: 100%;
+  background: var(--amber);
+  content: "";
+}
+
+/* KPI labels */
+#shopOverviewMetrics > .card h3 {
+  margin: 0 0 13px;
+  color: var(--text-muted);
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.045em;
+  line-height: 1.45;
+}
+
+/* KPI values */
+#shopOverviewMetrics > .card h2 {
+  margin: 0 0 8px;
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: clamp(18px, 1.7vw, 23px);
+  font-weight: 600;
+  letter-spacing: -0.7px;
+  overflow-wrap: anywhere;
+  line-height: 1.35;
+}
+
+/* KPI descriptions */
+#shopOverviewMetrics > .card p {
+  margin: 0;
+  color: var(--text-faint);
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+/* Financial performance emphasis */
+#shopOverviewMetrics > .card:nth-child(4) h2 {
+  color: var(--green);
+}
+
+#shopOverviewMetrics > .card:nth-child(5) h2,
+#shopOverviewMetrics > .card:nth-child(6) h2,
+#shopOverviewMetrics > .card:nth-child(7) h2,
+#shopOverviewMetrics > .card:nth-child(8) h2 {
+  color: var(--yellow);
+}
+
+/* Operational KPI cards */
+#shopOverviewMetrics > .card:nth-child(n + 10)::before {
+  background: var(--grey-bar);
+}
+
+#shopOverviewMetrics > .card:nth-child(n + 10) {
+  min-height: 112px;
+  background: var(--bg);
+  box-shadow: none;
+}
+
+#shopOverviewMetrics > .card:nth-child(n + 10) h2 {
+  font-size: 25px;
+}
+
+/* Overview information panels */
+#shopOverviewSection > .card {
+  min-width: 0;
+  margin-top: 18px !important;
+  padding: 22px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--bg-card);
+  box-shadow: var(--shadow);
+}
+
+#shopOverviewSection > .card h3 {
+  margin: 0 0 7px;
+  font-size: 16px;
+  font-weight: 750;
+  letter-spacing: -0.2px;
+}
+
+#shopOverviewSection > .card > p {
+  margin: 0 0 17px;
+  color: var(--text-muted);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+/* Tables */
+#shopOverviewSection .table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+#shopOverviewSection table {
+  width: 100%;
+  min-width: 680px;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 12px;
+}
+
+#shopOverviewSection table th {
+  padding: 13px 12px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text-muted);
+  font-size: 10px;
+  font-weight: 750;
+  letter-spacing: 0.055em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+#shopOverviewSection table td {
+  padding: 14px 12px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+  line-height: 1.55;
+  vertical-align: middle;
+}
+
+#shopOverviewSection table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+#shopOverviewSection table tbody tr:hover {
+  background: var(--amber-soft);
+}
+
+/* Customer names and important amounts */
+#shopOverviewSection table td strong {
+  font-weight: 700;
+}
+
+#shopOverviewSection table td br + * {
+  color: var(--text-muted);
+}
+
+/* Record Payment action */
+#shopOverviewSection table .btn-secondary {
+  min-height: 34px;
+  padding: 7px 11px;
+  border: 1px solid var(--amber);
+  border-radius: 7px;
+  background: var(--amber-soft);
+  color: var(--amber);
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+#shopOverviewSection table .btn-secondary:hover {
+  background: var(--amber);
+  color: #fff;
+}
+
+/* Empty and loading messages */
+#shopOverviewSection .card > p,
+#shopOverviewSection #shopPaymentReminders > p,
+#shopOverviewSection #shopLowStockList > p,
+#shopOverviewSection #shopRecentActivity > p {
+  color: var(--text-muted);
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+/* Dark theme refinements */
+body[data-theme="dark"] #shopOverviewMetrics > .card:nth-child(n + 10) {
+  background: rgba(255, 255, 255, 0.025);
+}
+
+body[data-theme="dark"] #shopOverviewSection table th {
+  background: rgba(255, 255, 255, 0.025);
+}
+
+/* Tablet */
+@media (max-width: 1100px) {
+  #shopOverviewMetrics {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* Mobile */
+@media (max-width: 650px) {
+  #shopOverviewSection > .section-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  #shopOverviewSection > .section-header h2 {
+    font-size: 22px;
+  }
+
+  #shopOverviewPeriod {
+    width: 100%;
+  }
+
+  #shopOverviewMetrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  #shopOverviewMetrics > .card {
+    min-height: 115px;
+    padding: 15px 13px;
+  }
+
+  #shopOverviewMetrics > .card h2 {
+    font-size: 17px;
+  }
+
+  #shopOverviewMetrics > .card h3 {
+    font-size: 10px;
+  }
+
+  #shopOverviewMetrics > .card p {
+    font-size: 10px;
+  }
+
+  #shopOverviewSection > .card {
+    padding: 16px 13px;
+  }
+}
+
+@media (max-width: 360px) {
+  #shopOverviewMetrics {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+
+/* ==========================================
+   MIKE DIGITALS — REPAIR JOBS
+   Stage 4: Dashboard presentation
+========================================== */
+
+#repairJobsSection {
+  min-width: 0;
+}
+
+/* Page heading */
+#repairJobsSection > .section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 22px;
+}
+
+#repairJobsSection > .section-header h2 {
+  margin: 0 0 6px;
+  font-size: 25px;
+  font-weight: 750;
+  letter-spacing: -0.7px;
+}
+
+#repairJobsSection > .section-header p {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+/* New Repair Job button */
+#repairJobsSection > .section-header .btn-primary {
+  min-height: 42px;
+  padding: 10px 17px;
+  border: 1px solid var(--amber);
+  border-radius: 9px;
+  background: var(--amber);
+  color: #fff;
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.18s ease, opacity 0.18s ease;
+}
+
+#repairJobsSection > .section-header .btn-primary:hover {
+  opacity: 0.92;
+  transform: translateY(-1px);
+}
+
+/* Repair summary cards */
+#repairJobsSummary {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+#repairJobsSummary > .card {
+  position: relative;
+  min-width: 0;
+  min-height: 118px;
+  margin: 0;
+  padding: 20px 18px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 13px;
+  background: var(--bg-card);
+  box-shadow: var(--shadow);
+}
+
+#repairJobsSummary > .card::before {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 3px;
+  height: 100%;
+  background: var(--amber);
+  content: "";
+}
+
+#repairJobsSummary > .card:nth-child(2)::before {
+  background: var(--yellow);
+}
+
+#repairJobsSummary > .card:nth-child(3)::before {
+  background: var(--green);
+}
+
+#repairJobsSummary > .card:nth-child(4)::before {
+  background: var(--red);
+}
+
+#repairJobsSummary > .card p {
+  margin: 0 0 13px;
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.035em;
+  line-height: 1.5;
+}
+
+#repairJobsSummary > .card h2 {
+  margin: 0;
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: clamp(21px, 2vw, 27px);
+  font-weight: 600;
+  letter-spacing: -0.7px;
+  overflow-wrap: anywhere;
+}
+
+#repairJobsSummary > .card:nth-child(3) h2 {
+  color: var(--green);
+}
+
+#repairJobsSummary > .card:nth-child(4) h2 {
+  color: var(--red);
+}
+
+/* Repair Records panel */
+#repairJobsSection > .card {
+  min-width: 0;
+  margin-top: 18px !important;
+  padding: 22px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--bg-card);
+  box-shadow: var(--shadow);
+}
+
+#repairJobsSection > .card > .section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+#repairJobsSection > .card .section-header h3 {
+  margin: 0 0 6px;
+  font-size: 16px;
+  font-weight: 750;
+}
+
+#repairJobsSection > .card .section-header p {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+/* Refresh button */
+#repairJobsSection .section-header .btn-secondary {
+  min-height: 36px;
+  padding: 8px 13px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+#repairJobsSection .section-header .btn-secondary:hover {
+  border-color: var(--amber);
+  color: var(--amber);
+}
+
+/* Repair records table */
+#repairJobsList {
+  width: 100%;
+  min-width: 0;
+}
+
+#repairJobsList > div {
+  width: 100%;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+#repairJobsList table {
+  width: 100%;
+  min-width: 1050px;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 12px;
+}
+
+#repairJobsList table th {
+  padding: 14px 12px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text-muted);
+  font-size: 10px;
+  font-weight: 750;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+#repairJobsList table td {
+  padding: 15px 12px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+  line-height: 1.6;
+  vertical-align: middle;
+}
+
+#repairJobsList table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+#repairJobsList table tbody tr:hover {
+  background: var(--amber-soft);
+}
+
+#repairJobsList table td:first-child {
+  color: var(--amber);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+#repairJobsList table td small {
+  color: var(--text-muted);
+  font-size: 11px;
+}
+
+#repairJobsList table td:nth-child(5),
+#repairJobsList table td:nth-child(6),
+#repairJobsList table td:nth-child(7) {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+/* View action */
+#repairJobsList table .btn-secondary {
+  min-height: 33px;
+  padding: 7px 13px;
+  border: 1px solid var(--amber);
+  border-radius: 7px;
+  background: var(--amber-soft);
+  color: var(--amber);
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+#repairJobsList table .btn-secondary:hover {
+  background: var(--amber);
+  color: #fff;
+}
+
+/* Repair form and details panels */
+#repairJobsSection #repairFormContainer,
+#repairJobsSection #repairDetailsContainer {
+  margin-top: 20px !important;
+  padding: 22px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--bg-card);
+  box-shadow: var(--shadow);
+}
+
+#repairJobsSection #repairFormContainer h3,
+#repairJobsSection #repairDetailsContainer h3 {
+  margin: 0 0 18px;
+  font-size: 17px;
+  font-weight: 750;
+}
+
+#repairJobsSection #repairFormContent label,
+#repairJobsSection #repairDetailsContent label {
+  display: block;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.6;
+}
+
+#repairJobsSection #repairFormContent input,
+#repairJobsSection #repairFormContent select,
+#repairJobsSection #repairFormContent textarea,
+#repairJobsSection #repairDetailsContent input,
+#repairJobsSection #repairDetailsContent select,
+#repairJobsSection #repairDetailsContent textarea {
+  width: 100%;
+  max-width: 100%;
+  margin-top: 6px;
+  padding: 11px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text);
+  font: inherit;
+  font-size: 13px;
+}
+
+#repairJobsSection #repairFormContent input:focus,
+#repairJobsSection #repairFormContent select:focus,
+#repairJobsSection #repairFormContent textarea:focus,
+#repairJobsSection #repairDetailsContent input:focus,
+#repairJobsSection #repairDetailsContent select:focus,
+#repairJobsSection #repairDetailsContent textarea:focus {
+  outline: none;
+  border-color: var(--amber);
+  box-shadow: 0 0 0 3px var(--amber-soft);
+}
+
+#repairJobsSection #repairFormContent button,
+#repairJobsSection #repairDetailsContent button {
+  margin-top: 12px;
+}
+
+/* Empty and loading states */
+#repairJobsSection #repairJobsList > p {
+  padding: 18px 0;
+  color: var(--text-muted);
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+/* Dark theme */
+body[data-theme="dark"] #repairJobsSection > .card,
+body[data-theme="dark"] #repairJobsSummary > .card {
+  background: var(--bg-card);
+}
+
+body[data-theme="dark"] #repairJobsList table th {
+  background: rgba(255, 255, 255, 0.025);
+}
+
+/* Tablet */
+@media (max-width: 1050px) {
+  #repairJobsSummary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* Mobile */
+@media (max-width: 650px) {
+  #repairJobsSection > .section-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  #repairJobsSection > .section-header h2 {
+    font-size: 22px;
+  }
+
+  #repairJobsSection > .section-header .btn-primary {
+    width: 100%;
+  }
+
+  #repairJobsSummary {
+    gap: 10px;
+  }
+
+  #repairJobsSummary > .card {
+    min-height: 105px;
+    padding: 16px 13px;
+  }
+
+  #repairJobsSummary > .card p {
+    font-size: 10px;
+  }
+
+  #repairJobsSummary > .card h2 {
+    font-size: 21px;
+  }
+
+  #repairJobsSection > .card,
+  #repairJobsSection #repairFormContainer,
+  #repairJobsSection #repairDetailsContainer {
+    padding: 16px 13px;
+  }
+}
+
+@media (max-width: 360px) {
+  #repairJobsSummary {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+
+/* ==========================================
+   MIKE DIGITALS — INVENTORY MANAGEMENT
+   Stage 5: Dashboard presentation
+========================================== */
+
+#inventorySection {
+  min-width: 0;
+}
+
+/* Main heading */
+#inventorySection > .plans-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin: 0 0 20px;
+  padding: 21px 23px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--bg-card);
+  box-shadow: var(--shadow);
+}
+
+#inventorySection > .plans-heading .section-title {
+  margin: 0 0 7px;
+  font-size: 23px;
+  font-weight: 750;
+  letter-spacing: -0.6px;
+}
+
+#inventorySection .inventory-help {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+/* Refresh Inventory */
+#inventorySection > .plans-heading .section-toggle {
+  min-height: 39px;
+  padding: 9px 15px;
+  border: 1px solid var(--amber);
+  border-radius: 8px;
+  background: var(--amber);
+  color: #fff;
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+#inventorySection > .plans-heading .section-toggle:hover {
+  opacity: 0.9;
+}
+
+/* Feedback message */
+#inventoryMessage {
+  margin: 0 0 14px;
+  color: var(--text-muted);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+/* Inventory panels */
+#inventorySection > .plans-panel {
+  min-width: 0;
+  margin: 0 0 20px;
+  padding: 22px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--bg-card);
+  box-shadow: var(--shadow);
+}
+
+#inventorySection > .plans-panel > .section-title {
+  margin: 0 0 19px;
+  font-size: 16px;
+  font-weight: 750;
+  letter-spacing: -0.2px;
+}
+
+/* Add inventory form */
+#inventorySection .inventory-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 17px;
+  align-items: end;
+}
+
+#inventorySection .inventory-form label {
+  display: block;
+  min-width: 0;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.6;
+}
+
+#inventorySection .inventory-form input,
+#inventorySection .inventory-form select {
+  display: block;
+  width: 100%;
+  min-height: 42px;
+  margin-top: 6px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 13px;
+  box-sizing: border-box;
+}
+
+#inventorySection .inventory-form input:focus,
+#inventorySection .inventory-form select:focus {
+  outline: none;
+  border-color: var(--amber);
+  box-shadow: 0 0 0 3px var(--amber-soft);
+}
+
+/* Add Item button */
+#inventorySection .inventory-primary-btn {
+  min-height: 42px;
+  padding: 10px 17px;
+  border: 1px solid var(--amber);
+  border-radius: 8px;
+  background: var(--amber);
+  color: #fff;
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+#inventorySection .inventory-primary-btn:hover {
+  opacity: 0.9;
+}
+
+#inventorySection .inventory-primary-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Search and filter toolbar */
+#inventorySection .inventory-toolbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 11px;
+  margin-bottom: 17px;
+}
+
+#inventorySection .inventory-toolbar > input,
+#inventorySection .inventory-toolbar > select {
+  min-height: 40px;
+  min-width: 150px;
+  padding: 9px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 12px;
+}
+
+#inventorySection .inventory-toolbar > input {
+  flex: 1;
+}
+
+#inventorySection .inventory-toolbar > input:focus,
+#inventorySection .inventory-toolbar > select:focus {
+  outline: none;
+  border-color: var(--amber);
+  box-shadow: 0 0 0 3px var(--amber-soft);
+}
+
+/* Low-stock checkbox */
+#inventorySection .inventory-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+#inventorySection .inventory-check input {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--amber);
+}
+
+/* Inventory tables */
+#inventorySection .inventory-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+#inventorySection .inventory-table {
+  width: 100%;
+  min-width: 850px;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 12px;
+}
+
+#inventorySection .inventory-table th {
+  padding: 13px 12px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text-muted);
+  font-size: 10px;
+  font-weight: 750;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+#inventorySection .inventory-table td {
+  padding: 14px 12px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+  line-height: 1.6;
+  vertical-align: middle;
+}
+
+#inventorySection .inventory-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+#inventorySection .inventory-table tbody tr:hover {
+  background: var(--amber-soft);
+}
+
+#inventorySection .inventory-table td strong {
+  font-weight: 700;
+}
+
+#inventorySection .inventory-table td small {
+  color: var(--text-muted);
+  font-size: 11px;
+}
+
+/* Stock status indicators */
+#inventorySection .inventory-status-low,
+#inventorySection .inventory-status-ok {
+  display: inline-block;
+  padding: 5px 9px;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+#inventorySection .inventory-status-low {
+  background: var(--red-soft);
+  color: var(--red);
+}
+
+#inventorySection .inventory-status-ok {
+  background: var(--green-soft);
+  color: var(--green);
+}
+
+/* Restock and Edit actions */
+#inventorySection .inventory-table td button {
+  min-height: 31px;
+  margin: 2px;
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 10px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+#inventorySection .inventory-table td button:hover {
+  border-color: var(--amber);
+  background: var(--amber-soft);
+  color: var(--amber);
+}
+
+/* Dark mode */
+body[data-theme="dark"] #inventorySection > .plans-panel,
+body[data-theme="dark"] #inventorySection > .plans-heading {
+  background: var(--bg-card);
+}
+
+body[data-theme="dark"] #inventorySection .inventory-table th {
+  background: rgba(255, 255, 255, 0.025);
+}
+
+/* Tablet */
+@media (max-width: 800px) {
+  #inventorySection .inventory-form {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+  #inventorySection > .plans-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 17px;
+  }
+
+  #inventorySection > .plans-heading .section-title {
+    font-size: 21px;
+  }
+
+  #inventorySection > .plans-heading .section-toggle {
+    width: 100%;
+  }
+
+  #inventorySection > .plans-panel {
+    padding: 16px 13px;
+  }
+
+  #inventorySection .inventory-form {
+    grid-template-columns: 1fr;
+    gap: 13px;
+  }
+
+  #inventorySection .inventory-primary-btn {
+    width: 100%;
+  }
+
+  #inventorySection .inventory-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  #inventorySection .inventory-toolbar > input,
+  #inventorySection .inventory-toolbar > select {
+    width: 100%;
+  }
+
+  #inventorySection .inventory-check {
+    padding: 5px 0;
+  }
+}
+
+
+
+/* ==========================================
+   MIKE DIGITALS — SALES MANAGEMENT
+   Stage 6: Dashboard presentation
+========================================== */
+
+#salesSection {
+  min-width: 0;
+}
+
+/* Sales heading */
+#salesSection > .section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin: 0 0 20px;
+  padding: 21px 23px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--bg-card);
+  box-shadow: var(--shadow);
+}
+
+#salesSection > .section-header h2 {
+  margin: 0 0 7px;
+  color: var(--text);
+  font-size: 23px;
+  font-weight: 750;
+  letter-spacing: -0.6px;
+}
+
+#salesSection > .section-header p {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+/* New Sale button */
+#salesSection > .section-header .btn-primary {
+  min-height: 40px;
+  padding: 10px 17px;
+  border: 1px solid var(--amber);
+  border-radius: 8px;
+  background: var(--amber);
+  color: #fff;
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* Sales summary */
+#salesSection #salesSummary {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+#salesSection #salesSummary .summary-card {
+  min-width: 0;
+  padding: 19px 21px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--bg-card);
+  box-shadow: var(--shadow);
+}
+
+#salesSection #salesSummary .label {
+  margin-bottom: 9px;
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 650;
+}
+
+#salesSection #salesSummary .value {
+  color: var(--text);
+  font-size: 23px;
+  font-weight: 750;
+  letter-spacing: -0.5px;
+}
+
+/* Sales records panel */
+#salesSection > .card {
+  min-width: 0;
+  padding: 22px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--bg-card);
+  box-shadow: var(--shadow);
+}
+
+#salesSection > .card > h3 {
+  margin: 0 0 18px;
+  color: var(--text);
+  font-size: 16px;
+  font-weight: 750;
+}
+
+/* Search and refresh */
+#salesSection .inventory-toolbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 11px;
+  margin-bottom: 17px;
+}
+
+#salesSection #salesSearch {
+  flex: 1;
+  min-width: 180px;
+  min-height: 40px;
+  padding: 9px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 12px;
+}
+
+#salesSection #salesSearch:focus {
+  outline: none;
+  border-color: var(--amber);
+  box-shadow: 0 0 0 3px var(--amber-soft);
+}
+
+#salesSection .inventory-toolbar .btn-secondary {
+  min-height: 40px;
+  padding: 9px 15px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* Sales table */
+#salesSection .inventory-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+#salesSection .inventory-table {
+  width: 100%;
+  min-width: 850px;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 12px;
+}
+
+#salesSection .inventory-table th {
+  padding: 13px 12px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text-muted);
+  font-size: 10px;
+  font-weight: 750;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+#salesSection .inventory-table td {
+  padding: 14px 12px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+  line-height: 1.6;
+  vertical-align: middle;
+}
+
+#salesSection .inventory-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+#salesSection .inventory-table tbody tr:hover {
+  background: var(--amber-soft);
+}
+
+#salesSection .inventory-table td button {
+  min-height: 31px;
+  padding: 6px 12px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 10px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+#salesSection .inventory-table td button:hover {
+  border-color: var(--amber);
+  background: var(--amber-soft);
+  color: var(--amber);
+}
+
+/* New Sale and Sale Details panels */
+#salesSection #saleFormContainer,
+#salesSection #saleDetailsContainer {
+  margin-top: 20px;
+  padding: 22px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--bg-card);
+  box-shadow: var(--shadow);
+}
+
+#salesSection #saleFormContainer > h3,
+#salesSection #saleDetailsContainer > h3 {
+  margin: 0 0 19px;
+  color: var(--text);
+  font-size: 17px;
+  font-weight: 750;
+}
+
+/* New Sale form */
+#salesSection #newSaleForm {
+  display: block;
+}
+
+#salesSection #newSaleForm .inventory-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+#salesSection #newSaleForm label,
+#salesSection #saleDetailsContent label {
+  display: block;
+  min-width: 0;
+  margin-bottom: 13px;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.6;
+}
+
+#salesSection #newSaleForm input,
+#salesSection #newSaleForm select,
+#salesSection #newSaleForm textarea,
+#salesSection #saleDetailsContent input,
+#salesSection #saleDetailsContent select,
+#salesSection #saleDetailsContent textarea {
+  display: block;
+  width: 100%;
+  min-height: 42px;
+  margin-top: 6px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 12px;
+  box-sizing: border-box;
+}
+
+#salesSection #newSaleForm textarea,
+#salesSection #saleDetailsContent textarea {
+  min-height: 85px;
+  resize: vertical;
+}
+
+#salesSection #newSaleForm input:focus,
+#salesSection #newSaleForm select:focus,
+#salesSection #newSaleForm textarea:focus,
+#salesSection #saleDetailsContent input:focus,
+#salesSection #saleDetailsContent select:focus,
+#salesSection #saleDetailsContent textarea:focus {
+  outline: none;
+  border-color: var(--amber);
+  box-shadow: 0 0 0 3px var(--amber-soft);
+}
+
+/* Item rows */
+#salesSection #saleItemRows {
+  margin: 12px 0;
+}
+
+#salesSection .sale-item-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 11px;
+  margin: 12px 0;
+  padding: 13px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg);
+}
+
+#salesSection .sale-item-row select {
+  flex: 2;
+  min-width: 180px;
+}
+
+#salesSection .sale-item-row input {
+  width: 90px;
+  min-width: 75px;
+}
+
+#salesSection .sale-item-row button,
+#salesSection #newSaleForm .btn-secondary,
+#salesSection #newSaleForm .btn-primary,
+#salesSection #saleDetailsContent .btn-primary {
+  min-height: 38px;
+  padding: 9px 15px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* Sale calculation area */
+#salesSection #newSaleForm #saleSubtotal {
+  color: var(--text);
+  font-weight: 700;
+}
+
+#salesSection #newSaleForm #saleTotal {
+  color: var(--amber);
+  font-size: 22px;
+  font-weight: 800;
+}
+
+#salesSection #newSaleForm h4,
+#salesSection #saleDetailsContent h4 {
+  margin: 22px 0 13px;
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 750;
+}
+
+#salesSection #saleFormMessage {
+  margin-top: 13px;
+  color: var(--red);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+/* Sale details */
+#salesSection #saleDetailsContent > p {
+  margin: 9px 0;
+  color: var(--text-muted);
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+#salesSection #saleDetailsContent > p strong {
+  color: var(--text);
+}
+
+/* Dark mode */
+body[data-theme="dark"] #salesSection > .section-header,
+body[data-theme="dark"] #salesSection > .card,
+body[data-theme="dark"] #salesSection #salesSummary .summary-card,
+body[data-theme="dark"] #salesSection #saleFormContainer,
+body[data-theme="dark"] #salesSection #saleDetailsContainer {
+  background: var(--bg-card);
+}
+
+body[data-theme="dark"] #salesSection .inventory-table th {
+  background: rgba(255, 255, 255, 0.025);
+}
+
+/* Tablet */
+@media (max-width: 800px) {
+  #salesSection #newSaleForm .inventory-form {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+  #salesSection > .section-header {
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 17px;
+  }
+
+  #salesSection > .section-header h2 {
+    font-size: 21px;
+  }
+
+  #salesSection > .section-header .btn-primary {
+    width: 100%;
+  }
+
+  #salesSection #salesSummary {
+    grid-template-columns: 1fr;
+    gap: 11px;
+  }
+
+  #salesSection > .card,
+  #salesSection #saleFormContainer,
+  #salesSection #saleDetailsContainer {
+    padding: 16px 13px;
+  }
+
+  #salesSection .inventory-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  #salesSection #salesSearch,
+  #salesSection .inventory-toolbar .btn-secondary {
+    width: 100%;
+  }
+
+  #salesSection #newSaleForm .inventory-form {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  #salesSection .sale-item-row {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  #salesSection .sale-item-row select,
+  #salesSection .sale-item-row input,
+  #salesSection .sale-item-row button {
+    width: 100%;
+  }
+}
+
+
+
+/* ==========================================
+   MIKE DIGITALS — EXPENSE MANAGEMENT
+   Stage 7: Dashboard presentation
+========================================== */
+
+#expensesSection {
+  min-width: 0;
+}
+
+/* Page heading */
+#expensesSection > .section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin: 0 0 20px;
+  padding: 21px 23px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--bg-card);
+  box-shadow: var(--shadow);
+}
+
+#expensesSection > .section-header h2 {
+  margin: 0 0 7px;
+  color: var(--text);
+  font-size: 23px;
+  font-weight: 750;
+  letter-spacing: -0.6px;
+}
+
+#expensesSection > .section-header p {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+/* Record Expense button */
+#expensesSection > .section-header .btn-primary {
+  min-height: 40px;
+  padding: 10px 17px;
+  border: 1px solid var(--amber);
+  border-radius: 8px;
+  background: var(--amber);
+  color: #fff;
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* Summary cards */
+#expensesSection #expensesSummary {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+#expensesSection #expensesSummary .summary-card {
+  min-width: 0;
+  padding: 19px 21px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--bg-card);
+  box-shadow: var(--shadow);
+}
+
+#expensesSection #expensesSummary .summary-card h3 {
+  margin: 0 0 9px;
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 650;
+}
+
+#expensesSection #expensesSummary .summary-card p {
+  margin: 0;
+  color: var(--text);
+  font-size: 23px;
+  font-weight: 750;
+  letter-spacing: -0.5px;
+}
+
+/* Expense records panel */
+#expensesSection > .card {
+  min-width: 0;
+  padding: 22px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--bg-card);
+  box-shadow: var(--shadow);
+}
+
+#expensesSection > .card > h3,
+#expensesSection #expenseFormContainer > h3 {
+  margin: 0 0 18px;
+  color: var(--text);
+  font-size: 16px;
+  font-weight: 750;
+}
+
+/* Search, filters and date range */
+#expensesSection .inventory-toolbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 11px;
+  margin-bottom: 17px;
+}
+
+#expensesSection .inventory-toolbar > input,
+#expensesSection .inventory-toolbar > select {
+  min-width: 135px;
+  min-height: 40px;
+  padding: 9px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 12px;
+}
+
+#expensesSection #expensesSearch {
+  flex: 1;
+  min-width: 190px;
+}
+
+#expensesSection .inventory-toolbar > input:focus,
+#expensesSection .inventory-toolbar > select:focus {
+  outline: none;
+  border-color: var(--amber);
+  box-shadow: 0 0 0 3px var(--amber-soft);
+}
+
+#expensesSection .inventory-toolbar .btn-secondary {
+  min-height: 40px;
+  padding: 9px 15px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* Expense history table */
+#expensesSection .table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+#expensesSection .table-responsive table {
+  width: 100%;
+  min-width: 780px;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 12px;
+}
+
+#expensesSection .table-responsive th {
+  padding: 13px 12px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text-muted);
+  font-size: 10px;
+  font-weight: 750;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+#expensesSection .table-responsive td {
+  padding: 14px 12px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+  line-height: 1.6;
+  vertical-align: middle;
+}
+
+#expensesSection .table-responsive tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+#expensesSection .table-responsive tbody tr:hover {
+  background: var(--amber-soft);
+}
+
+/* Record Expense panel */
+#expensesSection #expenseFormContainer {
+  margin-top: 20px;
+  padding: 22px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--bg-card);
+  box-shadow: var(--shadow);
+}
+
+#expensesSection #expenseFormContainer > h3 {
+  margin-bottom: 20px;
+}
+
+/* Expense form fields */
+#expensesSection #expenseFormContent .form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+#expensesSection #expenseFormContent label {
+  display: block;
+  margin-bottom: 7px;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.6;
+}
+
+#expensesSection #expenseFormContent input,
+#expensesSection #expenseFormContent select,
+#expensesSection #expenseFormContent textarea {
+  display: block;
+  width: 100%;
+  min-height: 42px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 12px;
+  box-sizing: border-box;
+}
+
+#expensesSection #expenseFormContent textarea {
+  min-height: 85px;
+  resize: vertical;
+}
+
+#expensesSection #expenseFormContent input:focus,
+#expensesSection #expenseFormContent select:focus,
+#expensesSection #expenseFormContent textarea:focus {
+  outline: none;
+  border-color: var(--amber);
+  box-shadow: 0 0 0 3px var(--amber-soft);
+}
+
+#expensesSection #expenseFormContent button {
+  min-height: 38px;
+  padding: 9px 16px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* Dark mode */
+body[data-theme="dark"] #expensesSection > .section-header,
+body[data-theme="dark"] #expensesSection > .card,
+body[data-theme="dark"] #expensesSection #expensesSummary .summary-card,
+body[data-theme="dark"] #expensesSection #expenseFormContainer {
+  background: var(--bg-card);
+}
+
+body[data-theme="dark"] #expensesSection .table-responsive th {
+  background: rgba(255, 255, 255, 0.025);
+}
+
+/* Tablet */
+@media (max-width: 800px) {
+  #expensesSection #expenseFormContent .form-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+  #expensesSection > .section-header {
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 17px;
+  }
+
+  #expensesSection > .section-header h2 {
+    font-size: 21px;
+  }
+
+  #expensesSection > .section-header .btn-primary {
+    width: 100%;
+  }
+
+  #expensesSection #expensesSummary {
+    grid-template-columns: 1fr;
+    gap: 11px;
+  }
+
+  #expensesSection > .card,
+  #expensesSection #expenseFormContainer {
+    padding: 16px 13px;
+  }
+
+  #expensesSection .inventory-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  #expensesSection .inventory-toolbar > input,
+  #expensesSection .inventory-toolbar > select,
+  #expensesSection .inventory-toolbar .btn-secondary {
+    width: 100%;
+  }
+
+  #expensesSection #expenseFormContent .form-grid {
+    grid-template-columns: 1fr;
+    gap: 11px;
+  }
+
+  #expensesSection #expenseFormContent button {
+    width: 100%;
+  }
+}
+
+
+
+/* ==========================================
+   MIKE DIGITALS — VTU ORDERS
+   Stage 8: Orders presentation
+========================================== */
+
+#vtuOrdersSection {
+  min-width: 0;
+}
+
+/* Page heading */
+#vtuOrdersSection > .section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin: 0 0 22px;
+  padding: 21px 23px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--bg-card);
+  box-shadow: var(--shadow);
+}
+
+#vtuOrdersSection > .section-header .section-title {
+  margin: 0 0 7px;
+  color: var(--text);
+  font-size: 23px;
+  font-weight: 750;
+  letter-spacing: -0.6px;
+}
+
+#vtuOrdersSection > .section-header p {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+#vtuOrdersSection > .section-header .btn-primary {
+  min-height: 40px;
+  padding: 10px 17px;
+  border: 1px solid var(--amber);
+  border-radius: 8px;
+  background: var(--amber);
+  color: #fff;
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* Section headings */
+#vtuOrdersSection > .section-title {
+  margin: 24px 0 13px;
+  color: var(--text);
+  font-size: 16px;
+  font-weight: 750;
+  letter-spacing: -0.2px;
+}
+
+#vtuOrdersSection #flaggedOrdersSection > .section-title {
+  margin-top: 0;
+}
+
+/* Attention section */
+#vtuOrdersSection #flaggedOrdersSection {
+  padding: 20px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--bg-card);
+  box-shadow: var(--shadow);
+}
+
+#vtuOrdersSection #flaggedOrders .order-row.flagged {
+  border-color: rgba(217, 54, 54, 0.35);
+  border-left: 3px solid var(--red);
+  background: var(--bg);
+}
+
+/* Order cards */
+#vtuOrdersSection .order-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 18px;
+  min-width: 0;
+  margin-bottom: 10px;
+  padding: 17px 19px;
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  background: var(--bg-card);
+  box-shadow: 0 3px 12px rgba(22, 34, 51, 0.025);
+  transition: border-color 0.18s ease, background 0.18s ease;
+}
+
+#vtuOrdersSection .order-row:last-child {
+  margin-bottom: 0;
+}
+
+#vtuOrdersSection .order-info {
+  flex: 1;
+  min-width: 0;
+}
+
+#vtuOrdersSection .order-plan {
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+#vtuOrdersSection .order-meta {
+  margin-top: 5px;
+  color: var(--text-muted);
+  font-size: 11px;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+
+#vtuOrdersSection .order-right {
+  flex-shrink: 0;
+  text-align: right;
+}
+
+#vtuOrdersSection .order-profit {
+  color: var(--green);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 750;
+}
+
+#vtuOrdersSection .order-status {
+  display: inline-block;
+  margin-top: 7px;
+  padding: 5px 9px;
+  border-radius: 6px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1.3;
+  text-transform: capitalize;
+}
+
+#vtuOrdersSection .status-delivered {
+  background: rgba(61, 220, 151, 0.12);
+  color: var(--green);
+}
+
+#vtuOrdersSection .status-pending {
+  background: rgba(255, 182, 39, 0.13);
+  color: var(--amber);
+}
+
+#vtuOrdersSection .status-failed,
+#vtuOrdersSection .status-partial {
+  background: rgba(255, 107, 107, 0.12);
+  color: var(--red);
+}
+
+/* Review action */
+#vtuOrdersSection #flaggedOrders button {
+  min-height: 34px;
+  padding: 8px 14px !important;
+  border-radius: 7px !important;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+/* Recent orders search and filter */
+#vtuOrdersSection > div[style*="display:flex"] {
+  align-items: center;
+  gap: 11px !important;
+  margin-bottom: 16px !important;
+}
+
+#vtuOrdersSection #orderSearch,
+#vtuOrdersSection #orderStatusFilter {
+  min-height: 42px;
+  padding: 10px 13px !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 8px !important;
+  background: var(--bg-card) !important;
+  color: var(--text) !important;
+  font-family: var(--font-body);
+  font-size: 12px;
+  box-sizing: border-box;
+}
+
+#vtuOrdersSection #orderSearch {
+  flex: 1;
+  min-width: 190px !important;
+}
+
+#vtuOrdersSection #orderStatusFilter {
+  min-width: 160px !important;
+}
+
+#vtuOrdersSection #orderSearch:focus,
+#vtuOrdersSection #orderStatusFilter:focus {
+  outline: none;
+  border-color: var(--amber) !important;
+  box-shadow: 0 0 0 3px var(--amber-soft);
+}
+
+/* Empty states */
+#vtuOrdersSection .empty-state {
+  padding: 25px 18px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg);
+  color: var(--text-muted);
+  font-size: 12px;
+  text-align: center;
+  line-height: 1.7;
+}
+
+/* Manual transaction form */
+#vtuOrdersSection #manualOrderFormContainer {
+  margin-bottom: 22px !important;
+  padding: 23px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--bg-card);
+  box-shadow: var(--shadow);
+}
+
+#vtuOrdersSection #manualOrderFormContainer > h3 {
+  margin: 0 0 8px;
+  color: var(--text);
+  font-size: 17px;
+  font-weight: 750;
+}
+
+#vtuOrdersSection #manualOrderFormContainer > p {
+  margin: 0 0 20px;
+  color: var(--text-muted);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+#vtuOrdersSection #manualOrderFormContent .form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 17px;
+}
+
+#vtuOrdersSection #manualOrderFormContent .form-group {
+  min-width: 0;
+}
+
+#vtuOrdersSection #manualOrderFormContent label {
+  display: block;
+  margin-bottom: 7px;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.5;
+}
+
+#vtuOrdersSection #manualOrderFormContent input,
+#vtuOrdersSection #manualOrderFormContent select,
+#vtuOrdersSection #manualOrderFormContent textarea {
+  display: block;
+  width: 100%;
+  min-height: 42px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 12px;
+  box-sizing: border-box;
+}
+
+#vtuOrdersSection #manualOrderFormContent textarea {
+  min-height: 90px;
+  resize: vertical;
+}
+
+#vtuOrdersSection #manualOrderFormContent input:focus,
+#vtuOrdersSection #manualOrderFormContent select:focus,
+#vtuOrdersSection #manualOrderFormContent textarea:focus {
+  outline: none;
+  border-color: var(--amber);
+  box-shadow: 0 0 0 3px var(--amber-soft);
+}
+
+/* Profit preview */
+#vtuOrdersSection #manualOrderFormContent .card {
+  padding: 17px !important;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg);
+  box-shadow: none;
+}
+
+#vtuOrdersSection #manualOrderFormContent .card h3 {
+  margin: 0 0 12px;
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 750;
+}
+
+#vtuOrdersSection #manualProfitPreview {
+  color: var(--text-muted);
+  font-size: 12px;
+  line-height: 1.8;
+}
+
+/* Form buttons */
+#vtuOrdersSection #manualOrderFormContent form > div:last-child {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+#vtuOrdersSection #manualOrderFormContent button {
+  min-height: 39px;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* Dark theme refinements */
+body[data-theme="dark"] #vtuOrdersSection > .section-header,
+body[data-theme="dark"] #vtuOrdersSection #flaggedOrdersSection,
+body[data-theme="dark"] #vtuOrdersSection .order-row,
+body[data-theme="dark"] #vtuOrdersSection #manualOrderFormContainer {
+  background: var(--bg-card);
+}
+
+body[data-theme="dark"] #vtuOrdersSection #flaggedOrders .order-row.flagged {
+  background: rgba(255, 119, 119, 0.045);
+}
+
+body[data-theme="dark"] #vtuOrdersSection .empty-state,
+body[data-theme="dark"] #vtuOrdersSection #manualOrderFormContent .card {
+  background: var(--bg);
+}
+
+/* Tablet */
+@media (max-width: 800px) {
+  #vtuOrdersSection #manualOrderFormContent .form-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+  #vtuOrdersSection > .section-header {
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 17px;
+  }
+
+  #vtuOrdersSection > .section-header .section-title {
+    font-size: 21px;
+  }
+
+  #vtuOrdersSection > .section-header .btn-primary {
+    width: 100%;
+  }
+
+  #vtuOrdersSection #flaggedOrdersSection,
+  #vtuOrdersSection #manualOrderFormContainer {
+    padding: 16px 13px;
+  }
+
+  #vtuOrdersSection > div[style*="display:flex"] {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  #vtuOrdersSection #orderSearch,
+  #vtuOrdersSection #orderStatusFilter {
+    width: 100%;
+    min-width: 0 !important;
+  }
+
+  #vtuOrdersSection .order-row {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 12px;
+    padding: 14px;
+  }
+
+  #vtuOrdersSection .order-right {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    width: 100%;
+    text-align: left;
+  }
+
+  #vtuOrdersSection .order-status {
+    margin-top: 0;
+  }
+
+  #vtuOrdersSection #manualOrderFormContent .form-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  #vtuOrdersSection #manualOrderFormContent form > div:last-child {
+    flex-direction: column;
+  }
+
+  #vtuOrdersSection #manualOrderFormContent form > div:last-child button {
+    width: 100%;
+  }
+}
+
+
+
 </style>
 </head>
 
@@ -751,7 +3558,46 @@
   </div>
 </div>
 
+
 <div id="dashboard" class="wrap" style="display:none;">
+
+  <div class="dashboard-layout">
+
+    <aside class="dashboard-sidebar">
+      <div class="sidebar-brand">
+        MIKE DIGITALS <span style="color:var(--amber)">MD</span>
+      </div>
+
+      <div class="sidebar-group">
+        <div class="sidebar-group-title">Phone Repairs & Accessories</div>
+
+        <button class="sidebar-link active" onclick="showDashboardView('r-overview', this)">Overview</button>
+        <button class="sidebar-link" onclick="showDashboardView('r-jobs', this)">Repair Jobs</button>
+        <button class="sidebar-link" onclick="showDashboardView('r-sales', this)">Sales</button>
+        <button class="sidebar-link" onclick="showDashboardView('r-inventory', this)">Inventory</button>
+        <button class="sidebar-link" onclick="showDashboardView('r-expenses', this)">Expenses</button>
+        <button class="sidebar-link" onclick="showDashboardView('r-track', this)">Track Repair</button>
+      </div>
+
+      <div class="sidebar-group">
+        <div class="sidebar-group-title">Data Business</div>
+
+        <button class="sidebar-link" onclick="showDashboardView('d-overview', this)">VTU Overview</button>
+        <button class="sidebar-link" onclick="showDashboardView('d-plans', this)">Data Plans</button>
+        <button class="sidebar-link" onclick="showDashboardView('d-orders', this)">Orders</button>
+      </div>
+
+      <div class="sidebar-group">
+        <div class="sidebar-group-title">Admin Access Control</div>
+
+        <button class="sidebar-link" onclick="showDashboardView('a-users', this)">Users</button>
+        <button class="sidebar-link" onclick="showDashboardView('a-roles', this)">Roles & Permissions</button>
+        <button class="sidebar-link" onclick="showDashboardView('a-activity', this)">Activity Log</button>
+      </div>
+    </aside>
+
+    <main class="dashboard-main">
+
 
   <header>
     <h1>Mike Digitals — Admin</h1>
@@ -763,7 +3609,7 @@
     </div>
   </header>
 
-  
+<div id="vtuOverviewSection">
 <section id="transactionSummary" class="transaction-summary" aria-labelledby="transactionSummaryTitle">
   <div class="transaction-summary-heading">
     <h2 id="transactionSummaryTitle">Transaction Summary</h2>
@@ -807,16 +3653,11 @@
 
 <div class="summary-grid" id="summaryGrid"></div>
 
-<!-- Business Management Navigation -->
-<nav class="business-nav" aria-label="Business management">
-  <button type="button" class="business-nav-btn active"
-    onclick="showBusinessSection('overview', this)">Overview</button>
-  <button type="button" class="business-nav-btn"
-    onclick="showBusinessSection('inventory', this)">Inventory</button>
-</nav>
+</div>
+
 
 <!-- Inventory Section -->
-<section id="inventorySection" hidden>
+<section id="inventorySection" class="dashboard-view" data-view="r-inventory" hidden>
   <div class="plans-heading">
     <div>
       <h2 class="section-title">Inventory Management</h2>
@@ -947,8 +3788,199 @@
 </section>
 
 
-  
-<section aria-labelledby="plansSectionTitle">
+
+<!-- SALES SECTION -->
+<section id="salesSection" class="dashboard-view" data-view="r-sales" hidden>
+
+  <div class="section-header">
+    <div>
+      <h2>Sales</h2>
+      <p>Record accessory sales and manage customer payments.</p>
+    </div>
+    <button type="button" class="btn-primary" onclick="showSaleForm()">
+      + New Sale
+    </button>
+  </div>
+
+  <div id="salesSummary" class="summary-grid"></div>
+
+  <div class="card" style="margin-top:20px;">
+    <h3>Sales Records</h3>
+
+    <div class="inventory-toolbar">
+      <input
+        id="salesSearch"
+        type="search"
+        placeholder="Search sale number or customer"
+        oninput="loadSales()"
+      >
+
+      <button type="button" class="btn-secondary" onclick="loadSales()">
+        Refresh
+      </button>
+    </div>
+
+    <div id="salesList">Loading sales...</div>
+  </div>
+
+  <div id="saleFormContainer" class="card" style="margin-top:20px;" hidden>
+    <h3>New Sale</h3>
+    <div id="saleFormContent"></div>
+  </div>
+
+  <div id="saleDetailsContainer" class="card" style="margin-top:20px;" hidden>
+    <h3>Sale Details</h3>
+    <div id="saleDetailsContent"></div>
+  </div>
+
+</section>
+
+
+
+<!-- EXPENSES SECTION -->
+<section id="expensesSection" class="dashboard-view" data-view="r-expenses" hidden>
+
+  <div class="section-header">
+    <div>
+      <h2>Expenses</h2>
+      <p>Record and monitor Mike Digitals' operating expenses.</p>
+    </div>
+
+    <button type="button" class="btn-primary" onclick="showExpenseForm()">
+      + Record Expense
+    </button>
+  </div>
+
+  <div id="expensesSummary" class="summary-grid"></div>
+
+  <div class="card" style="margin-top:20px;">
+    <h3>Expense Records</h3>
+
+    <div class="inventory-toolbar">
+      <input
+        id="expensesSearch"
+        type="search"
+        placeholder="Search expense description or number"
+        oninput="renderExpenses()"
+      >
+
+      <select id="expensesCategory" onchange="loadExpenses()">
+        <option value="">All Categories</option>
+        <option value="rent">Rent</option>
+        <option value="electricity">Electricity</option>
+        <option value="internet">Internet</option>
+        <option value="transport">Transport</option>
+        <option value="maintenance">Maintenance</option>
+        <option value="staff">Staff</option>
+        <option value="marketing">Marketing</option>
+        <option value="bank-charges">Bank Charges</option>
+        <option value="other">Other</option>
+      </select>
+
+      <input type="date" id="expensesFrom" onchange="loadExpenses()">
+      <input type="date" id="expensesTo" onchange="loadExpenses()">
+
+      <button type="button" class="btn-secondary" onclick="loadExpenses()">
+        Refresh
+      </button>
+    </div>
+
+    <div id="expensesList">Loading expenses...</div>
+  </div>
+
+  <div id="expenseFormContainer" class="card" style="margin-top:20px;" hidden>
+    <h3>Record New Expense</h3>
+    <div id="expenseFormContent"></div>
+  </div>
+
+</section>
+
+
+<!-- Shop Overview Section -->
+<section id="shopOverviewSection" class="dashboard-view" data-view="r-overview" hidden>
+  <div class="section-header">
+    <div>
+      <h2>Shop Overview</h2>
+      <p>Monitor phone repairs, accessory sales, expenses and stock.</p>
+    </div>
+
+    <select id="shopOverviewPeriod" onchange="loadShopOverview()">
+      <option value="today">Today</option>
+      <option value="week">This Week</option>
+      <option value="month">This Month</option>
+    </select>
+  </div>
+
+  <div id="shopOverviewDateRange" class="muted-text"></div>
+
+  <div id="shopOverviewMetrics" class="summary-grid">
+    <div class="card">Loading shop overview...</div>
+  </div>
+
+  <div class="card" style="margin-top:20px;">
+    <h3>Outstanding Payments</h3>
+    <p>Customers with unpaid repair or sales balances.</p>
+    <div id="shopPaymentReminders">Loading outstanding balances...</div>
+  </div>
+
+  <div class="card" style="margin-top:20px;">
+    <h3>Low Stock Alerts</h3>
+    <div id="shopLowStockList">Loading inventory alerts...</div>
+  </div>
+
+  <div class="card" style="margin-top:20px;">
+    <h3>Recent Activity</h3>
+    <div id="shopRecentActivity">Loading recent activity...</div>
+  </div>
+</section>
+
+
+<!-- REPAIR JOBS -->
+<section id="repairJobsSection" class="dashboard-view" data-view="r-jobs" hidden>
+
+  <div class="section-header">
+    <div>
+      <h2>Repair Jobs</h2>
+      <p>Manage customer repairs, payments and outstanding balances.</p>
+    </div>
+    <button class="btn-primary" onclick="showRepairForm()">
+      + New Repair Job
+    </button>
+  </div>
+
+  <div id="repairJobsSummary" class="summary-grid"></div>
+
+  <div class="card" style="margin-top:20px;">
+    <div class="section-header">
+      <div>
+        <h3>Repair Records</h3>
+        <p>View and manage all recorded repair jobs.</p>
+      </div>
+      <button class="btn-secondary" onclick="loadRepairJobs()">
+        Refresh
+      </button>
+    </div>
+
+    <div id="repairJobsList">
+      <p>Loading repair records...</p>
+    </div>
+  </div>
+
+  <div id="repairFormContainer" class="card" style="margin-top:20px;" hidden>
+    <h3 id="repairFormTitle">New Repair Job</h3>
+    <div id="repairFormContent"></div>
+  </div>
+
+  <div id="repairDetailsContainer" class="card" style="margin-top:20px;" hidden>
+    <h3>Repair Details</h3>
+    <div id="repairDetailsContent"></div>
+  </div>
+
+</section>
+
+
+<!-- Data Plans Section -->
+<section id="vtuPlansSection" class="dashboard-view" data-view="d-plans" aria-labelledby="plansSectionTitle" hidden>
   <div class="plans-heading">
     <div class="section-title" id="plansSectionTitle">Data Plans</div>
     <button
@@ -970,7 +4002,32 @@
 </section>
 
 
- <div id="flaggedOrdersSection">
+ <div id="vtuOrdersSection" class="dashboard-view" data-view="d-orders" hidden>
+  <div class="section-header" style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:20px;">
+    <div>
+      <div class="section-title">VTU Orders</div>
+      <p class="muted-text">Manage online orders and manually completed transactions.</p>
+    </div>
+
+    <button
+      type="button"
+      class="btn-primary"
+      onclick="showManualOrderForm()"
+    >
+      + Record Manual Transaction
+    </button>
+  </div>
+
+  <div id="manualOrderFormContainer" class="card" style="margin-bottom:20px;" hidden>
+    <h3>Record Manual VTU Transaction</h3>
+    <p class="muted-text">
+      Record a customer transaction completed outside the online storefront.
+    </p>
+
+    <div id="manualOrderFormMessage" role="status" aria-live="polite"></div>
+    <div id="manualOrderFormContent"></div>
+  </div>
+  <div id="flaggedOrdersSection">
   <div class="section-title">Orders needing your attention</div>
   <div id="flaggedOrders"></div>
 </div>
@@ -1001,10 +4058,14 @@
     </select>
   </div>
 
-  <div id="ordersList"></div>
+    <div id="ordersList"></div>
+  </div>
 
-
+    </main>
+  </div>
 </div>
+
+
 
 <script>
 
@@ -1012,35 +4073,72 @@ let currentOrders = [];
 
 let inventoryItems = [];
 
-function showBusinessSection(section, button) {
-  const inventorySelected = section === "inventory";
 
-  document.getElementById("transactionSummary").hidden = inventorySelected;
-  document.getElementById("summaryGrid").hidden = inventorySelected;
+function showDashboardView(viewId, button) {
+  const views = {
+    "r-overview": "shopOverviewSection",
+    "r-jobs": "repairJobsSection",
+    "r-sales": "salesSection",
+    "r-inventory": "inventorySection",
+    "r-expenses": "expensesSection",
+    "r-track": null,
+    "d-overview": "vtuOverviewSection",
+    "d-plans": "vtuPlansSection",
+    "d-orders": "vtuOrdersSection",
+    "a-users": null,
+    "a-roles": null,
+    "a-activity": null
+  };
 
-  document.querySelector('section[aria-labelledby="plansSectionTitle"]').hidden =
-    inventorySelected;
+  if (!(viewId in views)) {
+    console.error("Unknown dashboard view:", viewId);
+    return;
+  }
 
-  document.getElementById("flaggedOrders").previousElementSibling.hidden =
-    inventorySelected;
-  document.getElementById("flaggedOrders").hidden = inventorySelected;
-
-  document.getElementById("ordersList").previousElementSibling.hidden =
-    inventorySelected;
-
-  document.getElementById("orderSearch").parentElement.hidden =
-    inventorySelected;
-  document.getElementById("ordersList").hidden = inventorySelected;
-
-  document.getElementById("inventorySection").hidden = !inventorySelected;
-
-  document.querySelectorAll(".business-nav-btn").forEach((navButton) => {
-    navButton.classList.toggle("active", navButton === button);
+  document.querySelectorAll(".dashboard-view").forEach((view) => {
+    view.hidden = true;
   });
 
-  if (inventorySelected) {
+  document.getElementById("vtuOverviewSection").hidden = true;
+  document.getElementById("inventorySection").hidden = true;
+
+  const targetId = views[viewId];
+
+  if (targetId) {
+    const target = document.getElementById(targetId);
+
+    if (target) {
+      target.hidden = false;
+    }
+  }
+
+  document.querySelectorAll(".sidebar-link").forEach((link) => {
+    link.classList.toggle("active", link === button);
+  });
+
+  if (viewId === "r-inventory") {
     loadInventory();
     loadStockMovements();
+  }
+
+  if (viewId === "r-overview") {
+  loadShopOverview();
+}
+
+  if (viewId === "r-sales") {
+  loadSales();
+}
+
+if (viewId === "r-expenses") {
+  loadExpenses();
+}
+
+  if (viewId === "r-jobs") {
+  loadRepairJobs();
+}
+
+  if (viewId === "d-overview") {
+    loadData();
   }
 }
 
@@ -1084,6 +4182,17 @@ async function login() {
     passwordInput.value = "";
 
     await loadData();
+
+    // Open Shop Overview as the default dashboard view after login.
+    const dashboard = document.getElementById("dashboard");
+
+    if (dashboard.style.display === "block") {
+      const shopOverviewButton = document.querySelector(
+        '.sidebar-link[onclick*="r-overview"]'
+      );
+
+      showDashboardView("r-overview", shopOverviewButton);
+    }
 
   } catch (e) {
     errEl.textContent = "Couldn't reach the server. Please try again.";
@@ -1776,6 +4885,887 @@ async function loadInventory() {
 }
 
 
+function escapeRepairText(value) {
+  return String(value ?? "").replace(/[&<>"']/g, (char) => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;"
+  })[char]);
+}
+
+
+async function loadShopOverview() {
+  const period = document.getElementById("shopOverviewPeriod")?.value || "today";
+
+  const metricsContainer = document.getElementById("shopOverviewMetrics");
+  const remindersContainer = document.getElementById("shopPaymentReminders");
+  const stockContainer = document.getElementById("shopLowStockList");
+  const activityContainer = document.getElementById("shopRecentActivity");
+  const dateRangeContainer = document.getElementById("shopOverviewDateRange");
+
+  try {
+    if (metricsContainer) {
+      metricsContainer.innerHTML = '<div class="card">Loading overview...</div>';
+    }
+
+    const response = await fetch(
+      `/api/admin/shop/overview?period=${encodeURIComponent(period)}`,
+      { credentials: "same-origin", cache: "no-store" }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok || !data.success) {
+      throw new Error(data.message || "Unable to load Shop Overview.");
+    }
+
+    const m = data.metrics || {};
+
+    // Date range
+    if (dateRangeContainer && data.dateRange) {
+      const start = new Date(data.dateRange.start);
+      const end = new Date(new Date(data.dateRange.end).getTime() - 1);
+
+      dateRangeContainer.textContent =
+        `${formatDateTime(start)} – ${formatDateTime(end)}`;
+    }
+
+    // Summary metrics
+    if (metricsContainer) {
+            const cards = [
+        ["Total Income", m.totalIncome, "Product sales and repair payments received"],
+        ["Total Product Sales", m.totalProductSales, "Combined product sales receipts"],
+        ["Accessories", m.accessorySales, "Accessory sales receipts"],
+        ["Spare Parts", m.sparePartSales, "Spare-parts sales receipts"],
+        ["Tools", m.toolSales, "Tool sales receipts"],
+        ["Repair Income", m.repairIncome, "Payments received for repairs"],
+        ["Cost of Products Sold", m.productCostOfGoodsSold, "Cost of inventory sold"],
+        ["Repair Parts Used", m.repairPartsCost, "Cost of parts consumed in repairs"],
+        ["Total Items & Parts Cost", m.totalItemAndPartsCost, "Products sold plus repair parts used"],
+        ["Operating Expenses", m.operatingExpenses, "Recorded operating expenses"],
+        ["Net Profit", m.netProfit, "Income less item costs and expenses"],
+        ["Repair Outstanding", m.repairOutstanding, "Unpaid repair balances"],
+        ["Sales Outstanding", m.accessoryOutstanding, "Unpaid product-sale balances"],
+        ["Total Outstanding", m.totalOutstanding, "All unpaid customer balances"],
+        ["Inventory Value", m.inventoryValue, "Current stock at cost price"],
+      ];
+
+      metricsContainer.innerHTML = cards.map(([label, value, description]) => `
+        <div class="card">
+          <h3>${escapeRepairText(label)}</h3>
+          <h2>${fmtNaira(Number(value || 0))}</h2>
+          <p>${escapeRepairText(description)}</p>
+        </div>
+      `).join("") + `
+        <div class="card">
+          <h3>Active Repair Jobs</h3>
+          <h2>${Number(m.activeRepairs || 0)}</h2>
+          <p>Including repaired jobs awaiting collection</p>
+        </div>
+        <div class="card">
+          <h3>Awaiting Parts</h3>
+          <h2>${Number(m.awaitingParts || 0)}</h2>
+          <p>Repair jobs waiting for parts</p>
+        </div>
+        <div class="card">
+          <h3>Low Stock Items</h3>
+          <h2>${Number(m.lowStockCount || 0)}</h2>
+          <p>Items at or below their stock threshold</p>
+        </div>
+        <div class="card">
+          <h3>Out of Stock</h3>
+          <h2>${Number(m.outOfStockCount || 0)}</h2>
+          <p>Items with zero quantity</p>
+        </div>
+      `;
+    }
+
+    // Outstanding payment reminders
+    if (remindersContainer) {
+      const reminders = data.paymentReminders || [];
+
+      if (!reminders.length) {
+        remindersContainer.innerHTML = "<p>No outstanding customer balances.</p>";
+      } else {
+        remindersContainer.innerHTML = `
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>Customer</th>
+                  <th>Reference</th>
+                  <th>Type</th>
+                  <th>Total Amount</th>
+                  <th>Received</th>
+                  <th>Outstanding</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${reminders.map(item => `
+                  <tr>
+                    <td>
+                      <strong>${escapeRepairText(item.customerName || "Unknown")}</strong>
+                      <br>
+                      ${escapeRepairText(item.customerPhone || "No phone")}
+                    </td>
+                    <td>${escapeRepairText(item.reference || "—")}</td>
+                    <td>${item.type === "repair" ? "Repair" : "Accessory Sale"}</td>
+                    <td>${fmtNaira(Number(item.totalAmount || 0))}</td>
+                    <td>${fmtNaira(Number(item.amountPaid || 0))}</td>
+                    <td><strong>${fmtNaira(Number(item.balance || 0))}</strong></td>
+                    <td>
+                      <button 
+                        class="btn-secondary"
+                        onclick="${
+                          item.type === "repair"
+                            ? `openRepairDetails('${escapeRepairText(item.id)}')`
+                            : `showSalePaymentForm('${escapeRepairText(item.id)}')`
+                        }"
+                    >
+                      Record Payment
+                    </button>
+                    </td>
+                  </tr>
+                `).join("")}
+              </tbody>
+            </table>
+          </div>
+        `;
+      }
+    }
+
+    // Low stock alerts
+    if (stockContainer) {
+      const items = data.lowStockItems || [];
+
+      if (!items.length) {
+        stockContainer.innerHTML = "<p>No low-stock items.</p>";
+      } else {
+        stockContainer.innerHTML = `
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>Item</th>
+                  <th>Category</th>
+                  <th>Quantity Left</th>
+                  <th>Low Stock Threshold</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${items.map(item => `
+                  <tr>
+                    <td>${escapeRepairText(item.itemName || "Unnamed item")}</td>
+                    <td>${escapeRepairText(item.category || "—")}</td>
+                    <td>${Number(item.quantity || 0)}</td>
+                    <td>${Number(item.lowStockThreshold || 0)}</td>
+                    <td>
+                      ${Number(item.quantity || 0) === 0
+                        ? "Out of Stock"
+                        : "Low Stock"}
+                    </td>
+                  </tr>
+                `).join("")}
+              </tbody>
+            </table>
+          </div>
+        `;
+      }
+    }
+
+    // Recent activity
+    if (activityContainer) {
+      const recent = data.recent || {};
+      const repairs = recent.repairs || [];
+      const sales = recent.sales || [];
+      const expenses = recent.expenses || [];
+
+      const activity = [
+        ...repairs.map(item => ({
+          type: "Repair",
+          reference: item.jobNumber,
+          description: `${item.customerName || "Customer"} — ${item.deviceBrand || ""} ${item.deviceModel || ""}`,
+          amount: item.repairCost,
+          date: item.receivedAt,
+        })),
+        ...sales.map(item => ({
+          type: "Sale",
+          reference: item.saleNumber,
+          description: item.customerName || "Walk-in customer",
+          amount: item.totalAmount,
+          date: item.soldAt,
+        })),
+        ...expenses.map(item => ({
+          type: "Expense",
+          reference: item.expenseNumber,
+          description: item.description || item.category || "Business expense",
+          amount: item.amount,
+          date: item.incurredAt,
+        })),
+      ].sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
+
+      if (!activity.length) {
+        activityContainer.innerHTML = "<p>No recent activity.</p>";
+      } else {
+        activityContainer.innerHTML = `
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Type</th>
+                  <th>Reference</th>
+                  <th>Description</th>
+                  <th>Amount</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${activity.slice(0, 15).map(item => `
+                  <tr>
+                    <td>${item.date ? escapeRepairText(formatDateTime(item.date)) : "—"}</td>
+                    <td>${escapeRepairText(item.type)}</td>
+                    <td>${escapeRepairText(item.reference || "—")}</td>
+                    <td>${escapeRepairText(item.description)}</td>
+                    <td>${fmtNaira(Number(item.amount || 0))}</td>
+                  </tr>
+                `).join("")}
+              </tbody>
+            </table>
+          </div>
+        `;
+      }
+    }
+
+  } catch (error) {
+    console.error("Shop Overview error:", error);
+
+    if (metricsContainer) {
+      metricsContainer.innerHTML =
+        `<div class="card">Unable to load Shop Overview: ${escapeRepairText(error.message)}</div>`;
+    }
+
+    if (remindersContainer) {
+      remindersContainer.innerHTML = "<p>Unable to load outstanding balances.</p>";
+    }
+
+    if (stockContainer) {
+      stockContainer.innerHTML = "<p>Unable to load stock alerts.</p>";
+    }
+
+    if (activityContainer) {
+      activityContainer.innerHTML = "<p>Unable to load recent activity.</p>";
+    }
+  }
+}
+
+
+function showSalePaymentForm(id) {
+  const container = document.getElementById("shopPaymentReminders");
+
+  if (!container) return;
+
+  const existing = document.getElementById("salePaymentForm");
+
+  if (existing) existing.remove();
+
+  container.insertAdjacentHTML("beforeend", `
+    <div class="card" id="salePaymentForm" style="margin-top:20px;">
+      <h3>Record Sales Payment</h3>
+      <p>Enter the amount received from this customer.</p>
+
+      <form onsubmit="submitSalePayment(event, '${escapeRepairText(id)}')">
+        <div class="form-group">
+          <label>Amount Received (₦)</label>
+          <input
+            type="number"
+            name="amount"
+            min="0.01"
+            step="0.01"
+            required
+            placeholder="Enter payment amount"
+          >
+        </div>
+
+        <div class="form-group">
+          <label>Payment Method</label>
+          <select name="paymentMethod" required>
+            <option value="">Select payment method</option>
+            <option value="cash">Cash</option>
+            <option value="transfer">Transfer</option>
+            <option value="pos">POS</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Payment Reference (Optional)</label>
+          <input
+            type="text"
+            name="reference"
+            maxlength="150"
+            placeholder="Transaction reference"
+          >
+        </div>
+
+        <div class="form-group">
+          <label>Notes (Optional)</label>
+          <textarea
+            name="notes"
+            rows="2"
+            maxlength="500"
+            placeholder="Additional payment details"
+          ></textarea>
+        </div>
+
+        <button type="submit" class="btn-primary">
+          Save Payment
+        </button>
+
+        <button
+          type="button"
+          class="btn-secondary"
+          onclick="document.getElementById('salePaymentForm')?.remove()"
+        >
+          Cancel
+        </button>
+      </form>
+    </div>
+  `);
+
+  document.getElementById("salePaymentForm").scrollIntoView({
+    behavior: "smooth",
+    block: "center",
+  });
+}
+
+
+async function submitSalePayment(event, id) {
+  event.preventDefault();
+
+  const form = event.target;
+  const submitButton = form.querySelector('button[type="submit"]');
+
+  const payload = {
+    amount: Number(form.elements.amount.value),
+    paymentMethod: form.elements.paymentMethod.value,
+    reference: form.elements.reference.value.trim(),
+    notes: form.elements.notes.value.trim(),
+  };
+
+  if (!Number.isFinite(payload.amount) || payload.amount <= 0) {
+    alert("Enter a valid payment amount.");
+    return;
+  }
+
+  submitButton.disabled = true;
+  submitButton.textContent = "Saving...";
+
+  try {
+    const response = await fetch(
+      `/api/admin/sales/${encodeURIComponent(id)}/payments`,
+      {
+        method: "POST",
+        credentials: "same-origin",
+        cache: "no-store",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok || !data.success) {
+      throw new Error(data.message || "Unable to record sales payment.");
+    }
+
+    alert("Sales payment recorded successfully.");
+
+    await loadShopOverview();
+
+  } catch (error) {
+    console.error("Sales payment error:", error);
+    alert(error.message || "Unable to record sales payment.");
+
+    submitButton.disabled = false;
+    submitButton.textContent = "Save Payment";
+  }
+}
+
+
+async function loadRepairJobs() {
+  const list = document.getElementById("repairJobsList");
+  const summary = document.getElementById("repairJobsSummary");
+
+  list.innerHTML = "<p>Loading repair records...</p>";
+
+  try {
+    const response = await fetch("/api/admin/repairs", {
+      credentials: "same-origin",
+      cache: "no-store"
+    });
+
+    if (!response.ok) {
+      throw new Error(
+        response.status === 401
+          ? "Your admin session has expired. Please log in again."
+          : "Could not load repair records."
+      );
+    }
+
+    const data = await response.json();
+    const repairs = data.repairs || [];
+
+    const activeJobs = repairs.filter(job =>
+      ["received", "diagnosing", "awaiting-parts", "in-progress", "repaired"].includes(job.status)
+    ).length;
+
+    const completedJobs = repairs.filter(job =>
+      ["repaired", "collected"].includes(job.status)
+    ).length;
+
+    const outstanding = repairs
+      .filter(job => job.status !== "cancelled")
+      .reduce((sum, job) => sum + Number(job.balance || 0), 0);
+
+    summary.innerHTML = `
+      <div class="card">
+        <p>Total Repair Jobs</p>
+        <h2>${repairs.length}</h2>
+      </div>
+
+      <div class="card">
+        <p>Active Jobs</p>
+        <h2>${activeJobs}</h2>
+      </div>
+
+      <div class="card">
+        <p>Completed Jobs</p>
+        <h2>${completedJobs}</h2>
+      </div>
+
+      <div class="card">
+        <p>Outstanding Balances</p>
+        <h2>${fmtNaira(outstanding)}</h2>
+      </div>
+    `;
+
+    if (!repairs.length) {
+      list.innerHTML = "<p>No repair jobs have been recorded yet.</p>";
+      return;
+    }
+
+    list.innerHTML = `
+      <div style="overflow-x:auto;">
+        <table style="width:100%; border-collapse:collapse;">
+          <thead>
+            <tr>
+              <th>Job Number</th>
+              <th>Customer</th>
+              <th>Device</th>
+              <th>Status</th>
+              <th>Repair Cost</th>
+              <th>Amount Paid</th>
+              <th>Balance</th>
+              <th>Date Received</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${repairs.map(job => `
+              <tr>
+                <td>${escapeRepairText(job.jobNumber)}</td>
+                <td>
+                  ${escapeRepairText(job.customerName)}
+                  <br>
+                  <small>${escapeRepairText(job.customerPhone)}</small>
+                </td>
+                <td>
+                  ${escapeRepairText(job.deviceBrand)}
+                  ${escapeRepairText(job.deviceModel)}
+                </td>
+                <td>${escapeRepairText(job.status)}</td>
+                <td>${fmtNaira(job.repairCost)}</td>
+                <td>${fmtNaira(job.amountPaid)}</td>
+                <td>${fmtNaira(job.balance)}</td>
+                <td>${job.receivedAt ? escapeRepairText(formatDateTime(job.receivedAt)) : "—"}</td>
+                <td>
+                  <button class="btn-secondary" onclick="openRepairDetails('${escapeRepairText(job._id)}')">View
+                  </button>
+                </td>
+              </tr>
+            `).join("")}
+          </tbody>
+        </table>
+      </div>
+    `;
+
+  } catch (error) {
+    console.error("Load repair jobs error:", error);
+    list.innerHTML = `<p style="color:#dc2626;">${escapeRepairText(error.message)}</p>`;
+  }
+}
+
+
+
+function showRepairForm() {
+  const container = document.getElementById("repairFormContainer");
+  const details = document.getElementById("repairDetailsContainer");
+
+  details.hidden = true;
+  container.hidden = false;
+
+  document.getElementById("repairFormContent").innerHTML = `
+    <form id="newRepairForm" onsubmit="submitRepairJob(event)">
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;">
+
+        <label>Customer Name
+          <input name="customerName" required maxlength="100" placeholder="Customer's full name">
+        </label>
+
+        <label>Customer Phone
+          <input name="customerPhone" required maxlength="30" placeholder="Phone number">
+        </label>
+
+        <label>Device Brand
+          <input name="deviceBrand" required maxlength="50" placeholder="e.g. Samsung">
+        </label>
+
+        <label>Device Model
+          <input name="deviceModel" required maxlength="80" placeholder="e.g. Galaxy A12">
+        </label>
+
+        <label>Estimated Cost (₦)
+          <input name="estimatedCost" type="number" min="0" step="0.01" value="0">
+        </label>
+
+        <label>Final Repair Cost (₦)
+          <input name="repairCost" id="repairCostInput" type="number" min="0" step="0.01" required value="0" oninput="updateRepairBalance()">
+        </label>
+
+        <label>Amount Received (₦)
+          <input name="amountPaid" id="repairPaidInput" type="number" min="0" step="0.01" required value="0" oninput="updateRepairBalance()">
+        </label>
+
+        <label>Payment Method
+          <select name="paymentMethod" id="repairPaymentMethod">
+            <option value="cash">Cash</option>
+            <option value="transfer">Transfer</option>
+            <option value="pos">POS</option>
+            <option value="other">Other</option>
+          </select>
+        </label>
+
+        <label>Warranty Period (Days)
+          <input name="warrantyDays" type="number" min="0" max="3650" value="0">
+        </label>
+
+      </div>
+
+      <label style="display:block;margin-top:16px;">
+        Customer's Complaint / Reported Fault
+        <textarea name="reportedFault" required maxlength="2000" rows="3" placeholder="What problem did the customer report?"></textarea>
+      </label>
+
+      <label style="display:block;margin-top:16px;">
+        Initial Diagnosis (Optional)
+        <textarea name="diagnosis" maxlength="2000" rows="2"></textarea>
+      </label>
+
+      <label style="display:block;margin-top:16px;">
+        Repair Notes (Optional)
+        <textarea name="repairNotes" maxlength="3000" rows="2"></textarea>
+      </label>
+
+      <div class="card" style="margin-top:18px;">
+        <p>Outstanding Balance</p>
+        <h2 id="repairBalancePreview">₦0.00</h2>
+      </div>
+
+      <div style="display:flex;gap:10px;margin-top:20px;flex-wrap:wrap;">
+        <button type="submit" class="btn-primary" id="saveRepairButton">
+          Save Repair Job
+        </button>
+
+        <button type="button" class="btn-secondary" onclick="document.getElementById('repairFormContainer').hidden=true">
+          Cancel
+        </button>
+      </div>
+
+    </form>
+  `;
+
+  updateRepairBalance();
+}
+
+
+function updateRepairBalance() {
+  const cost = Number(document.getElementById("repairCostInput")?.value || 0);
+  const paid = Number(document.getElementById("repairPaidInput")?.value || 0);
+
+  const balance = Math.max(0, cost - paid);
+
+  const preview = document.getElementById("repairBalancePreview");
+
+  if (preview) {
+    preview.textContent = fmtNaira(balance, 2);
+  }
+}
+
+
+async function submitRepairJob(event) {
+  event.preventDefault();
+
+  const form = event.target;
+  const formData = new FormData(form);
+  const button = document.getElementById("saveRepairButton");
+
+  const repairCost = Number(formData.get("repairCost"));
+  const amountPaid = Number(formData.get("amountPaid"));
+
+  if (amountPaid > repairCost) {
+    alert("Amount received cannot exceed the repair cost.");
+    return;
+  }
+
+  if (amountPaid > 0 && !formData.get("paymentMethod")) {
+    alert("Select the payment method.");
+    return;
+  }
+
+  const payload = Object.fromEntries(formData.entries());
+
+  [
+    "estimatedCost",
+    "repairCost",
+    "amountPaid",
+    "warrantyDays"
+  ].forEach(field => {
+    payload[field] = Number(payload[field] || 0);
+  });
+
+  button.disabled = true;
+  button.textContent = "Saving...";
+
+  try {
+    const response = await fetch("/api/admin/repairs", {
+      method: "POST",
+      credentials: "same-origin",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(payload)
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.error || "Could not save repair job.");
+    }
+
+    alert("Repair job saved successfully.");
+
+    document.getElementById("repairFormContainer").hidden = true;
+
+    await loadRepairJobs();
+
+  } catch (error) {
+    console.error("Save repair job error:", error);
+    alert(error.message);
+  } finally {
+    button.disabled = false;
+    button.textContent = "Save Repair Job";
+  }
+}
+
+
+async function openRepairDetails(id) {
+  const container = document.getElementById("repairDetailsContainer");
+  const content = document.getElementById("repairDetailsContent");
+
+  document.getElementById("repairFormContainer").hidden = true;
+  container.hidden = false;
+  content.innerHTML = "<p>Loading repair details...</p>";
+
+  container.scrollIntoView({ behavior: "smooth", block: "start" });
+
+  try {
+    const response = await fetch(
+      `/api/admin/repairs/${encodeURIComponent(id)}`,
+      { credentials: "same-origin", cache: "no-store" }
+    );
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.error || "Could not load repair details.");
+    }
+
+    const job = result.repair;
+
+    const payments = job.payments || [];
+
+    content.innerHTML = `
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;">
+
+        <div><small>Job Number</small><h3>${escapeRepairText(job.jobNumber)}</h3></div>
+        <div><small>Customer</small><h3>${escapeRepairText(job.customerName)}</h3></div>
+        <div><small>Phone</small><h3>${escapeRepairText(job.customerPhone)}</h3></div>
+        <div><small>Device</small><h3>${escapeRepairText(job.deviceBrand)} ${escapeRepairText(job.deviceModel)}</h3></div>
+        <div><small>Status</small><h3>${escapeRepairText(job.status)}</h3></div>
+        <div><small>Received</small><h3>${escapeRepairText(formatDateTime(job.receivedAt))}</h3></div>
+        <div><small>Repair Cost</small><h3>${fmtNaira(job.repairCost, 2)}</h3></div>
+        <div><small>Total Received</small><h3>${fmtNaira(job.amountPaid, 2)}</h3></div>
+        <div><small>Outstanding Balance</small><h3>${fmtNaira(job.balance, 2)}</h3></div>
+
+      </div>
+
+      <div style="margin-top:20px;">
+        <h3>Customer Complaint</h3>
+        <p>${escapeRepairText(job.reportedFault)}</p>
+
+        <h3>Diagnosis</h3>
+        <p>${escapeRepairText(job.diagnosis || "Not recorded")}</p>
+
+        <h3>Repair Notes</h3>
+        <p>${escapeRepairText(job.repairNotes || "None")}</p>
+
+        <p><strong>Warranty:</strong> ${Number(job.warrantyDays || 0)} days</p>
+        <p><strong>Warranty Expiry:</strong> ${
+          job.warrantyExpiresAt
+            ? escapeRepairText(formatDateTime(job.warrantyExpiresAt))
+            : "Not applicable"
+        }</p>
+      </div>
+
+      <hr style="margin:24px 0;">
+
+      <h3>Payment History</h3>
+
+      ${Number(job.openingAmountPaid || 0) > 0 ? `
+        <p>Previous recorded payments (historical): 
+          <strong>${fmtNaira(job.openingAmountPaid, 2)}</strong>
+        </p>
+      ` : ""}
+
+      ${payments.length ? `
+        <div style="overflow-x:auto;">
+          <table style="width:100%;border-collapse:collapse;">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Amount</th>
+                <th>Method</th>
+                <th>Reference</th>
+                <th>Notes</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${payments.map(payment => `
+                <tr>
+                  <td>${escapeRepairText(formatDateTime(payment.paidAt))}</td>
+                  <td>${fmtNaira(payment.amount, 2)}</td>
+                  <td>${escapeRepairText(payment.paymentMethod)}</td>
+                  <td>${escapeRepairText(payment.reference || "—")}</td>
+                  <td>${escapeRepairText(payment.notes || "—")}</td>
+                </tr>
+              `).join("")}
+            </tbody>
+          </table>
+        </div>
+      ` : "<p>No individual payment entries recorded.</p>"}
+
+      ${Number(job.balance || 0) > 0 && job.status !== "cancelled" ? `
+        <hr style="margin:24px 0;">
+
+        <h3>Record Instalment Payment</h3>
+
+        <form onsubmit="submitRepairPayment(event, '${escapeRepairText(job._id)}')">
+
+          <label>Amount Received (₦)
+            <input name="amount" type="number" min="0.01" max="${Number(job.balance)}" step="0.01" required>
+          </label>
+
+          <label>Payment Method
+            <select name="paymentMethod" required>
+              <option value="cash">Cash</option>
+              <option value="transfer">Transfer</option>
+              <option value="pos">POS</option>
+              <option value="other">Other</option>
+            </select>
+          </label>
+
+          <label>Payment Reference (Optional)
+            <input name="reference" maxlength="100">
+          </label>
+
+          <label>Notes (Optional)
+            <textarea name="notes" maxlength="500" rows="2"></textarea>
+          </label>
+
+          <button type="submit" class="btn-primary">Record Payment</button>
+        </form>
+      ` : "<p><strong>No outstanding payment to collect.</strong></p>"}
+
+    `;
+  } catch (error) {
+    console.error("Repair details error:", error);
+    content.innerHTML = `<p style="color:#dc2626;">${escapeRepairText(error.message)}</p>`;
+  }
+}
+
+
+async function submitRepairPayment(event, id) {
+  event.preventDefault();
+
+  const form = event.target;
+  const payload = Object.fromEntries(new FormData(form).entries());
+
+  payload.amount = Number(payload.amount);
+
+  const button = form.querySelector('button[type="submit"]');
+  button.disabled = true;
+  button.textContent = "Recording...";
+
+  try {
+    const response = await fetch(
+      `/api/admin/repairs/${encodeURIComponent(id)}/payments`,
+      {
+        method: "POST",
+        credentials: "same-origin",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      }
+    );
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.error || "Could not record payment.");
+    }
+
+    alert("Payment recorded successfully.");
+
+    await loadRepairJobs();
+    await openRepairDetails(id);
+
+  } catch (error) {
+    console.error("Repair payment error:", error);
+    alert(error.message);
+    button.disabled = false;
+    button.textContent = "Record Payment";
+  }
+}
+
+
+
+
 // 2. DISPLAY AND SEARCH INVENTORY
 function renderInventory() {
   const body = document.getElementById("inventoryTableBody");
@@ -2137,6 +6127,1295 @@ async function loadStockMovements() {
     if (error.message !== "Admin session expired.") {
       inventoryMessage(error.message, true);
     }
+  }
+}
+
+
+// ======================================
+// SALES MANAGEMENT
+// ======================================
+
+let currentSales = [];
+let saleAccessoryItems = [];
+
+function escapeSaleHtml(value) {
+  return String(value ?? "").replace(/[&<>"']/g, (char) => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;",
+  })[char]);
+}
+
+function saleNaira(value) {
+  return "₦" + Number(value || 0).toLocaleString("en-NG", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+}
+
+function saleDate(value) {
+  if (typeof formatDateTime === "function") {
+    return formatDateTime(value);
+  }
+
+  return value ? new Date(value).toLocaleString("en-NG") : "—";
+}
+
+
+// LOAD AVAILABLE ACCESSORIES
+
+async function loadSaleInventory() {
+  const response = await fetch(
+    "/api/admin/inventory?category=accessory",
+    {
+      credentials: "same-origin",
+      cache: "no-store",
+    }
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.error || "Unable to load accessories.");
+  }
+
+  saleAccessoryItems = (data.items || []).filter(
+    (item) => Number(item.quantity) > 0
+  );
+
+  return saleAccessoryItems;
+}
+
+
+// DISPLAY NEW SALE FORM
+
+async function showSaleForm() {
+  const container = document.getElementById("saleFormContainer");
+  const content = document.getElementById("saleFormContent");
+
+  document.getElementById("saleDetailsContainer").hidden = true;
+  container.hidden = false;
+
+  content.innerHTML = "<p>Loading available accessories...</p>";
+
+  try {
+    await loadSaleInventory();
+
+    if (!saleAccessoryItems.length) {
+      content.innerHTML = "<p>No accessories currently have available stock.</p>";
+      return;
+    }
+
+    content.innerHTML = `
+      <form id="newSaleForm" onsubmit="submitSaleForm(event)">
+
+        <div class="inventory-form">
+
+          <label>Customer name
+            <input name="customerName" maxlength="150"
+              placeholder="Optional">
+          </label>
+
+          <label>Customer phone
+            <input name="customerPhone" maxlength="20"
+              placeholder="Optional">
+          </label>
+
+        </div>
+
+        <h4>Items</h4>
+
+        <div id="saleItemRows"></div>
+
+        <button type="button" class="btn-secondary"
+          onclick="addSaleItemRow()">
+          + Add Item
+        </button>
+
+        <div style="margin-top:20px;">
+          <p>Subtotal: <strong id="saleSubtotal">₦0.00</strong></p>
+
+          <label>Discount (₦)
+            <input id="saleDiscount" name="discount"
+              type="number" min="0" step="0.01" value="0"
+              oninput="updateSaleTotal()">
+          </label>
+
+          <h3>Total: <span id="saleTotal">₦0.00</span></h3>
+
+          <label>Amount received (₦)
+            <input name="amountPaid" type="number"
+              min="0" step="0.01"
+              placeholder="Leave blank if fully paid">
+          </label>
+
+          <label>Payment method
+            <select name="paymentMethod" required>
+              <option value="cash">Cash</option>
+              <option value="transfer">Transfer</option>
+              <option value="pos">POS</option>
+              <option value="other">Other</option>
+            </select>
+          </label>
+
+          <label>Notes
+            <textarea name="notes" maxlength="1000"
+              placeholder="Optional notes"></textarea>
+          </label>
+        </div>
+
+        <div style="display:flex; gap:10px; margin-top:20px; flex-wrap:wrap;">
+          <button type="submit" class="btn-primary">
+            Save Sale
+          </button>
+
+          <button type="button" class="btn-secondary"
+            onclick="document.getElementById('saleFormContainer').hidden=true">
+            Cancel
+          </button>
+        </div>
+
+        <div id="saleFormMessage" role="status"></div>
+
+      </form>
+    `;
+
+    addSaleItemRow();
+
+  } catch (error) {
+    content.innerHTML = `
+      <p>${escapeSaleHtml(error.message)}</p>
+    `;
+  }
+}
+
+
+// ADD AN ITEM ROW
+
+function addSaleItemRow() {
+  const container = document.getElementById("saleItemRows");
+
+  const options = saleAccessoryItems.map((item) => `
+  <option value="${escapeSaleHtml(item._id)}">
+    ${escapeSaleHtml(item.itemName)}
+    — Stock: ${Number(item.quantity)}
+    — ${saleNaira(item.sellingPrice)}
+  </option>
+`).join("");
+
+  const row = document.createElement("div");
+
+  row.className = "sale-item-row";
+  row.style.cssText =
+    "display:flex;gap:10px;flex-wrap:wrap;margin:12px 0;align-items:center;";
+
+  row.innerHTML = `
+    <select class="sale-item-select" required
+      onchange="updateSaleTotal()"
+      style="flex:2;min-width:180px;">
+      <option value="">Select accessory</option>
+      ${options}
+    </select>
+
+    <input class="sale-item-quantity"
+      type="number" min="1" step="1" value="1"
+      required oninput="updateSaleTotal()"
+      style="width:90px;">
+
+    <button type="button" class="btn-secondary"
+      onclick="this.parentElement.remove();updateSaleTotal()">
+      Remove
+    </button>
+  `;
+
+  container.appendChild(row);
+
+  updateSaleTotal();
+}
+
+
+// CALCULATE SALE TOTAL
+
+function updateSaleTotal() {
+  const rows = document.querySelectorAll(".sale-item-row");
+
+  let subtotal = 0;
+
+  rows.forEach((row) => {
+    const itemId = row.querySelector(".sale-item-select").value;
+    const quantity = Number(
+      row.querySelector(".sale-item-quantity").value
+    );
+
+    const item = saleAccessoryItems.find(
+      (entry) => String(entry._id) === itemId
+    );
+
+    if (item && Number.isInteger(quantity) && quantity > 0) {
+      subtotal += quantity * Number(item.sellingPrice);
+    }
+  });
+
+  const discount = Number(
+    document.getElementById("saleDiscount")?.value || 0
+  );
+
+  document.getElementById("saleSubtotal").textContent =
+    saleNaira(subtotal);
+
+  document.getElementById("saleTotal").textContent =
+    saleNaira(Math.max(0, subtotal - discount));
+}
+
+
+// SAVE NEW SALE
+
+async function submitSaleForm(event) {
+  event.preventDefault();
+
+  const form = event.target;
+  const message = document.getElementById("saleFormMessage");
+
+  const rows = Array.from(
+    document.querySelectorAll(".sale-item-row")
+  );
+
+  const items = [];
+
+  for (const row of rows) {
+    const inventoryItemId =
+      row.querySelector(".sale-item-select").value;
+
+    const quantity = Number(
+      row.querySelector(".sale-item-quantity").value
+    );
+
+    const item = saleAccessoryItems.find(
+      (entry) => String(entry._id) === inventoryItemId
+    );
+
+    if (!item || !Number.isSafeInteger(quantity) || quantity <= 0) {
+      message.textContent = "Select valid accessories and quantities.";
+      return;
+    }
+
+    if (quantity > Number(item.quantity)) {
+      message.textContent =
+        `Insufficient stock for ${item.itemName}.`;
+      return;
+    }
+
+    items.push({
+      inventoryItemId,
+      quantity,
+    });
+  }
+
+  if (!items.length) {
+    message.textContent = "Add at least one item.";
+    return;
+  }
+
+  const discount = Number(form.elements.discount.value || 0);
+  const amountPaidValue = form.elements.amountPaid.value.trim();
+
+  const subtotal = items.reduce((sum, entry) => {
+    const item = saleAccessoryItems.find(
+      (product) => String(product._id) === entry.inventoryItemId
+    );
+
+    return sum + Number(item.sellingPrice) * entry.quantity;
+  }, 0);
+
+  const total = subtotal - discount;
+
+  if (!Number.isFinite(discount) || discount < 0 || discount > subtotal) {
+    message.textContent = "Enter a valid discount.";
+    return;
+  }
+
+  if (
+    amountPaidValue !== "" &&
+    (
+      !Number.isFinite(Number(amountPaidValue)) ||
+      Number(amountPaidValue) < 0 ||
+      Number(amountPaidValue) > total
+    )
+  ) {
+    message.textContent = "Enter a valid amount received.";
+    return;
+  }
+
+  const payload = {
+    customerName: form.elements.customerName.value.trim(),
+    customerPhone: form.elements.customerPhone.value.trim(),
+    items,
+    discount,
+    amountPaid: amountPaidValue === ""
+      ? null
+      : Number(amountPaidValue),
+    paymentMethod: form.elements.paymentMethod.value,
+    notes: form.elements.notes.value.trim(),
+  };
+
+  const submitButton = form.querySelector('button[type="submit"]');
+  submitButton.disabled = true;
+  message.textContent = "Saving sale...";
+
+  try {
+    const response = await fetch("/api/admin/sales", {
+      method: "POST",
+      credentials: "same-origin",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok || !data.success) {
+      throw new Error(data.error || "Unable to save sale.");
+    }
+
+    alert("Sale recorded successfully.");
+
+    document.getElementById("saleFormContainer").hidden = true;
+
+    await loadSales();
+
+    if (typeof loadShopOverview === "function") {
+      loadShopOverview();
+    }
+
+    if (typeof loadInventory === "function") {
+      loadInventory();
+    }
+
+  } catch (error) {
+    message.textContent = error.message;
+    submitButton.disabled = false;
+  }
+}
+
+
+// LOAD SALES HISTORY
+
+async function loadSales() {
+  const container = document.getElementById("salesList");
+  const search = document.getElementById("salesSearch")?.value.trim() || "";
+
+  container.innerHTML = "<p>Loading sales...</p>";
+
+  try {
+    const response = await fetch(
+      "/api/admin/sales?search=" + encodeURIComponent(search),
+      {
+        credentials: "same-origin",
+        cache: "no-store",
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok || !data.success) {
+      throw new Error(data.error || "Unable to retrieve sales.");
+    }
+
+    currentSales = data.sales || [];
+
+    renderSales();
+
+  } catch (error) {
+    container.innerHTML = `
+      <p>${escapeSaleHtml(error.message)}</p>
+    `;
+  }
+}
+
+
+// DISPLAY SALES HISTORY
+
+function renderSales() {
+  const container = document.getElementById("salesList");
+  const summary = document.getElementById("salesSummary");
+
+  const outstanding = currentSales.reduce(
+    (sum, sale) => sum + Number(sale.balance || 0),
+    0
+  );
+
+  summary.innerHTML = `
+    <div class="summary-card">
+      <div class="label">Sales Records</div>
+      <div class="value">${currentSales.length}</div>
+    </div>
+
+    <div class="summary-card">
+      <div class="label">Outstanding Balances</div>
+      <div class="value">${saleNaira(outstanding)}</div>
+    </div>
+  `;
+
+  if (!currentSales.length) {
+    container.innerHTML = "<p>No sales records found.</p>";
+    return;
+  }
+
+  container.innerHTML = `
+    <div class="inventory-table-wrap">
+      <table class="inventory-table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Sale No.</th>
+            <th>Customer</th>
+            <th>Total</th>
+            <th>Paid</th>
+            <th>Balance</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          ${currentSales.map((sale) => {
+            const balance = Number(sale.balance || 0);
+            const paid = Number(sale.amountPaid || 0);
+
+            const status = balance <= 0
+              ? "Paid"
+              : paid > 0
+                ? "Part-paid"
+                : "Unpaid";
+
+            return `
+              <tr>
+                <td>${escapeSaleHtml(saleDate(sale.soldAt))}</td>
+                <td>${escapeSaleHtml(sale.saleNumber)}</td>
+                <td>${escapeSaleHtml(sale.customerName || "Walk-in customer")}</td>
+                <td>${saleNaira(sale.totalAmount)}</td>
+                <td>${saleNaira(paid)}</td>
+                <td>${saleNaira(balance)}</td>
+                <td>${status}</td>
+                <td>
+                  <button type="button" class="btn-secondary"
+                    onclick="openSaleDetails('${escapeSaleHtml(sale._id)}')">
+                    View
+                  </button>
+                </td>
+              </tr>
+            `;
+          }).join("")}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
+
+// VIEW SALE DETAILS AND PAYMENT HISTORY
+
+function openSaleDetails(id) {
+  const sale = currentSales.find(
+    (entry) => String(entry._id) === String(id)
+  );
+
+  if (!sale) {
+    alert("Sale record not found. Refresh the sales list.");
+    return;
+  }
+
+  const container = document.getElementById("saleDetailsContainer");
+  const content = document.getElementById("saleDetailsContent");
+
+  document.getElementById("saleFormContainer").hidden = true;
+  container.hidden = false;
+
+  const payments = sale.payments || [];
+  const items = sale.items || [];
+
+  content.innerHTML = `
+    <p><strong>Sale number:</strong> ${escapeSaleHtml(sale.saleNumber)}</p>
+    <p><strong>Date:</strong> ${escapeSaleHtml(saleDate(sale.soldAt))}</p>
+    <p><strong>Customer:</strong> ${escapeSaleHtml(sale.customerName || "Walk-in customer")}</p>
+    <p><strong>Phone:</strong> ${escapeSaleHtml(sale.customerPhone || "—")}</p>
+
+    <h4>Items</h4>
+
+    <div class="inventory-table-wrap">
+      <table class="inventory-table">
+        <thead>
+          <tr>
+            <th>Item</th>
+            <th>Quantity</th>
+            <th>Unit price</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          ${items.map((item) => `
+            <tr>
+              <td>${escapeSaleHtml(item.itemNameSnapshot)}</td>
+              <td>${Number(item.quantity)}</td>
+              <td>${saleNaira(item.unitSellingPrice)}</td>
+              <td>${saleNaira(item.lineTotal)}</td>
+            </tr>
+          `).join("")}
+        </tbody>
+      </table>
+    </div>
+
+    <p>Subtotal: <strong>${saleNaira(sale.subtotal)}</strong></p>
+    <p>Discount: <strong>${saleNaira(sale.discount)}</strong></p>
+    <p>Total: <strong>${saleNaira(sale.totalAmount)}</strong></p>
+    <p>Amount paid: <strong>${saleNaira(sale.amountPaid)}</strong></p>
+    <p>Outstanding: <strong>${saleNaira(sale.balance)}</strong></p>
+
+    <h4>Payment History</h4>
+
+    ${
+      payments.length
+        ? payments.map((payment) => `
+            <p>
+              ${saleNaira(payment.amount)}
+              — ${escapeSaleHtml(payment.paymentMethod)}
+              — ${escapeSaleHtml(saleDate(payment.paidAt))}
+            </p>
+          `).join("")
+        : "<p>No dated payment records.</p>"
+    }
+
+    ${
+      Number(sale.balance) > 0
+        ? `
+          <h4>Record Additional Payment</h4>
+
+          <form onsubmit="submitSalePayment(event, '${escapeSaleHtml(sale._id)}')">
+
+            <label>Amount received (₦)
+              <input name="amount" type="number"
+                min="0.01" max="${Number(sale.balance)}"
+                step="0.01" required>
+            </label>
+
+            <label>Payment method
+              <select name="paymentMethod" required>
+                <option value="cash">Cash</option>
+                <option value="transfer">Transfer</option>
+                <option value="pos">POS</option>
+                <option value="other">Other</option>
+              </select>
+            </label>
+
+            <label>Reference (optional)
+              <input name="reference" maxlength="150">
+            </label>
+
+            <label>Notes (optional)
+              <textarea name="notes" maxlength="500"></textarea>
+            </label>
+
+            <button type="submit" class="btn-primary">
+              Record Payment
+            </button>
+
+          </form>
+        `
+        : "<p>This sale is fully paid.</p>"
+    }
+
+    <button type="button" class="btn-secondary"
+      style="margin-top:15px;"
+      onclick="document.getElementById('saleDetailsContainer').hidden=true">
+      Close Details
+    </button>
+  `;
+}
+
+
+// RECORD ADDITIONAL PAYMENT
+
+async function submitSalePayment(event, id) {
+  event.preventDefault();
+
+  const form = event.target;
+
+  const payload = {
+    amount: Number(form.elements.amount.value),
+    paymentMethod: form.elements.paymentMethod.value,
+    reference: form.elements.reference.value.trim(),
+    notes: form.elements.notes.value.trim(),
+  };
+
+  try {
+    const response = await fetch(
+      `/api/admin/sales/${encodeURIComponent(id)}/payments`,
+      {
+        method: "POST",
+        credentials: "same-origin",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok || !data.success) {
+      throw new Error(data.message || "Unable to record payment.");
+    }
+
+    alert("Payment recorded successfully.");
+
+    await loadSales();
+
+    openSaleDetails(id);
+
+    if (typeof loadShopOverview === "function") {
+      loadShopOverview();
+    }
+
+  } catch (error) {
+    alert(error.message);
+  }
+}
+
+
+
+// ==========================================
+// EXPENSES MANAGEMENT
+// ==========================================
+
+let currentExpenses = [];
+
+function escapeExpenseHtml(value) {
+  return String(value ?? "").replace(/[&<>"']/g, (char) => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;",
+  })[char]);
+}
+
+function expenseNaira(amount) {
+  return "₦" + Number(amount || 0).toLocaleString("en-NG", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+}
+
+function expenseDate(value) {
+  if (!value) return "—";
+
+  return new Date(value).toLocaleString("en-NG", {
+    timeZone: "Africa/Lagos",
+    weekday: "long",
+    day: "2-digit",
+    month: "2-digit",
+    year: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
+function expenseCategoryLabel(category) {
+  const labels = {
+    rent: "Rent",
+    electricity: "Electricity",
+    internet: "Internet",
+    transport: "Transport",
+    maintenance: "Maintenance",
+    staff: "Staff",
+    marketing: "Marketing",
+    "bank-charges": "Bank Charges",
+    other: "Other",
+  };
+
+  return labels[category] || category;
+}
+
+async function loadExpenses() {
+  const list = document.getElementById("expensesList");
+  if (!list) return;
+
+  list.textContent = "Loading expenses...";
+
+  try {
+    const params = new URLSearchParams();
+
+    const category = document.getElementById("expensesCategory")?.value;
+    const from = document.getElementById("expensesFrom")?.value;
+    const to = document.getElementById("expensesTo")?.value;
+
+    if (category) params.set("category", category);
+
+    // Include the full selected dates in Lagos time.
+    if (from) params.set("from", `${from}T00:00:00+01:00`);
+    if (to) params.set("to", `${to}T23:59:59.999+01:00`);
+
+    const response = await fetch(
+      `/api/admin/expenses?${params.toString()}`,
+      {
+        credentials: "same-origin",
+        cache: "no-store",
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok || !data.success) {
+      throw new Error(data.error || "Unable to load expenses.");
+    }
+
+    currentExpenses = data.expenses || [];
+
+    renderExpenses(data.totalAmount);
+
+  } catch (error) {
+    console.error("Expenses loading error:", error);
+    list.innerHTML = `<p class="error-text">${escapeExpenseHtml(error.message)}</p>`;
+  }
+}
+
+function renderExpenses(totalAmount) {
+  const list = document.getElementById("expensesList");
+  const summary = document.getElementById("expensesSummary");
+
+  if (!list || !summary) return;
+
+  const search = (
+    document.getElementById("expensesSearch")?.value || ""
+  ).trim().toLowerCase();
+
+  const filtered = currentExpenses.filter((expense) => {
+    const searchable = [
+      expense.expenseNumber,
+      expense.description,
+      expense.category,
+      expense.notes,
+    ].join(" ").toLowerCase();
+
+    return searchable.includes(search);
+  });
+
+  const displayedTotal = filtered.reduce(
+    (sum, expense) => sum + Number(expense.amount || 0),
+    0
+  );
+
+  summary.innerHTML = `
+    <div class="summary-card">
+      <h3>Total Expenses</h3>
+      <p>${expenseNaira(search ? displayedTotal : totalAmount)}</p>
+    </div>
+
+    <div class="summary-card">
+      <h3>Expense Records</h3>
+      <p>${filtered.length}</p>
+    </div>
+  `;
+
+  if (!filtered.length) {
+    list.innerHTML = "<p>No expense records found.</p>";
+    return;
+  }
+
+  list.innerHTML = `
+    <div class="table-responsive">
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Expense No.</th>
+            <th>Description</th>
+            <th>Category</th>
+            <th>Payment</th>
+            <th>Amount</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          ${filtered.map((expense) => `
+            <tr>
+              <td>${escapeExpenseHtml(expenseDate(expense.incurredAt))}</td>
+              <td>${escapeExpenseHtml(expense.expenseNumber)}</td>
+              <td>${escapeExpenseHtml(expense.description)}</td>
+              <td>${escapeExpenseHtml(expenseCategoryLabel(expense.category))}</td>
+              <td>${escapeExpenseHtml(expense.paymentMethod)}</td>
+              <td>${expenseNaira(expense.amount)}</td>
+            </tr>
+          `).join("")}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
+function showExpenseForm() {
+  const container = document.getElementById("expenseFormContainer");
+  const content = document.getElementById("expenseFormContent");
+
+  container.hidden = false;
+
+  const now = new Date();
+  const localDateTime = new Date(
+    now.getTime() - now.getTimezoneOffset() * 60000
+  ).toISOString().slice(0, 16);
+
+  content.innerHTML = `
+    <form onsubmit="submitExpenseForm(event)">
+
+      <div class="form-grid">
+
+        <div>
+          <label>Description *</label>
+          <input
+            name="description"
+            type="text"
+            maxlength="500"
+            required
+            placeholder="e.g. Shop electricity bill"
+          >
+        </div>
+
+        <div>
+          <label>Category *</label>
+          <select name="category" required>
+            <option value="">Select category</option>
+            <option value="rent">Rent</option>
+            <option value="electricity">Electricity</option>
+            <option value="internet">Internet</option>
+            <option value="transport">Transport</option>
+            <option value="maintenance">Maintenance</option>
+            <option value="staff">Staff</option>
+            <option value="marketing">Marketing</option>
+            <option value="bank-charges">Bank Charges</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+
+        <div>
+          <label>Amount (₦) *</label>
+          <input
+            name="amount"
+            type="number"
+            min="0.01"
+            step="0.01"
+            required
+            placeholder="Enter amount"
+          >
+        </div>
+
+        <div>
+          <label>Payment Method *</label>
+          <select name="paymentMethod" required>
+            <option value="cash">Cash</option>
+            <option value="transfer">Transfer</option>
+            <option value="pos">POS</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+
+        <div>
+          <label>Date and Time *</label>
+          <input
+            name="incurredAt"
+            type="datetime-local"
+            value="${localDateTime}"
+            required
+          >
+        </div>
+
+        <div>
+          <label>Notes (Optional)</label>
+          <textarea
+            name="notes"
+            maxlength="1000"
+            placeholder="Additional details"
+          ></textarea>
+        </div>
+
+      </div>
+
+      <div style="margin-top:16px; display:flex; gap:10px; flex-wrap:wrap;">
+        <button type="submit" class="btn-primary">
+          Save Expense
+        </button>
+
+        <button
+          type="button"
+          class="btn-secondary"
+          onclick="document.getElementById('expenseFormContainer').hidden=true"
+        >
+          Cancel
+        </button>
+      </div>
+
+    </form>
+  `;
+}
+
+async function submitExpenseForm(event) {
+  event.preventDefault();
+
+  const form = event.target;
+  const formData = new FormData(form);
+
+  const amount = Number(formData.get("amount"));
+  const incurredAt = new Date(formData.get("incurredAt"));
+
+  if (!Number.isFinite(amount) || amount <= 0) {
+    alert("Enter a valid expense amount.");
+    return;
+  }
+
+  if (Number.isNaN(incurredAt.getTime())) {
+    alert("Enter a valid expense date.");
+    return;
+  }
+
+  const payload = {
+    description: String(formData.get("description") || "").trim(),
+    category: formData.get("category"),
+    amount,
+    paymentMethod: formData.get("paymentMethod"),
+    incurredAt: incurredAt.toISOString(),
+    notes: String(formData.get("notes") || "").trim(),
+  };
+
+  const submitButton = form.querySelector('button[type="submit"]');
+  submitButton.disabled = true;
+  submitButton.textContent = "Saving...";
+
+  try {
+    const response = await fetch("/api/admin/expenses", {
+      method: "POST",
+      credentials: "same-origin",
+      cache: "no-store",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok || !data.success) {
+      throw new Error(data.error || "Unable to save expense.");
+    }
+
+    alert("Expense recorded successfully.");
+
+    document.getElementById("expenseFormContainer").hidden = true;
+
+    form.reset();
+
+    await loadExpenses();
+
+  } catch (error) {
+    console.error("Expense saving error:", error);
+    alert(error.message);
+    submitButton.disabled = false;
+    submitButton.textContent = "Save Expense";
+  }
+}
+
+
+// =============================
+// MANUAL VTU TRANSACTIONS
+// =============================
+
+function showManualOrderForm() {
+  const container = document.getElementById("manualOrderFormContainer");
+  const content = document.getElementById("manualOrderFormContent");
+  const message = document.getElementById("manualOrderFormMessage");
+
+  message.textContent = "";
+
+  const lagosDate = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Africa/Lagos",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(new Date());
+
+  content.innerHTML = `
+    <form id="manualOrderForm" onsubmit="submitManualOrder(event)">
+
+      <div class="form-grid">
+
+        <div class="form-group">
+          <label for="manualCustomerName">Customer Name (optional)</label>
+          <input
+            id="manualCustomerName"
+            type="text"
+            maxlength="100"
+            placeholder="Customer name"
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="manualMobileNumber">Customer Phone Number *</label>
+          <input
+            id="manualMobileNumber"
+            type="tel"
+            required
+            maxlength="20"
+            placeholder="08012345678"
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="manualNetwork">Network *</label>
+          <select id="manualNetwork" required>
+            <option value="">Select network</option>
+            <option value="MTN">MTN</option>
+            <option value="Airtel">Airtel</option>
+            <option value="Glo">Glo</option>
+            <option value="9mobile">9mobile</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="manualSize">Data Size / Service *</label>
+          <input
+            id="manualSize"
+            type="text"
+            required
+            maxlength="100"
+            placeholder="e.g. 5GB"
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="manualValidity">Validity (optional)</label>
+          <input
+            id="manualValidity"
+            type="text"
+            maxlength="100"
+            placeholder="e.g. 30 days"
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="manualSellingPrice">Selling Price (₦) *</label>
+          <input
+            id="manualSellingPrice"
+            type="number"
+            required
+            min="0.01"
+            step="0.01"
+            placeholder="1600"
+            oninput="updateManualOrderProfit()"
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="manualWholesaleCost">Wholesale Cost (₦) *</label>
+          <input
+            id="manualWholesaleCost"
+            type="number"
+            required
+            min="0"
+            step="0.01"
+            placeholder="1450"
+            oninput="updateManualOrderProfit()"
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="manualPaymentMethod">Payment Method *</label>
+          <select id="manualPaymentMethod" required>
+            <option value="">Select payment method</option>
+            <option value="cash">Cash</option>
+            <option value="transfer">Bank Transfer</option>
+            <option value="pos">POS</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="manualTransactionDate">Transaction Date *</label>
+          <input
+            id="manualTransactionDate"
+            type="date"
+            required
+            value="${lagosDate}"
+            max="${lagosDate}"
+          >
+        </div>
+
+      </div>
+
+      <div class="form-group" style="margin-top:15px;">
+        <label for="manualNotes">Notes (optional)</label>
+        <textarea
+          id="manualNotes"
+          rows="3"
+          maxlength="1000"
+          placeholder="Additional transaction details"
+        ></textarea>
+      </div>
+
+      <div class="card" style="margin-top:18px; padding:16px;">
+        <h3>Profit Calculation Preview</h3>
+
+        <div id="manualProfitPreview">
+          Enter the selling price and wholesale cost to calculate profit.
+        </div>
+      </div>
+
+      <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:18px;">
+        <button type="submit" class="btn-primary" id="manualOrderSubmitBtn">
+          Save Manual Transaction
+        </button>
+
+        <button
+          type="button"
+          class="btn-secondary"
+          onclick="hideManualOrderForm()"
+        >
+          Cancel
+        </button>
+      </div>
+
+    </form>
+  `;
+
+  container.hidden = false;
+  container.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+
+function hideManualOrderForm() {
+  document.getElementById("manualOrderFormContainer").hidden = true;
+}
+
+
+function updateManualOrderProfit() {
+  const sellingPrice = Number(
+    document.getElementById("manualSellingPrice")?.value
+  );
+
+  const wholesaleCost = Number(
+    document.getElementById("manualWholesaleCost")?.value
+  );
+
+  const preview = document.getElementById("manualProfitPreview");
+
+  if (
+    !Number.isFinite(sellingPrice) ||
+    !Number.isFinite(wholesaleCost) ||
+    sellingPrice <= 0 ||
+    wholesaleCost < 0
+  ) {
+    preview.textContent =
+      "Enter a valid selling price and wholesale cost.";
+    return;
+  }
+
+  const walletFundingFee = sellingPrice * 0.005;
+  const profit = sellingPrice - wholesaleCost - walletFundingFee;
+  const profitMargin = (profit / sellingPrice) * 100;
+
+  preview.innerHTML = `
+    <div style="display:grid; gap:9px;">
+      <div>Customer Payment: <strong>${fmtNaira(sellingPrice, 2)}</strong></div>
+      <div>Paystack Fee: <strong>${fmtNaira(0, 2)}</strong></div>
+      <div>Wallet Funding Fee (0.5%): <strong>${fmtNaira(walletFundingFee, 2)}</strong></div>
+      <div>Wholesale Cost: <strong>${fmtNaira(wholesaleCost, 2)}</strong></div>
+      <hr>
+      <div>Net Profit:
+        <strong style="color:${profit >= 0 ? "var(--green)" : "var(--red)"};">
+          ${fmtNaira(profit, 2)}
+        </strong>
+      </div>
+      <div>Profit Margin: <strong>${profitMargin.toFixed(2)}%</strong></div>
+    </div>
+  `;
+}
+
+
+async function submitManualOrder(event) {
+  event.preventDefault();
+
+  const button = document.getElementById("manualOrderSubmitBtn");
+  const message = document.getElementById("manualOrderFormMessage");
+
+  const transactionDate =
+    document.getElementById("manualTransactionDate").value;
+
+  const payload = {
+    customerName: document.getElementById("manualCustomerName").value.trim(),
+    mobileNumber: document.getElementById("manualMobileNumber").value.trim(),
+    network: document.getElementById("manualNetwork").value,
+    size: document.getElementById("manualSize").value.trim(),
+    validity: document.getElementById("manualValidity").value.trim(),
+    sellingPrice: Number(document.getElementById("manualSellingPrice").value),
+    wholesaleCost: Number(document.getElementById("manualWholesaleCost").value),
+    paymentMethod: document.getElementById("manualPaymentMethod").value,
+    transactionDate: `${transactionDate}T12:00:00+01:00`,
+    notes: document.getElementById("manualNotes").value.trim(),
+  };
+
+  button.disabled = true;
+  button.textContent = "Saving transaction...";
+  message.textContent = "";
+
+  try {
+    const response = await fetch("/api/admin/orders/manual", {
+      method: "POST",
+      credentials: "same-origin",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (response.status === 401) {
+      document.getElementById("dashboard").style.display = "none";
+      document.getElementById("loginScreen").style.display = "block";
+      document.getElementById("passwordInput").value = "";
+      document.getElementById("loginError").textContent =
+        "Your session has expired. Please log in again.";
+      return;
+    }
+
+    const result = await response.json().catch(() => ({}));
+
+    if (!response.ok || !result.success) {
+      throw new Error(result.error || "Unable to save transaction.");
+    }
+
+    // Add the newly saved transaction to the existing Orders list.
+    currentOrders.unshift(result.order);
+
+    renderOrders(currentOrders);
+
+    // Refresh the transaction summary.
+    await loadTransactionSummary("today");
+
+    message.textContent = "Manual transaction saved successfully.";
+    message.style.color = "var(--green)";
+
+    document.getElementById("manualOrderForm").reset();
+
+    alert("Manual VTU transaction recorded successfully.");
+
+    hideManualOrderForm();
+
+  } catch (err) {
+    message.textContent = err.message;
+    message.style.color = "var(--red)";
+  } finally {
+    button.disabled = false;
+    button.textContent = "Save Manual Transaction";
   }
 }
 
