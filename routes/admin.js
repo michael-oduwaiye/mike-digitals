@@ -12,6 +12,7 @@
  * The actual ADMIN_PASSWORD is no longer sent with every admin request.
  */
 
+const { generateExport } = require("../lib/admin-exports");
 const crypto = require("crypto");
 const express = require("express");
 const db = require("../lib/db");
@@ -3341,6 +3342,700 @@ router.get("/expenses", async (req, res) => {
 
     return res.status(500).json({
       error: "Unable to retrieve business expenses.",
+    });
+  }
+});
+
+
+
+/* ==========================================
+   MIKE DIGITALS — ADMIN REPORT EXPORTS
+   All routes inherit requireAdminSession.
+========================================== */
+
+function escapeExportRegex(value) {
+  return String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function applyExportDateRange(filter, field, from, to) {
+  if (!from && !to) return;
+
+  filter[field] = {};
+
+  if (from) {
+    const start = new Date(from);
+
+    if (Number.isNaN(start.getTime())) {
+      throw new Error("Invalid start date.");
+    }
+
+    filter[field].$gte = start;
+  }
+
+  if (to) {
+    const end = new Date(to);
+
+    if (Number.isNaN(end.getTime())) {
+      throw new Error("Invalid end date.");
+    }
+
+    end.setHours(23, 59, 59, 999);
+    filter[field].$lte = end;
+  }
+}
+
+function exportDate(value) {
+  return value ? new Date(value).toISOString() : "";
+}
+
+function exportPayments(payments) {
+  if (!Array.isArray(payments)) return "";
+
+  return payments.map((payment) => [
+    payment.amount,
+    payment.paymentMethod,
+    exportDate(payment.paidAt),
+    payment.reference,
+    payment.notes,
+  ].filter(Boolean).join(" | ")).join("; ");
+}
+
+function exportItems(items) {
+  if (!Array.isArray(items)) return "";
+
+  return items.map((item) => [
+    item.itemNameSnapshot || item.itemName || "",
+    `Qty: ${item.quantity || 0}`,
+    `Unit price: ${item.unitSellingPrice ?? ""}`,
+    `Line total: ${item.lineTotal ?? ""}`,
+  ].join(", ")).join("; ");
+}
+
+function exportRepairParts(parts) {
+  if (!Array.isArray(parts)) return "";
+
+  return parts.map((part) => [
+    part.itemNameSnapshot || "",
+    `Qty: ${part.quantity || 0}`,
+    `Unit cost: ${part.unitCostPrice ?? ""}`,
+  ].join(", ")).join("; ");
+}
+
+function exportSummary(label, records, amountField) {
+  const total = records.reduce(
+    (sum, record) => sum + Number(record[amountField] || 0),
+    0
+  );
+
+  return [
+    { label: "Business", value: "Mike Digitals" },
+    { label: "Total records", value: records.length },
+    ...(amountField
+      ? [{ label: "Total amount (NGN)", value: total }]
+      : []),
+  ];
+}
+
+
+// GET /api/admin/exports/:type/:format
+router.get("/exports/:type/:format", async (req, res) => {
+  try {
+    const type = String(req.params.type || "").toLowerCase();
+    const format = String(req.params.format || "").toLowerCase();
+
+    const supportedTypes = [
+      "orders",
+      "inventory",
+      "movements",
+      "repairs",
+      "sales",
+      "expenses",
+    ];
+
+    const supportedFormats = ["pdf", "xlsx", "docx", "csv"];
+
+    if (!supportedTypes.includes(type)) {
+      return res.status(400).json({
+        error: "Unsupported export record type.",
+      });
+    }
+
+    if (!supportedFormats.includes(format)) {
+      return res.status(400).json({
+        error: "Unsupported export format.",
+      });
+    }
+
+    const query = req.query;
+    let title = "";
+    let columns = [];
+    let records = [];
+    let summary = [];
+    let pdfOptions = {};
+
+    // ======================================
+    // VTU ORDERS — ONLINE + MANUAL
+    // ======================================
+
+    if (type === "orders") {
+      records = await db.readAll();
+
+      const search = String(query.search || "")
+        .trim()
+        .toLowerCase();
+
+      const status = String(query.status || "all").toLowerCase();
+
+      if (!["all", "delivered", "failed", "pending"].includes(status)) {
+        return res.status(400).json({
+          error: "Invalid order status filter.",
+        });
+      }
+
+      records = records.filter((order) => {
+        const orderStatus = String(
+          order.fulfillmentStatus || "pending"
+        ).replace("not_started", "pending");
+
+        const matchesStatus =
+          status === "all" || orderStatus === status;
+
+        const searchable = [
+          order.mobileNumber,
+          order.paystackReference,
+        ].join(" ").toLowerCase();
+
+        return matchesStatus && searchable.includes(search);
+      });
+
+      records.sort(
+        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+      );
+
+      title = "VTU Orders Report";
+
+      columns = [
+        { key: "createdAt", header: "Transaction Date" },
+        { key: "source", header: "Transaction Source" },
+        { key: "customerName", header: "Customer" },
+        { key: "mobileNumber", header: "Phone Number" },
+        { key: "network", header: "Network" },
+        { key: "size", header: "Data Plan" },
+        { key: "validity", header: "Validity" },
+        { key: "sellingPrice", header: "Selling Price (NGN)" },
+        { key: "wholesaleCost", header: "Wholesale Cost (NGN)" },
+        { key: "totalFees", header: "Total Fees (NGN)" },
+        { key: "profit", header: "Profit (NGN)" },
+        { key: "profitMargin", header: "Profit Margin (%)" },
+        { key: "paymentMethod", header: "Payment Method" },
+        { key: "paymentStatus", header: "Payment Status" },
+        { key: "fulfillmentStatus", header: "Fulfilment Status" },
+        { key: "paystackReference", header: "Payment Reference" },
+        { key: "notes", header: "Notes" },
+      ];
+
+      records = records.map((order) => ({
+        ...order,
+        source: order.source || "online",
+        createdAt: exportDate(order.createdAt),
+        fulfillmentStatus: String(
+          order.fulfillmentStatus || "pending"
+        ).replace("not_started", "pending"),
+      }));
+
+      summary = exportSummary("Orders", records, "sellingPrice");
+    }
+
+    // ======================================
+    // INVENTORY
+    // ======================================
+
+    if (type === "inventory") {
+      const filter = {};
+
+      if (query.category) {
+        const allowed = [
+          "accessory",
+          "spare-part",
+          "tool",
+          "other",
+        ];
+
+        if (!allowed.includes(query.category)) {
+          return res.status(400).json({
+            error: "Invalid inventory category.",
+          });
+        }
+
+        filter.category = query.category;
+      }
+
+      if (query.search) {
+        const search = escapeExportRegex(
+          String(query.search).trim()
+        );
+
+        filter.$or = [
+          { itemName: { $regex: search, $options: "i" } },
+          { variant: { $regex: search, $options: "i" } },
+        ];
+      }
+
+      records = await InventoryItem.find(filter)
+        .sort({ itemName: 1 })
+        .lean();
+
+      if (query.lowStock === "true") {
+        records = records.filter(
+          (item) => item.quantity <= item.lowStockThreshold
+        );
+      }
+
+      title = "Inventory Report";
+
+      columns = [
+        { key: "itemName", header: "Item Name" },
+        { key: "category", header: "Category" },
+        { key: "variant", header: "Variant" },
+        { key: "quantity", header: "Quantity in Stock" },
+        { key: "costPrice", header: "Unit Cost (NGN)" },
+        { key: "sellingPrice", header: "Selling Price (NGN)" },
+        { key: "stockValue", header: "Stock Value (NGN)" },
+        { key: "lowStockThreshold", header: "Low Stock Threshold" },
+        { key: "stockStatus", header: "Stock Status" },
+      ];
+
+      records = records.map((item) => ({
+        ...item,
+        stockValue: Number(item.quantity || 0) *
+          Number(item.costPrice || 0),
+        stockStatus:
+          item.quantity <= item.lowStockThreshold
+            ? "Low Stock"
+            : "In Stock",
+      }));
+
+      summary = exportSummary("Inventory", records, "stockValue");
+    }
+
+    // ======================================
+    // STOCK MOVEMENTS
+    // ======================================
+
+    if (type === "movements") {
+      const filter = {};
+
+      if (query.itemId) {
+        if (!mongoose.isValidObjectId(query.itemId)) {
+          return res.status(400).json({
+            error: "Invalid inventory item ID.",
+          });
+        }
+
+        filter.inventoryItemId = query.itemId;
+      }
+
+      if (query.movementType) {
+        const allowed = [
+          "opening-stock",
+          "purchase",
+          "sale",
+          "repair-usage",
+          "return",
+          "adjustment",
+        ];
+
+        if (!allowed.includes(query.movementType)) {
+          return res.status(400).json({
+            error: "Invalid movement type.",
+          });
+        }
+
+        filter.movementType = query.movementType;
+      }
+
+      applyExportDateRange(
+        filter,
+        "createdAt",
+        query.startDate,
+        query.endDate
+      );
+
+      records = await StockMovement.find(filter)
+        .sort({ createdAt: -1 })
+        .lean();
+
+      title = "Stock Movement Report";
+
+      columns = [
+        { key: "createdAt", header: "Date" },
+        { key: "itemNameSnapshot", header: "Item" },
+        { key: "movementType", header: "Movement Type" },
+        { key: "quantityChange", header: "Quantity Change" },
+        { key: "unitCostPrice", header: "Unit Cost (NGN)" },
+        { key: "unitSellingPrice", header: "Unit Selling Price (NGN)" },
+        { key: "referenceType", header: "Reference Type" },
+        { key: "referenceId", header: "Reference ID" },
+        { key: "notes", header: "Notes" },
+      ];
+
+      records = records.map((movement) => ({
+        ...movement,
+        createdAt: exportDate(movement.createdAt),
+      }));
+
+      summary = exportSummary("Stock Movements", records);
+    }
+
+    // ======================================
+    // REPAIR JOBS
+    // ======================================
+
+    if (type === "repairs") {
+      const filter = {
+        isArchived: query.archived === "true"
+          ? true
+          : { $ne: true },
+      };
+
+      if (query.status) {
+        const allowed = [
+          "received",
+          "diagnosing",
+          "awaiting-parts",
+          "in-progress",
+          "repaired",
+          "collected",
+          "unrepairable",
+          "cancelled",
+        ];
+
+        if (!allowed.includes(query.status)) {
+          return res.status(400).json({
+            error: "Invalid repair status.",
+          });
+        }
+
+        filter.status = query.status;
+      }
+
+      if (query.search) {
+        const search = escapeExportRegex(
+          String(query.search).trim()
+        );
+
+        filter.$or = [
+          { jobNumber: { $regex: search, $options: "i" } },
+          { customerName: { $regex: search, $options: "i" } },
+          { customerPhone: { $regex: search, $options: "i" } },
+          { deviceBrand: { $regex: search, $options: "i" } },
+          { deviceModel: { $regex: search, $options: "i" } },
+          { deviceModelNumber: { $regex: search, $options: "i" } },
+        ];
+      }
+
+      records = await RepairJob.find(filter)
+        .sort({ createdAt: -1 })
+        .lean();
+
+      title = "Repair Jobs Report";
+
+      // These columns are used by Excel, Word and CSV.
+      columns = [
+        { key: "jobNumber", header: "Job Number" },
+        { key: "customerName", header: "Customer Name" },
+        { key: "customerPhone", header: "Customer Phone" },
+        { key: "deviceBrand", header: "Device Brand" },
+        { key: "deviceModel", header: "Device Model" },
+        { key: "deviceModelNumber", header: "Model Number" },
+        { key: "reportedFault", header: "Reported Fault" },
+        { key: "diagnosis", header: "Diagnosis" },
+        { key: "repairNotes", header: "Repair Notes" },
+        { key: "status", header: "Status" },
+        { key: "estimatedCost", header: "Estimated Cost (NGN)" },
+        { key: "repairCost", header: "Repair Cost (NGN)" },
+        { key: "amountPaid", header: "Amount Paid (NGN)" },
+        { key: "balance", header: "Balance (NGN)" },
+        { key: "payments", header: "Payment History" },
+        { key: "partsUsed", header: "Parts Used" },
+        { key: "receivedAt", header: "Date Received" },
+        { key: "completedAt", header: "Date Completed" },
+        { key: "collectedAt", header: "Date Collected" },
+        { key: "warrantyExpiresAt", header: "Warranty Expiry" },
+        { key: "internalNotes", header: "Internal Notes" },
+      ];
+
+      // PDF-only columns: exactly match the Repair History layout.
+      const pdfColumns = [
+        { key: "jobNumber", header: "Job ID" },
+        { key: "receivedAt", header: "Date received" },
+        { key: "customerName", header: "Customer" },
+        { key: "device", header: "Device" },
+        { key: "reportedFault", header: "Fault reported" },
+        { key: "partsUsed", header: "Parts used" },
+        { key: "repairCost", header: "Price (NGN)" },
+        { key: "amountPaid", header: "Paid (NGN)" },
+        { key: "balance", header: "Balance (NGN)" },
+        { key: "status", header: "Status" },
+      ];
+
+      const formatRepairDate = (value) => {
+        if (!value) return "—";
+
+        return new Date(value).toLocaleDateString("en-GB", {
+          timeZone: "Africa/Lagos",
+          day: "2-digit",
+          month: "short",
+          year: "numeric",
+        });
+      };
+
+      const formatRepairStatus = (status) => {
+        const labels = {
+          received: "Received",
+          diagnosing: "Diagnosing",
+          "awaiting-parts": "Awaiting Parts",
+          "in-progress": "In Progress",
+          repaired: "Completed",
+          collected: "Collected",
+          unrepairable: "Unrepairable",
+          cancelled: "Cancelled",
+        };
+
+        return labels[status] || status || "—";
+      };
+
+      const pdfRows = records.map((job) => ({
+        jobNumber: job.jobNumber || "—",
+        receivedAt: formatRepairDate(job.receivedAt),
+        customerName: job.customerName || "—",
+        device: [
+          job.deviceBrand,
+          job.deviceModel,
+        ].filter(Boolean).join(" ") || "—",
+        reportedFault: job.reportedFault || "—",
+        partsUsed: Array.isArray(job.partsUsed) && job.partsUsed.length
+          ? job.partsUsed
+              .map((part) => part.itemNameSnapshot || part.itemName || "Part")
+              .join(", ")
+          : "None",
+        repairCost: Number(job.repairCost || 0),
+        amountPaid: Number(job.amountPaid || 0),
+        balance: Number(job.balance || 0),
+        status: formatRepairStatus(job.status),
+      }));
+
+      const filterDescriptions = [];
+
+      if (query.archived === "true") {
+        filterDescriptions.push("Archived records");
+      } else {
+        filterDescriptions.push("Active records");
+      }
+
+      if (query.status) {
+        filterDescriptions.push(
+          `Status: ${formatRepairStatus(query.status)}`
+        );
+      }
+
+      if (query.search) {
+        filterDescriptions.push(`Search: ${String(query.search).trim()}`);
+      }
+
+      pdfOptions = {
+        layout: "repair-history",
+        title: "Repair History",
+        subtitle: filterDescriptions.length === 1 &&
+          !query.status &&
+          !query.search &&
+          query.archived !== "true"
+            ? "Active records · No additional filters"
+            : filterDescriptions.join(" · "),
+        generatedBy: "Michael",
+        columns: pdfColumns,
+        rows: pdfRows,
+      };
+
+      // Preserve the existing comprehensive data for non-PDF exports.
+      records = records.map((job) => ({
+        ...job,
+        payments: exportPayments(job.payments),
+        partsUsed: exportRepairParts(job.partsUsed),
+        receivedAt: exportDate(job.receivedAt),
+        completedAt: exportDate(job.completedAt),
+        collectedAt: exportDate(job.collectedAt),
+        warrantyExpiresAt: exportDate(job.warrantyExpiresAt),
+      }));
+
+      summary = exportSummary("Repairs", records, "repairCost");
+    }
+
+
+    // ======================================
+    // SALES
+    // ======================================
+
+    if (type === "sales") {
+      const filter = {};
+
+      applyExportDateRange(
+        filter,
+        "soldAt",
+        query.from,
+        query.to
+      );
+
+      if (query.search) {
+        const searchText = String(query.search).trim();
+
+        if (searchText.length > 100) {
+          return res.status(400).json({
+            error: "Search term is too long.",
+          });
+        }
+
+        const search = escapeExportRegex(searchText);
+
+        filter.$or = [
+          { saleNumber: { $regex: search, $options: "i" } },
+          { customerName: { $regex: search, $options: "i" } },
+          { customerPhone: { $regex: search, $options: "i" } },
+        ];
+      }
+
+      records = await Sale.find(filter)
+        .sort({ soldAt: -1 })
+        .lean();
+
+      title = "Sales Report";
+
+      columns = [
+        { key: "soldAt", header: "Date Sold" },
+        { key: "saleNumber", header: "Sale Number" },
+        { key: "customerName", header: "Customer Name" },
+        { key: "customerPhone", header: "Customer Phone" },
+        { key: "items", header: "Items Sold" },
+        { key: "subtotal", header: "Subtotal (NGN)" },
+        { key: "discount", header: "Discount (NGN)" },
+        { key: "totalAmount", header: "Total Amount (NGN)" },
+        { key: "amountPaid", header: "Amount Paid (NGN)" },
+        { key: "balance", header: "Balance (NGN)" },
+        { key: "paymentMethod", header: "Payment Method" },
+        { key: "payments", header: "Payment History" },
+        { key: "notes", header: "Notes" },
+      ];
+
+      records = records.map((sale) => ({
+        ...sale,
+        soldAt: exportDate(sale.soldAt),
+        items: exportItems(sale.items),
+        payments: exportPayments(sale.payments),
+      }));
+
+      summary = exportSummary("Sales", records, "totalAmount");
+    }
+
+    // ======================================
+    // BUSINESS EXPENSES
+    // ======================================
+
+    if (type === "expenses") {
+      const filter = {};
+
+      const allowedCategories = [
+        "rent",
+        "electricity",
+        "internet",
+        "transport",
+        "maintenance",
+        "staff",
+        "marketing",
+        "bank-charges",
+        "other",
+      ];
+
+      if (query.category) {
+        if (!allowedCategories.includes(query.category)) {
+          return res.status(400).json({
+            error: "Invalid expense category.",
+          });
+        }
+
+        filter.category = query.category;
+      }
+
+      applyExportDateRange(
+        filter,
+        "incurredAt",
+        query.from,
+        query.to
+      );
+
+      if (query.search) {
+        const search = escapeExportRegex(
+          String(query.search).trim()
+        );
+
+        filter.$or = [
+          { expenseNumber: { $regex: search, $options: "i" } },
+          { description: { $regex: search, $options: "i" } },
+          { category: { $regex: search, $options: "i" } },
+          { notes: { $regex: search, $options: "i" } },
+        ];
+      }
+
+      records = await BusinessExpense.find(filter)
+        .sort({ incurredAt: -1 })
+        .lean();
+
+      title = "Business Expenses Report";
+
+      columns = [
+        { key: "incurredAt", header: "Date" },
+        { key: "expenseNumber", header: "Expense Number" },
+        { key: "description", header: "Description" },
+        { key: "category", header: "Category" },
+        { key: "paymentMethod", header: "Payment Method" },
+        { key: "amount", header: "Amount (NGN)" },
+        { key: "notes", header: "Notes" },
+      ];
+
+      records = records.map((expense) => ({
+        ...expense,
+        incurredAt: exportDate(expense.incurredAt),
+      }));
+
+      summary = exportSummary("Expenses", records, "amount");
+    }
+
+    // ======================================
+    // GENERATE AND SEND FILE
+    // ======================================
+
+    const report = await generateExport({
+      title,
+      columns,
+      rows: records,
+      summary,
+      format,
+      pdfOptions,
+    });
+
+    res.setHeader("Cache-Control", "no-store");
+    res.setHeader("Content-Type", report.contentType);
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename="${report.filename}"`
+    );
+
+    return res.status(200).send(report.buffer);
+
+  } catch (err) {
+    console.error("Admin export error:", err.message);
+
+    return res.status(400).json({
+      error: err.message || "Unable to generate the requested report.",
     });
   }
 });

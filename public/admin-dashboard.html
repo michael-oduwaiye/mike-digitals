@@ -1863,16 +1863,6 @@ body[data-theme="dark"] #shopOverviewSection table th {
   color: #fff;
 }
 
-/* Repair form and details panels */
-#repairJobsSection #repairFormContainer,
-#repairJobsSection #repairDetailsContainer {
-  margin-top: 20px !important;
-  padding: 22px;
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  background: var(--bg-card);
-  box-shadow: var(--shadow);
-}
 
 #repairJobsSection #repairFormContainer h3,
 #repairJobsSection #repairDetailsContainer h3 {
@@ -1981,8 +1971,6 @@ body[data-theme="dark"] #repairJobsList table th {
     font-size: 21px;
   }
 
-  #repairJobsSection > .card,
-  #repairJobsSection #repairFormContainer,
   #repairJobsSection #repairDetailsContainer {
     padding: 16px 13px;
   }
@@ -3532,9 +3520,115 @@ body[data-theme="dark"] #vtuOrdersSection #manualOrderFormContent .card {
   }
 }
 
+.repair-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  align-items: start;
+}
 
+.repair-form-grid > label {
+  min-width: 0;
+}
+
+.repair-form-grid input,
+.repair-form-grid select {
+  box-sizing: border-box;
+  height: 42px;
+}
+
+@media (max-width: 520px) {
+  .repair-form-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
 
 </style>
+
+
+<style>
+/* ==========================================
+   MIKE DIGITALS — CENTERED ADMIN MODALS
+========================================== */
+
+body.admin-modal-open {
+  overflow: hidden;
+}
+
+#adminModalBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 9998;
+  background: rgba(10, 16, 28, 0.62);
+  backdrop-filter: blur(3px);
+}
+
+.admin-modal-panel {
+  position: fixed !important;
+  z-index: 9999 !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+
+  width: min(720px, calc(100vw - 32px));
+  max-width: 720px;
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+
+  margin: 0 !important;
+  padding: 28px !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 16px !important;
+  background: var(--bg-card) !important;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.28) !important;
+}
+
+#saleDetailsContainer.admin-modal-panel {
+  width: min(850px, calc(100vw - 32px));
+  max-width: 850px;
+}
+
+.admin-modal-close {
+  position: sticky;
+  float: right;
+  top: 0;
+  z-index: 2;
+
+  width: 34px;
+  height: 34px;
+  margin: -10px -10px 4px 12px;
+
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 21px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.admin-modal-close:hover {
+  border-color: var(--red);
+  color: var(--red);
+}
+
+.admin-modal-panel > h3 {
+  padding-right: 35px;
+}
+
+@media (max-width: 600px) {
+  .admin-modal-panel,
+  #saleDetailsContainer.admin-modal-panel {
+    width: calc(100vw - 20px);
+    max-height: calc(100vh - 20px);
+    padding: 19px 15px !important;
+    border-radius: 13px;
+  }
+}
+</style>
+
 </head>
 
 <body>
@@ -3731,6 +3825,12 @@ body[data-theme="dark"] #vtuOrdersSection #manualOrderFormContent .card {
         <input id="inventoryLowStock" type="checkbox" onchange="loadInventory()">
         Low stock only
       </label>
+
+      <button type="button" onclick="downloadAdminExport('inventory', 'pdf')">PDF</button>
+      <button type="button" onclick="downloadAdminExport('inventory', 'xlsx')">Excel</button>
+      <button type="button" onclick="downloadAdminExport('inventory', 'docx')">Word</button>
+      <button type="button" onclick="downloadAdminExport('inventory', 'csv')">CSV</button>
+
     </div>
 
     <div class="inventory-table-wrap">
@@ -3765,6 +3865,12 @@ body[data-theme="dark"] #vtuOrdersSection #manualOrderFormContent .card {
         <option value="return">Return</option>
         <option value="adjustment">Adjustment</option>
       </select>
+
+      <button type="button" onclick="downloadAdminExport('movements', 'pdf')">PDF</button>
+      <button type="button" onclick="downloadAdminExport('movements', 'xlsx')">Excel</button>
+      <button type="button" onclick="downloadAdminExport('movements', 'docx')">Word</button>
+      <button type="button" onclick="downloadAdminExport('movements', 'csv')">CSV</button>
+
     </div>
 
     <div class="inventory-table-wrap">
@@ -3818,6 +3924,11 @@ body[data-theme="dark"] #vtuOrdersSection #manualOrderFormContent .card {
       <button type="button" class="btn-secondary" onclick="loadSales()">
         Refresh
       </button>
+
+      <button type="button" class="btn-secondary" onclick="downloadAdminExport('sales', 'pdf')">PDF</button>
+      <button type="button" class="btn-secondary" onclick="downloadAdminExport('sales', 'xlsx')">Excel</button>
+      <button type="button" class="btn-secondary" onclick="downloadAdminExport('sales', 'docx')">Word</button>
+      <button type="button" class="btn-secondary" onclick="downloadAdminExport('sales', 'csv')">CSV</button>
     </div>
 
     <div id="salesList">Loading sales...</div>
@@ -3883,6 +3994,11 @@ body[data-theme="dark"] #vtuOrdersSection #manualOrderFormContent .card {
       <button type="button" class="btn-secondary" onclick="loadExpenses()">
         Refresh
       </button>
+
+      <button type="button" class="btn-secondary" onclick="downloadAdminExport('expenses', 'pdf')">PDF</button>
+      <button type="button" class="btn-secondary" onclick="downloadAdminExport('expenses', 'xlsx')">Excel</button>
+      <button type="button" class="btn-secondary" onclick="downloadAdminExport('expenses', 'docx')">Word</button>
+      <button type="button" class="btn-secondary" onclick="downloadAdminExport('expenses', 'csv')">CSV</button>
     </div>
 
     <div id="expensesList">Loading expenses...</div>
@@ -3956,9 +4072,16 @@ body[data-theme="dark"] #vtuOrdersSection #manualOrderFormContent .card {
         <h3>Repair Records</h3>
         <p>View and manage all recorded repair jobs.</p>
       </div>
-      <button class="btn-secondary" onclick="loadRepairJobs()">
-        Refresh
-      </button>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+        <button class="btn-secondary" onclick="loadRepairJobs()">
+          Refresh
+        </button>
+
+        <button class="btn-secondary" onclick="downloadAdminExport('repairs', 'pdf')">PDF</button>
+        <button class="btn-secondary" onclick="downloadAdminExport('repairs', 'xlsx')">Excel</button>
+        <button class="btn-secondary" onclick="downloadAdminExport('repairs', 'docx')">Word</button>
+        <button class="btn-secondary" onclick="downloadAdminExport('repairs', 'csv')">CSV</button>
+      </div>
     </div>
 
     <div id="repairJobsList">
@@ -3966,15 +4089,32 @@ body[data-theme="dark"] #vtuOrdersSection #manualOrderFormContent .card {
     </div>
   </div>
 
-  <div id="repairFormContainer" class="card" style="margin-top:20px;" hidden>
-    <h3 id="repairFormTitle">New Repair Job</h3>
-    <div id="repairFormContent"></div>
-  </div>
 
-  <div id="repairDetailsContainer" class="card" style="margin-top:20px;" hidden>
-    <h3>Repair Details</h3>
-    <div id="repairDetailsContent"></div>
-  </div>
+  <div id="repairFormContainer"
+     class="card"
+     role="dialog"
+     aria-modal="true"
+     aria-labelledby="repairFormTitle"
+     tabindex="-1"
+     hidden>
+
+  <h3 id="repairFormTitle">New Repair Job</h3>
+  <div id="repairFormContent"></div>
+</div>
+
+<div id="repairDetailsContainer"
+     class="card"
+     role="dialog"
+     aria-modal="true"
+     aria-labelledby="repairDetailsTitle"
+     tabindex="-1"
+     hidden>
+
+  <h3 id="repairDetailsTitle">Repair Details</h3>
+  <div id="repairDetailsContent"></div>
+</div>
+
+
 
 </section>
 
@@ -4056,6 +4196,12 @@ body[data-theme="dark"] #vtuOrdersSection #manualOrderFormContent .card {
       <option value="failed">Failed</option>
       <option value="pending">Pending</option>
     </select>
+
+    <button type="button" onclick="downloadAdminExport('orders', 'pdf')">PDF</button>
+    <button type="button" onclick="downloadAdminExport('orders', 'xlsx')">Excel</button>
+    <button type="button" onclick="downloadAdminExport('orders', 'docx')">Word</button>
+    <button type="button" onclick="downloadAdminExport('orders', 'csv')">CSV</button>
+
   </div>
 
     <div id="ordersList"></div>
@@ -4072,6 +4218,180 @@ body[data-theme="dark"] #vtuOrdersSection #manualOrderFormContent .card {
 let currentOrders = [];
 
 let inventoryItems = [];
+
+
+// ==========================================
+// SHARED ADMIN MODAL CONTROLLER
+// ==========================================
+
+let activeAdminModal = null;
+
+function openAdminModal(container) {
+  if (!container) return;
+
+  // Close any previously open modal.
+  if (activeAdminModal && activeAdminModal !== container) {
+    closeAdminModal(activeAdminModal);
+  }
+
+  let backdrop = document.getElementById("adminModalBackdrop");
+
+  if (!backdrop) {
+    backdrop = document.createElement("div");
+    backdrop.id = "adminModalBackdrop";
+    backdrop.addEventListener("click", () => {
+      if (activeAdminModal) {
+        closeAdminModal(activeAdminModal);
+      }
+    });
+
+    document.body.appendChild(backdrop);
+  }
+
+  container.hidden = false;
+  container.classList.add("admin-modal-panel");
+
+  if (!container.querySelector(".admin-modal-close")) {
+    const closeButton = document.createElement("button");
+    closeButton.type = "button";
+    closeButton.className = "admin-modal-close";
+    closeButton.setAttribute("aria-label", "Close modal");
+    closeButton.innerHTML = "&times;";
+    closeButton.addEventListener("click", () => {
+      closeAdminModal(container);
+    });
+
+    container.prepend(closeButton);
+  }
+
+  document.body.classList.add("admin-modal-open");
+  activeAdminModal = container;
+}
+
+function closeAdminModal(container) {
+  if (!container) return;
+
+  container.hidden = true;
+  container.classList.remove("admin-modal-panel");
+
+  const closeButton = container.querySelector(".admin-modal-close");
+  if (closeButton) closeButton.remove();
+
+  if (activeAdminModal === container) {
+    activeAdminModal = null;
+  }
+
+  if (!activeAdminModal) {
+    document.body.classList.remove("admin-modal-open");
+    document.getElementById("adminModalBackdrop")?.remove();
+  }
+}
+
+// Close the active modal with Escape.
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && activeAdminModal) {
+    closeAdminModal(activeAdminModal);
+  }
+});
+
+
+async function downloadAdminExport(type, format) {
+  const params = new URLSearchParams();
+
+  // Orders
+  if (type === "orders") {
+    const search = document.getElementById("orderSearch")?.value.trim();
+    const status = document.getElementById("orderStatusFilter")?.value;
+
+    if (search) params.set("search", search);
+    if (status && status !== "all") params.set("status", status);
+  }
+
+  // Inventory
+  if (type === "inventory") {
+    const search = document.getElementById("inventorySearch")?.value.trim();
+    const category = document.getElementById("inventoryCategory")?.value;
+    const lowStock = document.getElementById("inventoryLowStock")?.checked;
+
+    if (search) params.set("search", search);
+    if (category && category !== "all") params.set("category", category);
+    if (lowStock) params.set("lowStock", "true");
+  }
+
+  // Stock movements
+  if (type === "movements") {
+    const movementType =
+      document.getElementById("movementTypeFilter")?.value;
+
+    if (movementType && movementType !== "all") {
+      params.set("movementType", movementType);
+    }
+  }
+
+  // Sales
+  if (type === "sales") {
+    const search = document.getElementById("salesSearch")?.value.trim();
+    if (search) params.set("search", search);
+  }
+
+  // Expenses
+  if (type === "expenses") {
+    const category = document.getElementById("expensesCategory")?.value;
+    const from = document.getElementById("expensesFrom")?.value;
+    const to = document.getElementById("expensesTo")?.value;
+    const search = document.getElementById("expensesSearch")?.value.trim();
+
+    if (category && category !== "all") params.set("category", category);
+    if (from) params.set("from", `${from}T00:00:00+01:00`);
+    if (to) params.set("to", `${to}T23:59:59.999+01:00`);
+    if (search) params.set("search", search);
+  }
+
+  const query = params.toString();
+  const url =
+    `/api/admin/exports/${encodeURIComponent(type)}/${encodeURIComponent(format)}` +
+    (query ? `?${query}` : "");
+
+  try {
+    const response = await fetch(url, {
+      method: "GET",
+      credentials: "same-origin",
+      cache: "no-store",
+    });
+
+    if (!response.ok) {
+      let message = "Export failed. Please try again.";
+
+      try {
+        const result = await response.json();
+        if (result.message) message = result.message;
+        else if (result.error) message = result.error;
+      } catch (_) {}
+
+      if (response.status === 401 || response.status === 403) {
+        message = "Your admin session has expired. Please log in again.";
+      }
+
+      alert(message);
+      return;
+    }
+
+    const blob = await response.blob();
+    const objectUrl = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+
+    link.href = objectUrl;
+    link.download = `${type}-report.${format}`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+
+    URL.revokeObjectURL(objectUrl);
+  } catch (error) {
+    console.error("Admin export error:", error);
+    alert("Unable to download the report. Check your connection and try again.");
+  }
+}
 
 
 function showDashboardView(viewId, button) {
@@ -5417,13 +5737,13 @@ function showRepairForm() {
   const container = document.getElementById("repairFormContainer");
   const details = document.getElementById("repairDetailsContainer");
 
-  details.hidden = true;
-  container.hidden = false;
+  closeAdminModal(details);
+  openAdminModal(container);
 
   document.getElementById("repairFormContent").innerHTML = `
     <form id="newRepairForm" onsubmit="submitRepairJob(event)">
 
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;">
+      <div class="repair-form-grid">
 
         <label>Customer Name
           <input name="customerName" required maxlength="100" placeholder="Customer's full name">
@@ -5493,7 +5813,7 @@ function showRepairForm() {
           Save Repair Job
         </button>
 
-        <button type="button" class="btn-secondary" onclick="document.getElementById('repairFormContainer').hidden=true">
+        <button type="button" class="btn-secondary" onclick="closeAdminModal(document.       getElementById('repairFormContainer'))">
           Cancel
         </button>
       </div>
@@ -5571,7 +5891,7 @@ async function submitRepairJob(event) {
 
     alert("Repair job saved successfully.");
 
-    document.getElementById("repairFormContainer").hidden = true;
+    closeAdminModal(document.getElementById("repairFormContainer"));
 
     await loadRepairJobs();
 
@@ -5586,14 +5906,9 @@ async function submitRepairJob(event) {
 
 
 async function openRepairDetails(id) {
-  const container = document.getElementById("repairDetailsContainer");
-  const content = document.getElementById("repairDetailsContent");
-
-  document.getElementById("repairFormContainer").hidden = true;
-  container.hidden = false;
+  closeAdminModal(document.getElementById("repairFormContainer"));
+  openAdminModal(container);
   content.innerHTML = "<p>Loading repair details...</p>";
-
-  container.scrollIntoView({ behavior: "smooth", block: "start" });
 
   try {
     const response = await fetch(
@@ -6136,7 +6451,7 @@ async function loadStockMovements() {
 // ======================================
 
 let currentSales = [];
-let saleAccessoryItems = [];
+let saleInventoryItems = [];
 
 function escapeSaleHtml(value) {
   return String(value ?? "").replace(/[&<>"']/g, (char) => ({
@@ -6164,11 +6479,11 @@ function saleDate(value) {
 }
 
 
-// LOAD AVAILABLE ACCESSORIES
+// LOAD AVAILABLE INVENTORY ITEMS
 
 async function loadSaleInventory() {
   const response = await fetch(
-    "/api/admin/inventory?category=accessory",
+    "/api/admin/inventory",
     {
       credentials: "same-origin",
       cache: "no-store",
@@ -6178,14 +6493,14 @@ async function loadSaleInventory() {
   const data = await response.json();
 
   if (!response.ok) {
-    throw new Error(data.error || "Unable to load accessories.");
+    throw new Error(data.error || "Unable to load inventory items.");
   }
 
-  saleAccessoryItems = (data.items || []).filter(
+  saleInventoryItems = (data.items || []).filter(
     (item) => Number(item.quantity) > 0
   );
 
-  return saleAccessoryItems;
+  return saleInventoryItems;
 }
 
 
@@ -6195,16 +6510,16 @@ async function showSaleForm() {
   const container = document.getElementById("saleFormContainer");
   const content = document.getElementById("saleFormContent");
 
-  document.getElementById("saleDetailsContainer").hidden = true;
-  container.hidden = false;
+  closeAdminModal(document.getElementById("saleDetailsContainer"));
+  openAdminModal(container);
 
-  content.innerHTML = "<p>Loading available accessories...</p>";
+  content.innerHTML = "<p>Loading available inventory items...</p>";
 
   try {
     await loadSaleInventory();
 
-    if (!saleAccessoryItems.length) {
-      content.innerHTML = "<p>No accessories currently have available stock.</p>";
+    if (!saleInventoryItems.length) {
+      content.innerHTML = "<p>No inventory items currently have available stock.</p>";
       return;
     }
 
@@ -6272,7 +6587,7 @@ async function showSaleForm() {
           </button>
 
           <button type="button" class="btn-secondary"
-            onclick="document.getElementById('saleFormContainer').hidden=true">
+            onclick="closeAdminModal(document.getElementById('saleFormContainer'))">
             Cancel
           </button>
         </div>
@@ -6292,47 +6607,143 @@ async function showSaleForm() {
 }
 
 
+
+// FILTER INVENTORY ITEMS BY CATEGORY
+
+function setSaleItemCategory(button, category) {
+  const row = button.closest(".sale-item-row");
+
+  if (!row) return;
+
+  row.dataset.category = category;
+
+  // Update the active category button.
+  row.querySelectorAll(".sale-category-filter").forEach((filter) => {
+    const active = filter.dataset.category === category;
+
+    filter.style.backgroundColor = active ? "#f97316" : "";
+    filter.style.color = active ? "#ffffff" : "";
+    filter.style.borderColor = active ? "#f97316" : "";
+  });
+
+  // Reset the selected item when the category changes.
+  const select = row.querySelector(".sale-item-select");
+  select.value = "";
+
+  const filteredItems = saleInventoryItems.filter((item) => {
+    return category === "all" || item.category === category;
+  });
+
+  select.innerHTML = `
+    <option value="">Select inventory item</option>
+    ${filteredItems.map((item) => `
+      <option value="${escapeSaleHtml(item._id)}">
+        ${escapeSaleHtml(item.itemName)}
+        — Stock: ${Number(item.quantity)}
+        — ${saleNaira(item.sellingPrice)}
+      </option>
+    `).join("")}
+  `;
+
+  updateSaleTotal();
+}
+
+
 // ADD AN ITEM ROW
 
 function addSaleItemRow() {
   const container = document.getElementById("saleItemRows");
 
-  const options = saleAccessoryItems.map((item) => `
-  <option value="${escapeSaleHtml(item._id)}">
-    ${escapeSaleHtml(item.itemName)}
-    — Stock: ${Number(item.quantity)}
-    — ${saleNaira(item.sellingPrice)}
-  </option>
-`).join("");
-
   const row = document.createElement("div");
 
   row.className = "sale-item-row";
+  row.dataset.category = "all";
+
   row.style.cssText =
-    "display:flex;gap:10px;flex-wrap:wrap;margin:12px 0;align-items:center;";
+    "display:flex;flex-direction:column;gap:8px;margin:16px 0;padding:12px;border:1px solid #ddd;border-radius:8px;";
 
   row.innerHTML = `
-    <select class="sale-item-select" required
-      onchange="updateSaleTotal()"
-      style="flex:2;min-width:180px;">
-      <option value="">Select accessory</option>
-      ${options}
-    </select>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;">
 
-    <input class="sale-item-quantity"
-      type="number" min="1" step="1" value="1"
-      required oninput="updateSaleTotal()"
-      style="width:90px;">
+      <button type="button"
+        class="btn-secondary sale-category-filter"
+        data-category="all"
+        onclick="setSaleItemCategory(this, 'all')">
+        All
+      </button>
 
-    <button type="button" class="btn-secondary"
-      onclick="this.parentElement.remove();updateSaleTotal()">
-      Remove
-    </button>
+      <button type="button"
+        class="btn-secondary sale-category-filter"
+        data-category="accessory"
+        onclick="setSaleItemCategory(this, 'accessory')">
+        Accessories
+      </button>
+
+      <button type="button"
+        class="btn-secondary sale-category-filter"
+        data-category="spare-part"
+        onclick="setSaleItemCategory(this, 'spare-part')">
+        Spare Parts
+      </button>
+
+      <button type="button"
+        class="btn-secondary sale-category-filter"
+        data-category="tool"
+        onclick="setSaleItemCategory(this, 'tool')">
+        Tools
+      </button>
+
+      <button type="button"
+        class="btn-secondary sale-category-filter"
+        data-category="other"
+        onclick="setSaleItemCategory(this, 'other')">
+        Other
+      </button>
+
+    </div>
+
+    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+
+      <select class="sale-item-select"
+        required
+        onchange="updateSaleTotal()"
+        style="flex:2;min-width:180px;">
+        <option value="">Select inventory item</option>
+        ${saleInventoryItems.map((item) => `
+          <option value="${escapeSaleHtml(item._id)}">
+            ${escapeSaleHtml(item.itemName)}
+            — Stock: ${Number(item.quantity)}
+            — ${saleNaira(item.sellingPrice)}
+          </option>
+        `).join("")}
+      </select>
+
+      <input class="sale-item-quantity"
+        type="number"
+        min="1"
+        step="1"
+        value="1"
+        required
+        oninput="updateSaleTotal()"
+        style="width:90px;">
+
+      <button type="button"
+        class="btn-secondary"
+        onclick="this.closest('.sale-item-row').remove();updateSaleTotal()">
+        Remove
+      </button>
+
+    </div>
   `;
 
   container.appendChild(row);
 
-  updateSaleTotal();
+  // Highlight All as the default category.
+  const allButton = row.querySelector(
+    '.sale-category-filter[data-category="all"]'
+  );
+
+  setSaleItemCategory(allButton, "all");
 }
 
 
@@ -6349,7 +6760,7 @@ function updateSaleTotal() {
       row.querySelector(".sale-item-quantity").value
     );
 
-    const item = saleAccessoryItems.find(
+    const item = saleInventoryItems.find(
       (entry) => String(entry._id) === itemId
     );
 
@@ -6392,12 +6803,12 @@ async function submitSaleForm(event) {
       row.querySelector(".sale-item-quantity").value
     );
 
-    const item = saleAccessoryItems.find(
+    const item = saleInventoryItems.find(
       (entry) => String(entry._id) === inventoryItemId
     );
 
     if (!item || !Number.isSafeInteger(quantity) || quantity <= 0) {
-      message.textContent = "Select valid accessories and quantities.";
+      message.textContent = "Select valid inventory items and quantities.";
       return;
     }
 
@@ -6422,7 +6833,7 @@ async function submitSaleForm(event) {
   const amountPaidValue = form.elements.amountPaid.value.trim();
 
   const subtotal = items.reduce((sum, entry) => {
-    const item = saleAccessoryItems.find(
+    const item = saleInventoryItems.find(
       (product) => String(product._id) === entry.inventoryItemId
     );
 
@@ -6482,7 +6893,7 @@ async function submitSaleForm(event) {
 
     alert("Sale recorded successfully.");
 
-    document.getElementById("saleFormContainer").hidden = true;
+    closeAdminModal(document.getElementById("saleFormContainer"));
 
     await loadSales();
 
@@ -6631,8 +7042,8 @@ function openSaleDetails(id) {
   const container = document.getElementById("saleDetailsContainer");
   const content = document.getElementById("saleDetailsContent");
 
-  document.getElementById("saleFormContainer").hidden = true;
-  container.hidden = false;
+  closeAdminModal(document.getElementById("saleFormContainer"));
+  openAdminModal(container);
 
   const payments = sale.payments || [];
   const items = sale.items || [];
@@ -6730,7 +7141,7 @@ function openSaleDetails(id) {
 
     <button type="button" class="btn-secondary"
       style="margin-top:15px;"
-      onclick="document.getElementById('saleDetailsContainer').hidden=true">
+      onclick="closeAdminModal(document.getElementById('saleDetailsContainer'))">
       Close Details
     </button>
   `;
@@ -6961,7 +7372,7 @@ function showExpenseForm() {
   const container = document.getElementById("expenseFormContainer");
   const content = document.getElementById("expenseFormContent");
 
-  container.hidden = false;
+  openAdminModal(container);
 
   const now = new Date();
   const localDateTime = new Date(
@@ -7051,7 +7462,7 @@ function showExpenseForm() {
         <button
           type="button"
           class="btn-secondary"
-          onclick="document.getElementById('expenseFormContainer').hidden=true"
+          onclick="closeAdminModal(document.getElementById('expenseFormContainer'))"
         >
           Cancel
         </button>
@@ -7112,7 +7523,7 @@ async function submitExpenseForm(event) {
 
     alert("Expense recorded successfully.");
 
-    document.getElementById("expenseFormContainer").hidden = true;
+    closeAdminModal(document.getElementById("expenseFormContainer"));
 
     form.reset();
 
@@ -7288,13 +7699,16 @@ function showManualOrderForm() {
     </form>
   `;
 
-  container.hidden = false;
-  container.scrollIntoView({ behavior: "smooth", block: "start" });
+  openAdminModal(container);
 }
 
 
 function hideManualOrderForm() {
-  document.getElementById("manualOrderFormContainer").hidden = true;
+  function hideManualOrderForm() {
+  closeAdminModal(
+    document.getElementById("manualOrderFormContainer")
+  );
+  }
 }
 
 
