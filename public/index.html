@@ -322,7 +322,11 @@ initTheme();
 
 
 // SET THIS to your backend's current public URL
-const BACKEND_URL = "https://michael-stack-telecoms.onrender.com";
+const BACKEND_URL =
+  window.location.hostname === "localhost" ||
+  window.location.hostname === "127.0.0.1"
+    ? window.location.origin
+    : "https://michael-stack-telecoms.onrender.com";
 
 const plans = {
   mtn: [],

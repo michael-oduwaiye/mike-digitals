@@ -53,6 +53,42 @@ const PLANS = [
     fulfillment: [{ dataId: 447, wholesaleCost: 1450 }],
   },
 
+
+  // ---------------- MTN AWOOF PLANS (2 DAYS) ----------------
+  {
+    id: "mtn-4gb-2d",
+    network: "mtn",
+    size: "4GB",
+    validity: "2 days",
+    sellingPrice: 1200,
+    fulfillment: [{ dataId: 873, wholesaleCost: 970 }],
+  },
+  {
+    id: "mtn-5gb-2d",
+    network: "mtn",
+    size: "5GB",
+    validity: "2 days",
+    sellingPrice: 1350,
+    fulfillment: [{ dataId: 874, wholesaleCost: 1164 }],
+  },
+  {
+    id: "mtn-6.5gb-2d",
+    network: "mtn",
+    size: "6.5GB",
+    validity: "2 days",
+    sellingPrice: 1650,
+    fulfillment: [{ dataId: 875, wholesaleCost: 1455 }],
+  },
+  {
+    id: "mtn-8gb-2d",
+    network: "mtn",
+    size: "8GB",
+    validity: "2 days",
+    sellingPrice: 1900,
+    fulfillment: [{ dataId: 876, wholesaleCost: 1746 }],
+  },
+
+
   // ---------------- GLO ----------------
   {
     id: "glo-45mb-1d",
