@@ -83,6 +83,7 @@ mongoose
   .connect(process.env.MONGODB_URI)
   .then(async () => {
     console.log("✅ Connected to MongoDB");
+    await db.migrateAirtel878();
 
     // Add configured plans that are missing from MongoDB.
     // Existing plan records will not be overwritten.

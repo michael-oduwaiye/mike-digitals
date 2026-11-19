@@ -274,13 +274,16 @@
   </div>
 
   <div class="network-toggle" id="networkToggle">
-    <button class="network-btn active" data-network="mtn">
-      <span class="sig-bars"><i></i><i></i><i></i><i></i></span> MTN
-    </button>
-    <button class="network-btn" data-network="glo">
-      <span class="sig-bars"><i></i><i></i><i></i><i></i></span> Glo
-    </button>
-  </div>
+  <button class="network-btn active" data-network="mtn">
+    <span class="sig-bars"><i></i><i></i><i></i><i></i></span> MTN
+  </button>
+  <button class="network-btn" data-network="glo">
+    <span class="sig-bars"><i></i><i></i><i></i><i></i></span> Glo
+  </button>
+  <button class="network-btn" data-network="airtel">
+    <span class="sig-bars"><i></i><i></i><i></i><i></i></span> Airtel
+  </button>
+</div>
 
   <div class="plan-grid" id="planGrid"></div>
 </div>
@@ -331,6 +334,7 @@ const BACKEND_URL =
 const plans = {
   mtn: [],
   glo: [],
+  airtel: [],
 };
 
 let plansLoaded = false;
@@ -362,6 +366,7 @@ async function loadPlans() {
 
     plans.mtn = [];
     plans.glo = [];
+    plans.airtel = [];
 
     data.forEach(item => {
       const network = String(item.network || "").toLowerCase();

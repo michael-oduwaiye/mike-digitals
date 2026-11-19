@@ -24,6 +24,7 @@
 const NETWORK_IDS = {
   mtn: 1,
   glo: 2,
+  airtel: 3,
 };
 
 const PLANS = [
@@ -86,6 +87,15 @@ const PLANS = [
     validity: "2 days",
     sellingPrice: 1900,
     fulfillment: [{ dataId: 876, wholesaleCost: 1746 }],
+  },
+
+  {
+    id: "mtn-1gb-1d-265",
+    network: "mtn",
+    size: "1GB",
+    validity: "1 day",
+    sellingPrice: 350,
+    fulfillment: [{ dataId: 265, wholesaleCost: 320 }], // MTN 1GB Daily
   },
 
 
@@ -188,6 +198,25 @@ const PLANS = [
     sellingPrice: 2000,
     fulfillment: [{ dataId: 494, wholesaleCost: 1888 }],
   },
+
+    // ---------------- AIRTEL ----------------
+  {
+    id: "airtel-1gb-1d-877",
+    network: "airtel",
+    size: "1GB",
+    validity: "1 day",
+    sellingPrice: 300,
+    fulfillment: [{ dataId: 877, wholesaleCost: 260 }], // AIRTEL SME 1GB Daily
+  },
+  {
+    id: "airtel-2.5gb-1d-878",
+    network: "airtel",
+    size: "2.5GB",
+    validity: "1 day",
+    sellingPrice: 550,
+    fulfillment: [{ dataId: 878, wholesaleCost: 525 }], // AIRTEL SME 2.5GB
+  },
+
 ];
 
 function getPlanById(id) {
